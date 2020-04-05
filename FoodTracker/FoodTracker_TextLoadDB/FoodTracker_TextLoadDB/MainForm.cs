@@ -33,7 +33,7 @@ namespace FoodTracker_TextLoadDB
         public static readonly Regex regexNumberValue = new Regex(
             @"^\d+([\./]{1}\d+)?$");
         public static readonly Regex regexDishResult = new Regex(
-            @"^\>===(?<Amount>\d+(g\b|ml\b|\b)) (?<Name>[^@]+) (@(?<Brand>.+) )?(?<Macros>[\d\.]{1,4}/[\d\.]{1,4}/[\d\.]{1,4}$)");
+            @"^\>===(?<Amount>\d+(g\b|ml\b|\b)) (?<Name>[^@]+) (@(?<Brand>.+) )?(?<Macros>[\d\.]{1,5}/[\d\.]{1,5}/[\d\.]{1,5}$)");
 
         public static List<FoodItem> Foods;     //global list of all Food Items(dishes included) found in current program state
         public static List<DayEntry> Days;      //global list of all Day Entries found in current program state
@@ -80,6 +80,30 @@ namespace FoodTracker_TextLoadDB
         {
             for (DateTime date = calendar.SelectionStart; date <= calendar.SelectionEnd; date = date.AddDays(1))
                 yield return date;
+        }
+        #endregion
+
+        #region Form KeyPress&TextChanges
+        private void textBox_searchFood_KeyPress(object sender, KeyPressEventArgs e)    //handles Enter for food search
+        {
+            if (e.KeyChar == 13)    //checks if Enter was typed
+            {
+                button_searchFood.PerformClick();   //triggers searchFood button click event
+                e.Handled = true;                   //sets keypress event as handled(stops whatever else was gonna happen like putting char in textbox)
+            }
+            else e.Handled = false;                 //sets keypress event as not handled(continues to do whatever normal keypress things should happen)
+        }
+        private void output_TextChanged(object sender, EventArgs e)     //scrolls down when output text changes
+        {
+            output.ScrollToCaret();
+        }
+        private void MainForm_KeyPress(object sender, KeyPressEventArgs e)  //clears the output when ` is pressed anywhere on the form 
+        {
+            if (e.KeyChar == '`')
+            {
+                button_clear.PerformClick();
+                e.Handled = true;
+            }
         }
         #endregion
 
@@ -443,7 +467,11 @@ namespace FoodTracker_TextLoadDB
             output.AppendText($"TESTING...\n");
             Stopwatch timer = Stopwatch.StartNew();
 
-            output.AppendText("" + "xasd".CompareTo("dsa") + "!!");
+            int en= (char)Keys.Enter;
+            MessageBox.Show("" + en);
+
+            en = (char)Keys.Divide;
+            MessageBox.Show("" + en);
 
             timer.Stop();
             output.AppendText($"\n...DONE! ({timer.Elapsed})\n");

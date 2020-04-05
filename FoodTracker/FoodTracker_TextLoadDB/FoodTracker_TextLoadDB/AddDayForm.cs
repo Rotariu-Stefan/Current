@@ -463,9 +463,13 @@ namespace FoodTracker_TextLoadDB
         private void textBox_noteScore_TextChanged(object sender, EventArgs e) => checkNotePasted(textBox_noteScore);
         private void textBox_noteMealScore_TextChanged(object sender, EventArgs e) => checkNotePasted(textBox_noteMealScore);
         private void textBox_portion_TextChanged(object sender, EventArgs e) => checkNumberPasted(textBox_portion);
+        private void output_TextChanged(object sender, EventArgs e)     //scrolls down when output text changes
+        {
+            output.ScrollToCaret();
+        }
         #endregion
 
-        private void button_WTF_Click(object sender, EventArgs e)       ///tests whatever I feel like
+        private void button_WTF_Click(object sender, EventArgs e)       //tests whatever I feel like
         {
             output.AppendText($"TESTING...");
             Stopwatch timer = Stopwatch.StartNew();

@@ -75,6 +75,7 @@
             this.textBox_filepath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_filepath.Location = new System.Drawing.Point(223, 43);
             this.textBox_filepath.Name = "textBox_filepath";
+            this.textBox_filepath.ReadOnly = true;
             this.textBox_filepath.Size = new System.Drawing.Size(399, 20);
             this.textBox_filepath.TabIndex = 2;
             this.textBox_filepath.Text = "..\\..\\NUTCalc.text";
@@ -118,6 +119,7 @@
             this.output.Size = new System.Drawing.Size(712, 600);
             this.output.TabIndex = 5;
             this.output.Text = "...output\n";
+            this.output.TextChanged += new System.EventHandler(this.output_TextChanged);
             // 
             // button_clear
             // 
@@ -183,6 +185,7 @@
             this.textBox_searchFood.Size = new System.Drawing.Size(183, 21);
             this.textBox_searchFood.TabIndex = 14;
             this.textBox_searchFood.Text = "varza";
+            this.textBox_searchFood.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_searchFood_KeyPress);
             // 
             // button_processFile
             // 
@@ -264,10 +267,12 @@
             this.Controls.Add(this.label_title);
             this.Controls.Add(this.button_findFile);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SvFoodTracker_TextLoadDB";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

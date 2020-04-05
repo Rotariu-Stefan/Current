@@ -153,6 +153,7 @@
             this.output.Size = new System.Drawing.Size(540, 399);
             this.output.TabIndex = 43;
             this.output.Text = "";
+            this.output.TextChanged += new System.EventHandler(this.output_TextChanged);
             // 
             // textBox_noteMealText
             // 
