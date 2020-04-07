@@ -164,7 +164,7 @@ namespace FoodTracker_TextLoadDB
         private void button_addMeal_Click(object sender, EventArgs e)   //adds a new meal(and selects it) for current day
         {
             _day.addMealEntry(new MealEntry());
-            _day._mealEntries.Last()._note = new Note(textBox_noteMealScore.Text, textBox_noteMealText.Text);
+            //_day._mealEntries.Last()._note = new Note(textBox_noteMealScore.Text, textBox_noteMealText.Text);
             _day._mealEntries.Last()._name = "Meal" + _day._mealEntries.Count;
             _day._mealEntries.Last()._portion = Convert.ToDouble(textBox_portion.Text);
             ((BindingSource)comboBox_meals.DataSource).ResetBindings(false);
@@ -454,6 +454,15 @@ namespace FoodTracker_TextLoadDB
         private void textBox_fat_KeyPress(object sender, KeyPressEventArgs e) => foodEnterOrNr(textBox_fat, e);
         private void textBox_carbs_KeyPress(object sender, KeyPressEventArgs e) => foodEnterOrNr(textBox_carbs, e);
         private void textBox_protein_KeyPress(object sender, KeyPressEventArgs e) => foodEnterOrNr(textBox_protein, e);
+        private void textBox_activ_KeyPress(object sender, KeyPressEventArgs e)     //keypress for active button
+        {
+            if (e.KeyChar == 13)    //checks if Enter was typed
+            {
+                button_setActiv.PerformClick();     //triggers addActiv buttong click event
+                e.Handled = true;                   //sets keypress event as handled
+            }
+            else e.Handled = false;
+        }
 
         private void textBox_amount_TextChanged(object sender, EventArgs e) => checkNumberPasted(textBox_amount);
         private void textBox_searchFood_TextChanged(object sender, EventArgs e) => button_search.PerformClick();
@@ -463,10 +472,7 @@ namespace FoodTracker_TextLoadDB
         private void textBox_noteScore_TextChanged(object sender, EventArgs e) => checkNotePasted(textBox_noteScore);
         private void textBox_noteMealScore_TextChanged(object sender, EventArgs e) => checkNotePasted(textBox_noteMealScore);
         private void textBox_portion_TextChanged(object sender, EventArgs e) => checkNumberPasted(textBox_portion);
-        private void output_TextChanged(object sender, EventArgs e)     //scrolls down when output text changes
-        {
-            output.ScrollToCaret();
-        }
+        private void output_TextChanged(object sender, EventArgs e) => output.ScrollToCaret();  //scrolls down when output text changes
         #endregion
 
         private void button_WTF_Click(object sender, EventArgs e)       //tests whatever I feel like

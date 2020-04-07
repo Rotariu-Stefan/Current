@@ -2,12 +2,12 @@
 equation_text.innerText = "";
 const result_text = document.getElementById("resultText");      //test showing current number/result
 
-const numbers_btn = document.querySelectorAll(".number");       //number buttons
-const opMulti_btn = document.querySelectorAll(".multi");        //operand buttons working with multiple numbers
-const opSingle_btn = document.querySelectorAll(".single");      //operand buttons working a single number
+const numbers_btn = document.querySelectorAll(".number");       //number(digit) buttons
+const opMulti_btn = document.querySelectorAll(".multi");        //operand buttons working with multiple numbers (^ - + / *)
+const opSingle_btn = document.querySelectorAll(".single");      //operand buttons working a single number (1/x x^2 sqrt(x))
 
-const equals_btn = document.querySelector(".equals");
-const control_btn = document.querySelectorAll(".control"); 
+const equals_btn = document.querySelector(".equals");           //equals button
+const control_btn = document.querySelectorAll(".control");      //control buttons (CE, C, Del)
 
 const dot_btn = document.querySelector(".dot");
 const sign_btn = document.querySelector(".sign");
@@ -18,7 +18,7 @@ let cOperand = "";      //current operand waiting to be executed
 let regexEq = /=\-?\d+$/;
 let newnr = true;
 
-numbers_btn.forEach(function (nrb) {        //sets actions on number button click
+numbers_btn.forEach(function (nrb) {        //sets actions on number(digit) button click
     nrb.addEventListener("click", () => handleNumber(nrb.innerText))
 });
 opSingle_btn.forEach(function (ops) {       //sets actions on single operand button click
@@ -28,31 +28,31 @@ opMulti_btn.forEach(function (opm) {        //sets actions on multi operand butt
     opm.addEventListener("click", () => handleMultiOperand(opm.innerText));
 });
 
-equals_btn.addEventListener("click", () => handleEquals()); //sets actions on equals button click
+equals_btn.addEventListener("click", () => handleEquals()); //sets action on equals button click
 control_btn.forEach(function (ctr) {        //sets actions on control button click
     ctr.addEventListener("click", () => handleControl(ctr.innerText));
 });
 
-sign_btn.addEventListener("click", () => handleSign());
-dot_btn.addEventListener("click", () => handleDot());
+sign_btn.addEventListener("click", () => handleSign()); //set action on sign press
+dot_btn.addEventListener("click", () => handleDot());   //set action on dot press
 
-const handleNumber = function (nrb) {
+const handleNumber = function (nrb) {   //on number button press
     console.log("Number " + nrb);
 
-    if (regexEq.test(equation_text.innerHTML)) {
+    if (regexEq.test(equation_text.innerHTML)) {    //tests to see if = was last pressed and starts a new number(reset to 0)
         equation_text.innerHTML = "";
         cNumber = 0;
     }
-    if (newnr) {
+    if (newnr) {    //if new number was made set result_text to current number(don't add more)
         result_text.setAttribute("value", nrb);
         newnr = false;
     }
     else
-        result_text.setAttribute("value", result_text.getAttribute("value") + nrb);
+        result_text.setAttribute("value", result_text.getAttribute("value") + nrb); //else add digit to current number
     cNumber = Number(result_text.getAttribute("value"));
 }
 
-const handleSingleOperand = function (opr) {
+const handleSingleOperand = function (opr) {    //on single operand button press = performs Op on Current Number(NOT Whole Equation) then performs the rest of the equation and shows result
     console.log("Single " + opr);
 
     switch (opr) {
@@ -69,32 +69,32 @@ const handleSingleOperand = function (opr) {
             cNumber = Math.round((Math.sqrt(cNumber) + Number.EPSILON) * 100) / 100;
             break;
     }
-    handleEquals();
+    handleEquals();     //calls equals button
 
-    newnr = true;
+    newnr = true;       //sets newnr so next time number button is pressed a new equation starts over
 }
 
-const handleMultiOperand = function (opr) {
+const handleMultiOperand = function (opr) {     //on multi operand button press
     console.log("Multi " + opr);
 
-    if (equation_text.innerHTML === "")
+    if (equation_text.innerHTML === "")         //1st adds the current number if equation is empty(start of eq)
         equation_text.innerText += cNumber;
-    if (cOperand === "") {        
+    if (cOperand === "") {                      //if there is no multi op saved it adds it to equation
         pNumber = cNumber;
         equation_text.innerText += opr;
     }
-    else {
+    else {                                      //else does the math and adds the result plus new op to equation
         pNumber = doMath();
         equation_text.innerText += cNumber + opr;
     }
     cOperand = opr;
-    result_text.setAttribute("value", pNumber);
+    result_text.setAttribute("value", pNumber);     //changes result
     cNumber = 0;
 
-    newnr = true;
+    newnr = true;                               //sets newnr so next time number button is pressed a new equation starts over
 }
 
-const doMath = function () {
+const doMath = function () {    //returns result based on 2 saved numbers and saved operand (has up to 2decimal precision)
     switch (cOperand) {
         case "^":
             return Math.round((Math.pow(pNumber, cNumber) + Number.EPSILON) * 100) / 100;
@@ -109,13 +109,13 @@ const doMath = function () {
     }
 }
 
-const handleEquals = function () {
+const handleEquals = function () {  //process result on = press
     console.log("Equals");
 
-    if (cOperand === "")
+    if (cOperand === "")    //if there is no op saved treat treats current number as equation so far
         pNumber = cNumber;        
-    else {
-        let temp = cNumber;
+    else {                  //else does the math
+        let temp = cNumber; 
         cNumber = doMath();
         pNumber = temp;
     }
@@ -123,10 +123,10 @@ const handleEquals = function () {
     equation_text.innerText += pNumber + "=" + cNumber;
     cOperand = "";
 
-    newnr = true;
+    newnr = true;           //sets newnr so next time number button is pressed a new equation starts over
 }
 
-const handleControl = function (ctr) {
+const handleControl = function (ctr) {  //process result on CE, C, Del presses
     console.log("Control " + ctr);
 
     switch (ctr) {
@@ -150,25 +150,25 @@ const handleControl = function (ctr) {
     result_text.setAttribute("value", cNumber);
 }
 
-const handleSign = function () {
+const handleSign = function () {       //changes sign on current number
     console.log("Sign");
 
     cNumber = -cNumber;
     result_text.setAttribute("value", cNumber);
 }
 
-const handleDot = function () {
+const handleDot = function () {         //handles dot press
     console.log("Dot");
 
-    if (regexEq.test(equation_text.innerHTML)) {
+    if (regexEq.test(equation_text.innerHTML)) {    //if = was last pressed resets equation(much like a number press)
         equation_text.innerHTML = "";
         cNumber = 0;
     }
-    if (newnr) {
+    if (newnr) {        //if newnr is to start then set current value to 0.
         result_text.setAttribute("value", "0.");
         newnr = false;
     }
-    else if (!result_text.getAttribute("value").includes("."))
+    else if (!result_text.getAttribute("value").includes("."))  //else add a dot if a dot wasn't already added
         result_text.setAttribute("value", result_text.getAttribute("value") + ".");
     cNumber = Number(result_text.getAttribute("value"));
 }

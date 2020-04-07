@@ -19,7 +19,7 @@ namespace FoodTracker_TextLoadDB
         #region Fields
         //various constant regexes used to match and manipulated text data when init or processing text files with groups for identifying specific values
         public static readonly Regex regexEntry = new Regex(
-            @"(?<Amount>^\d+([\./]{1}\d+)?(g\b|ml\b|\b)) (?<Name>[^@]+) (@(?<Brand>.+) )?(?<Macros>[\d\.]{1,4}/[\d\.]{1,4}/[\d\.]{1,4}$)");
+            @"(?<Amount>^\d+([\./]{1}\d+)?(g\b|ml\b|\b)) (?<Name>[^@]+) (@(?<Brand>.+) )?(?<Macros>[\d\.]{1,5}/[\d\.]{1,5}/[\d\.]{1,5}$)");
         public static readonly Regex regexEntryResult = new Regex(
             @"^=(?<Macros>[\d\.]{1,5}/[\d\.]{1,5}/[\d\.]{1,5}$)");
         public static readonly Regex regexMealResult = new Regex(
@@ -467,11 +467,7 @@ namespace FoodTracker_TextLoadDB
             output.AppendText($"TESTING...\n");
             Stopwatch timer = Stopwatch.StartNew();
 
-            int en= (char)Keys.Enter;
-            MessageBox.Show("" + en);
-
-            en = (char)Keys.Divide;
-            MessageBox.Show("" + en);
+            MessageBox.Show(regexEntry.IsMatch("0.1 Pui SMCS @eu 168.9/4.2/297.9")+"!!");
 
             timer.Stop();
             output.AppendText($"\n...DONE! ({timer.Elapsed})\n");

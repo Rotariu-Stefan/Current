@@ -400,6 +400,7 @@
             this.textBox_activ.Name = "textBox_activ";
             this.textBox_activ.Size = new System.Drawing.Size(138, 21);
             this.textBox_activ.TabIndex = 18;
+            this.textBox_activ.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_activ_KeyPress);
             // 
             // button_setActiv
             // 

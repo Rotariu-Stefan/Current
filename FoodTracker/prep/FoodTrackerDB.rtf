@@ -5,6 +5,7 @@
 \b USERS\par
 -----\par
 \b0 | UID(int)\tab\tab\tab\}PK\par
+| Email(Str)\par
 | UName(Str)\par
 | FName(Str)\par
 | LName(Str)\par
@@ -21,10 +22,10 @@
 \b0 | FID(int) \tab\tab\}PK\par
 | Name(Str)\par
 | Brand(Str)\par
-| Fat(int)\par
-| Carbs(int)\par
-| Protein(int)\par
-\i | Calories(int)\i0\par
+| Fat(fl)\par
+| Carbs(fl)\par
+| Protein(fl)\par
+\i | Calories(fl)\i0\par
 | Note(Str)\par
 | MadeBy(int)\tab\tab =UID from USERS\par
 | Pic(Str)\par
@@ -42,7 +43,7 @@
 \b0 | Dish(int)\tab\tab =FID from FOOD\tab\}PK\par
 | Ingredient(int) \tab =FID from FOOD\tab\}\par
 | Measure(enum)\tab\tab >grams or pieces\par
-| Amount(int)\tab\tab\par
+| Amount(float)\par
 \par
 \b MEALS\par
 -----\par
@@ -56,7 +57,8 @@
 --------\par
 \b0 | Meal(int)\tab\tab =MID from MEALS\tab\}PK\par
 | Food(int)\tab\tab =FID from FOODS\tab\}\par
-| Amount(int)\tab\tab >allow pieces or just grams?\par
+| Measure(enum)\tab\tab >grams or pieces\par
+| Amount(float)\par
 \par
 \b\i DISHEXTRA\par
 ---------\par
@@ -86,10 +88,10 @@
 \b0 | IID(int) \tab\}PK\par
 | Name(Str)\par
 | Brand(Str)\par
-| Fat(int)\par
-| Carbs(int)\par
-| Protein(int)\par
-\i | Calories(int)\i0\par
+| Fat(fl)\par
+| Carbs(fl)\par
+| Protein(fl)\par
+\i | Calories(fl)\i0\par
 | Note(Str)\par
 | MadeBy(int)\tab\tab =UID from USERS\par
 | Pic(Str)\par
@@ -166,10 +168,10 @@
 \b0 | IID(int) \tab\}PK\par
 | Name(Str)\par
 | Brand(Str)\par
-| Fat(int)\par
-| Carbs(int)\par
-| Protein(int)\par
-\i | Calories(int)\i0\par
+| Fat(fl)\par
+| Carbs(fl)\par
+| Protein(fl)\par
+\i | Calories(fl)\i0\par
 | Note(Str)\par
 | MadeBy(int)\tab\tab =UID from USERS\par
 | Pic(Str)\par

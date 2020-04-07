@@ -17,15 +17,18 @@
     justify-content: center;
     align-content: center;
     grid-template-columns: minmax(15em, 20em);
+    border: double;
 }
 
 #resultArea {
     display: grid;
     grid-template-columns: inherit;
+    border: solid;
 }
 #buttonArea {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    border: solid;
 }
 
 #equationText {
