@@ -467,7 +467,7 @@ namespace FoodTracker_TextLoadDB
             output.AppendText($"TESTING...\n");
             Stopwatch timer = Stopwatch.StartNew();
 
-            MessageBox.Show(regexEntry.IsMatch("0.1 Pui SMCS @eu 168.9/4.2/297.9")+"!!");
+            MessageBox.Show(regexEntry.IsMatch("0.1 Pui SMCS @eu 168.9/4.2/297.9") + "!!");
 
             timer.Stop();
             output.AppendText($"\n...DONE! ({timer.Elapsed})\n");
