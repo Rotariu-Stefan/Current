@@ -35,10 +35,12 @@
     text-transform: uppercase;
     font-weight: bold;
     text-align: right;
+    min-height: 2rem;
+    word-wrap: break-word;
 }
 #resultText {
     text-align: right;
-    font-size: 3em;
+    font-size: 3rem;
 }
 button {
     height: 5vh;
