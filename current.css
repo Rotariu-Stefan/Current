@@ -1,0 +1,9 @@
+body{
+    color: #DDDDDD;
+	background-image: url(techwall.png);
+	background-size: cover;
+	margin: 0;
+    padding: 0;
+	width: 97vw;
+	height: 97vh;
+}
