@@ -35,14 +35,15 @@
     text-transform: uppercase;
     font-weight: bold;
     text-align: right;
-    min-height: 2rem;
+    min-height: 1rem;
     word-wrap: break-word;
 }
 #resultText {
     text-align: right;
-    font-size: 3rem;
+    font-size: 2rem;
 }
 button {
+    min-height: 25px;
     height: 5vh;
     text-transform: uppercase;
     font-weight: bold;
