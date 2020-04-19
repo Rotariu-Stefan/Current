@@ -1,11 +1,19 @@
-﻿body {
-    background-color: #333333;
-    color: #DDDDDD;
-    text-align: center;
+﻿html {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    background: url(calc.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+
+body {
+    margin: 0;
+    padding: 0;
     width: 100vw;
+    height: 100vh;
+    color: #DDDDDD;
+    text-align: center;
     display: grid;
     justify-content: center;
     grid-template-columns: 95vw;

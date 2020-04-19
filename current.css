@@ -1,9 +1,16 @@
-body{
-	margin: 0;
+html {
+    margin: 0;
     padding: 0;
-	width: 97vw;
-	height: 97vh;
+    width: 100%;
+    height: 100%;
+    background: url(techwall.png) no-repeat center center fixed;
+    background-size: cover;
     color: #DDDDDD;
-	background-image: url(techwall.png);
-	background-size: cover;
+}
+
+a, a:visited {
+    color: #AAAAEE;
+}
+a:hover {
+        color: #b6ff00;
 }
