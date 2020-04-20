@@ -1,0 +1,34 @@
+﻿html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color:black;
+    color:white;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    justify-content: center;
+    align-content:center;
+    grid-template-columns: 95vw;
+    grid-template-rows: auto minmax(20rem, 1fr) auto;
+}
+
+#calc {
+    border: double;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    grid-template-columns: minmax(20rem, 40rem);
+    grid-template-rows: minmax(3rem, 5rem) minmax(20rem, 40rem);
+}
+
+#buttonarea {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
