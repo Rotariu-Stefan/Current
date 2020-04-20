@@ -10,27 +10,37 @@
 body {
     margin: 0;
     padding: 0;
-    width: 100vw;
     height: 100vh;
+    width: 100vw;
     display: grid;
-    justify-content: center;
-    align-content:center;
-    grid-template-columns: 95vw;
     grid-template-rows: auto 1fr auto;
 }
 
 main {
+    margin: 5px 10px;
     border: double;
-    display:grid;
+    display: grid;
 }
 
 #buttonarea {
+    background-color: darkred;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    align-items:center;
-    justify-items:center;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 }
-.b16{
-    background-color:red;
-    grid-column:2;
+
+.btn {
+    font-weight: bolder;
+    font-size: 20px;
+    width: 100px;
+    height: 100px;
+}
+
+.b1, .b16{
+    grid-column:1/-1;
+}
+.b2, .b11{
+    grid-column:span 2;
+    grid-row:span 2;
 }
