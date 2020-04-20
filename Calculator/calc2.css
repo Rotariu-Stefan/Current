@@ -15,12 +15,14 @@ body {
     color: #DDDDDD;
     text-align: center;
     display: flex;
+    align-items: center;
     flex-direction: column;
 }
 
 #calc {
     border: double;
-    padding: 2px;
+    padding: 1px;
+    width: 98%;
     flex: auto;
     display: flex;
     flex-direction: column;
@@ -30,18 +32,21 @@ body {
 
 #resultArea {
     border: solid;
+    padding: 1px;
     display: grid;
     grid-template-columns: minmax(200px, 350px);
 }
 
 #buttonArea {
     border: solid;
+    padding: 1px;
     min-width: 200px;
     max-width: 350px;
     min-height: 150px;
     max-height: 400px;
     flex: auto;
     display: grid;
+    grid-gap: 1px;
     grid-template-columns: repeat(4, minmax(25px, 100px));
 }
 
@@ -86,10 +91,16 @@ button {
 h1 {
     text-decoration-line: underline;
     margin: 1px;
-    color:red;
 }
 
 h3, h4 {
     margin: 2px;
-    color:red;
+}
+
+header, footer {
+    width: 98%;
+}
+
+#author{
+    color:crimson;
 }
