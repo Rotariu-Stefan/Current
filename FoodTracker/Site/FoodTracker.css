@@ -3,6 +3,13 @@
     padding: 0;
     width: 100%;
     height: 100%;
+    font-size: 15px;
+}
+
+@media only screen and (max-width: 700px) {
+    html {
+        font-size: 10px;
+    }
 }
 
 /*body:after {
@@ -33,14 +40,6 @@ body {
     align-items: center;
 }
 
-.subblock {
-    margin: 1px;
-    padding: 1px;
-    background-color: bisque;
-    opacity:0.85;
-    border: 1px dotted #550000;
-}
-
 header {
     width: 98%;
     display: flex;
@@ -50,21 +49,14 @@ nav {
     width: 98%;
     display: flex;
     justify-content: space-around;
-}
-.navlink {
-    padding: 0 1px;
-    text-align: center;
-    border-left: 1px dotted;
-    border-right: 1px dotted;;
-}
-.navlink:visited{
-    color:#883333;
+    align-items: center;
 }
 
 main {
     width: 98%;
     flex: auto;
     border: double #550000;
+    text-align: center;
 }
 
 footer {
@@ -72,14 +64,22 @@ footer {
     text-align: center;
 }
 
-#titlearea {
-    flex: auto;
+.subblock {
+    margin: 1px;
+    padding: 1px;
+    background-color: bisque;
+    opacity: 0.85;
+    border: 1px dotted #550000;
 }
 
 .logo {
     padding: 2px;
-    width: 5em;
-    height: 5em;
+    width: 5rem;
+    height: 5rem;
+}
+
+#titlearea {
+    flex: auto;
 }
 
 #title {
@@ -95,6 +95,23 @@ footer {
     font-size: 1rem;
     font-style: italic;
 }
+
+.navlink {
+    padding: 0 1px;
+    text-align: center;
+    border-left: 1px dotted;
+    border-right: 1px dotted;
+    font-size: 1.5rem;
+    color: #550000;
+}
+
+    .navlink:visited {
+        color: #883333;
+    }
+
+    .navlink:hover {
+        color: coral;
+    }
 
 #author {
     margin: 1px;
