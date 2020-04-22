@@ -57,6 +57,9 @@ nav {
     border-left: 1px dotted;
     border-right: 1px dotted;;
 }
+.navlink:visited{
+    color:#883333;
+}
 
 main {
     width: 98%;
