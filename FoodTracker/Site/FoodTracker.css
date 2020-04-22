@@ -5,7 +5,7 @@
     height: 100%;
 }
 
-body:after {
+/*body:after {
     content: "";
     position: absolute;
     top: 0;
@@ -16,7 +16,7 @@ body:after {
     background-size: cover;
     opacity: 0.5;
     z-index: -1;
-}
+}*/
 
 body {
     margin: 0;
@@ -33,16 +33,48 @@ body {
     align-items: center;
 }
 
-header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+.subblock {
+    margin: 1px;
+    padding: 1px;
+    background-color: bisque;
+    opacity:0.85;
+    border: 1px dotted #550000;
 }
 
-header, main, footer {
+header {
     width: 98%;
+    display: flex;
+}
+
+nav {
+    width: 98%;
+    display: flex;
+    justify-content: space-around;
+}
+.navlink {
+    padding: 0 1px;
+    text-align: center;
+    border-left: 1px dotted;
+    border-right: 1px dotted;;
+}
+
+main {
+    width: 98%;
+    flex: auto;
+    border: double #550000;
+}
+
+footer {
+    width: 98%;
+    text-align: center;
+}
+
+#titlearea {
+    flex: auto;
 }
 
 .logo {
+    padding: 2px;
     width: 5em;
     height: 5em;
 }
@@ -50,19 +82,19 @@ header, main, footer {
 #title {
     margin: 0;
     padding: 0;
-    font-size: 3.5em;
+    font-size: 3rem;
     text-decoration: underline;
 }
 
 #subtitle {
     margin: 0;
     padding: 0;
-    font-size: 1em;
+    font-size: 1rem;
     font-style: italic;
-    grid-row:2/3;
-    grid-column:2/3;
 }
 
-#profilearea {
-    grid-row: span 2;
+#author {
+    margin: 1px;
+    padding: 1px;
+    font-size: 1rem;
 }
