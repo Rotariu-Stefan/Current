@@ -82,6 +82,11 @@ footer {
     flex: auto;
 }
 
+    #titlearea > a {
+        color: #550000;
+        text-decoration: none;
+    }
+
 #title {
     margin: 0;
     padding: 0;
@@ -99,8 +104,8 @@ footer {
 .navlink {
     padding: 0 1px;
     text-align: center;
-    border-left: 1px dotted;
-    border-right: 1px dotted;
+    /*border-left: 1px dotted;
+    border-right: 1px dotted;*/
     font-size: 1.5rem;
     color: #550000;
 }
@@ -111,6 +116,7 @@ footer {
 
     .navlink:hover {
         color: coral;
+        background-color: saddlebrown;
     }
 
 #author {
