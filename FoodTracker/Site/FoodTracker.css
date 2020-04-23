@@ -1,4 +1,8 @@
-﻿html {
+﻿* {
+    box-sizing: border-box;
+}
+
+html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -6,9 +10,21 @@
     font-size: 15px;
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (min-width: 2000px) {
+    html {
+        font-size: 35px;
+    }
+}
+
+@media only screen and (max-width: 750px) {
     html {
         font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 360px) {
+    html {
+        font-size: 7px;
     }
 }
 
@@ -27,7 +43,7 @@
 
 body {
     margin: 0;
-    padding: 0;
+    padding: 0.3rem 0.6rem;
     width: 100%;
     height: 100%;
     background: url(FTBack.jpg) no-repeat center center fixed;
@@ -41,27 +57,27 @@ body {
 }
 
 .subblock {
-    margin: 1px;
-    padding: 1px;
+    margin: 0px;
+    padding: 0px;
     background-color: bisque;
     opacity: 0.85;
     border: 1px dotted #550000;
 }
 
 header {
-    min-width: 98%;
+    min-width: 100%;
     display: flex;
 }
 
 nav {
-    min-width: 98%;
+    min-width: 100%;
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
 
 main {
-    width: 98%;
+    min-width: 100%;
     flex: auto;
     border: double #550000;
     display: grid;
@@ -70,20 +86,20 @@ main {
     align-content: space-around;
 }
 
-@media only screen and (min-width:90rem) {
+@media only screen and (min-width:70rem) {
     main {
         grid-template-columns: repeat(3, minmax(20rem, 1fr));
     }
 }
 
+footer {
+    min-width: 100%;
+    text-align: center;
+}
+
 #searcharea, #fooditemarea, #mealsarea {
     width: 95%;
     min-height: 35rem;
-}
-
-footer {
-    min-width: 98%;
-    text-align: center;
 }
 
 .logo {
@@ -119,7 +135,7 @@ footer {
 }
 
 .navlink {
-    padding: 0 1px;
+    padding: 1px;
     text-align: center;
     /*border-left: 1px dotted;
     border-right: 1px dotted;*/
