@@ -22,7 +22,7 @@ html {
     }
 }
 
-@media only screen and (max-width: 360px) {
+@media only screen and (max-width: 350px) {
     html {
         font-size: 7px;
     }
@@ -77,7 +77,7 @@ nav {
 }
 
 main {
-    min-width: 100%;
+    width: 100%;
     flex: auto;
     border: double #550000;
     display: grid;
@@ -86,7 +86,7 @@ main {
     align-content: space-around;
 }
 
-@media only screen and (min-width:70rem) {
+@media only screen and (min-width:1000px) {
     main {
         grid-template-columns: repeat(3, minmax(20rem, 1fr));
     }
