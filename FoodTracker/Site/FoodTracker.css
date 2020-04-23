@@ -40,13 +40,21 @@ body {
     align-items: center;
 }
 
+.subblock {
+    margin: 1px;
+    padding: 1px;
+    background-color: bisque;
+    opacity: 0.85;
+    border: 1px dotted #550000;
+}
+
 header {
-    width: 98%;
+    min-width: 98%;
     display: flex;
 }
 
 nav {
-    width: 98%;
+    min-width: 98%;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -56,20 +64,26 @@ main {
     width: 98%;
     flex: auto;
     border: double #550000;
-    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    justify-items: center;
+    align-content: space-around;
+}
+
+@media only screen and (min-width:90rem) {
+    main {
+        grid-template-columns: repeat(3, minmax(20rem, 1fr));
+    }
+}
+
+#searcharea, #fooditemarea, #mealsarea {
+    width: 95%;
+    min-height: 35rem;
 }
 
 footer {
-    width: 98%;
+    min-width: 98%;
     text-align: center;
-}
-
-.subblock {
-    margin: 1px;
-    padding: 1px;
-    background-color: bisque;
-    opacity: 0.85;
-    border: 1px dotted #550000;
 }
 
 .logo {
@@ -86,6 +100,9 @@ footer {
         color: #550000;
         text-decoration: none;
     }
+
+#profilearea {
+}
 
 #title {
     margin: 0;
