@@ -82,7 +82,7 @@ main {
     border: double #550000;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-    justify-items: center;
+    /*justify-items: center;*/
     align-content: space-around;
 }
 
@@ -99,7 +99,7 @@ footer {
 
 #searcharea, #fooditemarea, #mealsarea {
     width: 95%;
-    min-height: 10rem;
+    min-height: 35rem;
 }
 
 .logo {
