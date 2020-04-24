@@ -1,4 +1,5 @@
-﻿* {
+﻿/*#region Page Outline*/
+* {
     box-sizing: border-box;
 }
 
@@ -35,7 +36,6 @@ body {
     height: 100%;
     background: url(FTBack.jpg) no-repeat center center fixed;
     background-size: cover;
-    /*background-color:bisque;*/
     font-family: Calibri;
     color: #550000;
     /*display: flex;
@@ -63,9 +63,10 @@ body {
     padding: 0;
     background-color: bisque;
     opacity: 0.85;
-    border: 1px dotted #550000;
 }
+/*#endregion Page*/
 
+/*#region Page Sections*/
 header {
     min-width: 100%;
     display: flex;
@@ -82,7 +83,6 @@ main {
     width: 100%;
     padding: 5px;
     /*flex: auto;*/
-    border: double #550000;
     display: grid;
     grid-gap: 5px;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
@@ -99,12 +99,9 @@ footer {
     min-width: 100%;
     text-align: center;
 }
+/*#endregion Page Section*/
 
-#searcharea, #fooditemarea, #mealsarea {
-    width: 100%;
-    height: 35rem;
-}
-
+/*#region Top Section*/
 .logo {
     padding: 2px;
     width: 5rem;
@@ -140,22 +137,103 @@ footer {
 .navlink {
     padding: 1px;
     text-align: center;
-    font-size: 1.5rem;
     color: #550000;
     text-decoration: none;
 }
 
     .navlink:visited {
-        color: #883333;
+        color: #884444;
     }
 
     .navlink:hover {
         color: coral;
         background-color: saddlebrown;
     }
+/*#endregion Top Section*/
 
+/*#region Main Section*/
+#mealsarea, #searcharea, #fooditemarea {
+    padding: 0.5rem;
+    width: 100%;
+    height: 35rem;
+}
+
+#mealsarea {
+}
+
+.datepick {
+    text-align: center;
+}
+
+    .datepick input {
+        height: 2rem;
+        font-size: 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .datepick button {
+        width: 2rem;
+        background-color: #BB6666;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .datepick hr {
+        margin: 0;
+    }
+
+.note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+    .note img {
+        width: 2rem;
+        height: 2rem;
+        align-self: center;
+    }
+
+    .note span {
+        padding-right: 0.2rem;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .note label {
+        font-size: 0.8rem;
+        align-self: center;
+    }
+
+    .note hr {
+        margin: 0;
+        grid-column: span 2;
+        width: 100%;
+    }
+
+    .mealarea select{
+        width:20rem;
+        word-wrap:break-word;
+        text-wrap:normal;
+    }
+/*#endregion Main Section*/
+
+/*#region Bottom Section*/
 #author {
     margin: 1px;
     padding: 1px;
     font-size: 1rem;
 }
+/*#endregion Bottom Section*/
+
+/*#region Misc Classes*/
+.texthigh {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.boxshow {
+    border: 1px solid red;
+    border-radius: 5px;
+}
+/*#endregion Misc Classes*/
