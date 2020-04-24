@@ -41,20 +41,22 @@ body {
     /*display: flex;
     flex-direction: column;*/
     display: grid;
+    grid-gap: 0.15rem;
     grid-template-rows: auto auto 1fr auto;
 }
-/*body:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: url(FTBack2.jpg) no-repeat center center fixed;
-    background-size: cover;
-    opacity: 0.5;
-    z-index: -1;
-}*/
+
+    body:after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: url(FTBack2.jpg) no-repeat center center fixed;
+        background-size: cover;
+        opacity: 0.5;
+        z-index: -1;
+    }
 
 .subblock {
     margin: 0;
@@ -78,11 +80,11 @@ nav {
 
 main {
     width: 100%;
-    padding:5px;
+    padding: 5px;
     /*flex: auto;*/
     border: double #550000;
     display: grid;
-    grid-gap:5px;
+    grid-gap: 5px;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     align-content: center;
 }
@@ -138,10 +140,9 @@ footer {
 .navlink {
     padding: 1px;
     text-align: center;
-    /*border-left: 1px dotted;
-    border-right: 1px dotted;*/
     font-size: 1.5rem;
     color: #550000;
+    text-decoration: none;
 }
 
     .navlink:visited {
