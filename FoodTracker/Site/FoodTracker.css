@@ -1,4 +1,8 @@
-﻿html {
+﻿* {
+    box-sizing: border-box;
+}
+
+html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -95,7 +99,7 @@ footer {
 
 #searcharea, #fooditemarea, #mealsarea {
     width: 95%;
-    min-height: 35rem;
+    min-height: 10rem;
 }
 
 .logo {
