@@ -1,4 +1,8 @@
-﻿html {
+﻿* {
+    box-sizing: border-box;
+}
+
+html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -12,6 +16,8 @@ body {
     padding: 0;
     height: 100%;
     width: 100%;
+    background: url(pineapple.jpg) no-repeat center center fixed;
+    background-size: cover;
     display: grid;
     grid-template-rows: auto 1fr auto;
 }
@@ -27,7 +33,7 @@ main {
     display: grid;
     justify-items: center;
     align-items: center;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 .btn {
