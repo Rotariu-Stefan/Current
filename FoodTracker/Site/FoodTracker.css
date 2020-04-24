@@ -1,8 +1,4 @@
-﻿* {
-    box-sizing: border-box;
-}
-
-html {
+﻿html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -10,7 +6,7 @@ html {
     font-size: 15px;
 }
 
-@media only screen and (min-width: 2000px) {
+@media only screen and (min-width: 3000px) {
     html {
         font-size: 35px;
     }
