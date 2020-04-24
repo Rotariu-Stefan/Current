@@ -7,7 +7,7 @@ html {
     padding: 0;
     width: 100%;
     height: 100%;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 @media only screen and (min-width: 3000px) {
@@ -78,12 +78,13 @@ nav {
 
 main {
     width: 100%;
+    padding:5px;
     /*flex: auto;*/
     border: double #550000;
     display: grid;
+    grid-gap:5px;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-    justify-items: center;
-    align-content: space-around;
+    align-content: center;
 }
 
 @media only screen and (min-width: 1000px) {
@@ -98,8 +99,8 @@ footer {
 }
 
 #searcharea, #fooditemarea, #mealsarea {
-    width: 95%;
-    min-height: 35rem;
+    width: 100%;
+    height: 35rem;
 }
 
 .logo {
