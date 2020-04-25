@@ -60,7 +60,7 @@ body {
 
 .subblock {
     margin: 0;
-    padding: 0;
+    padding: 1px;
     background-color: bisque;
     opacity: 0.85;
 }
@@ -153,7 +153,6 @@ footer {
 
 /*#region Main Section*/
 #mealsarea, #searcharea, #fooditemarea {
-    padding: 0.5rem;
     width: 100%;
     height: 35rem;
 }
@@ -209,12 +208,6 @@ footer {
         margin: 0;
         grid-column: span 2;
         width: 100%;
-    }
-
-    .mealarea select{
-        width:20rem;
-        word-wrap:break-word;
-        text-wrap:normal;
     }
 /*#endregion Main Section*/
 
