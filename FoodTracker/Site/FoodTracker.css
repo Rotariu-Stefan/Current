@@ -78,11 +78,11 @@ nav {
 main {
     width: 100%;
     padding: 5px;
-    /*flex: auto;*/
     display: grid;
     grid-gap: 5px;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     align-content: center;
+    justify-content: center;
 }
 
 @media only screen and (min-width: 1000px) {
@@ -144,25 +144,64 @@ footer {
 /*#endregion Top Section*/
 
 /*#region Main Section*/
-#mealsArea, #searchArea, #fooditemArea {
-    width: 100%;
-    height: 35rem;
+#dayArea, #searchArea, #fooditemArea {
+    height: 40rem;
+    max-width: 35rem;
     padding: 0.2rem;
 }
 
+.note {
+    display: flex;
+    align-items: center;
+}
+
+    .note img {
+        width: 2rem;
+        height: 2rem;
+        padding-right: 0.2rem;
+    }
+
+    .note span {
+        padding-right: 0.2rem;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .note label {
+        font-size: 0.8rem;
+    }
+/*#region DayArea Block*/
 #dayArea {
     display: flex;
     flex-direction: column;
 }
 
+.datepick {
+    text-align: center;
+}
+
+    .datepick input {
+        height: 2rem;
+        font-size: 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .datepick button {
+        width: 2rem;
+        background-color: #BB6666;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
 .mealsArea {
     flex: auto;
     display: flex;
     flex-direction: column;
+    overflow: auto;
 }
 
 .mealArea {
-    flex: auto;
     display: flex;
     flex-direction: column;
 }
@@ -204,52 +243,70 @@ footer {
 }
 
 .mealTotal {
-    text-align:center;
-}
-.mealTotal span{
-    width:0px;
-    white-space:nowrap;
-    float:left;
-}
-
-.datepick {
     text-align: center;
 }
 
-    .datepick input {
-        height: 2rem;
-        font-size: 1rem;
-        text-align: center;
-        font-weight: bold;
+    .mealTotal span {
+        width: 0px;
+        white-space: nowrap;
+        float: left;
     }
+/*#endregion DayArea Block*/
 
-    .datepick button {
-        width: 2rem;
-        background-color: #BB6666;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-.note {
+/*#region SearchArea Block*/
+#searchArea {
     display: flex;
-    align-items: center;
+    flex-direction: column;
 }
 
-    .note img {
-        width: 2rem;
-        height: 2rem;
-        padding-right: 0.2rem;
+.searchHeader {
+    padding: 0.2rem;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+
+    .searchHeader form {
+        padding: 0.2rem;
     }
 
-    .note span {
-        padding-right: 0.2rem;
+    .searchHeader label {
+        float: left;
+    }
+
+    .searchHeader .search {
+        height: 2rem;
+        width: 100%;
         font-size: 1rem;
         font-weight: bold;
     }
 
-    .note label {
-        font-size: 0.8rem;
+    .searchHeader .amount {
+        height: 2rem;
+        width: 30%;
+        padding: 0 0.2rem;
+        font-size: 1rem;
+        font-weight: bold;
     }
+
+.searchResults {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.foodItem {
+    display: grid;
+    grid-template-columns: 1fr 4rem 2.5rem;
+}
+
+    .foodItem:hover {
+        color: coral;
+        background-color: saddlebrown;
+    }
+
+/*#endregion SearchArea Block*/
 
 /*#endregion Main Section*/
 
@@ -275,5 +332,14 @@ footer {
 
 .lineDown {
     border-bottom: 1px solid black;
+}
+
+.ftButton {
+    padding: 0.5rem;
+    margin: 0.1rem;
+    background-color: #BB6666;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 2px solid black;
 }
 /*#endregion Misc Classes*/
