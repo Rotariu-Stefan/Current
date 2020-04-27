@@ -76,18 +76,26 @@ nav {
 }
 
 main {
-    width: 100%;
     padding: 5px;
     display: grid;
     grid-gap: 5px;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     align-content: center;
-    justify-content: center;
 }
 
-@media only screen and (min-width: 1000px) {
+@media only screen and (min-width: 1245px) {
     main {
         grid-template-columns: repeat(3, minmax(20rem, 1fr));
+    }
+}
+
+@media only screen and (min-width: 376px) and (max-width: 430px), (min-width: 1630px), (min-width: 270px) and (max-width: 307px) {
+    main {
+        justify-items: center;
+    }
+
+    #dayArea, #searchArea, #fooditemArea {
+        width: 35rem;
     }
 }
 
@@ -146,7 +154,6 @@ footer {
 /*#region Main Section*/
 #dayArea, #searchArea, #fooditemArea {
     height: 40rem;
-    max-width: 35rem;
     padding: 0.2rem;
 }
 
@@ -253,16 +260,15 @@ footer {
     flex-direction: column;
 }
 
+    #searchArea form {
+        padding: 0.2rem;
+    }
+
 .searchHeader {
-    padding: 0.2rem;
     text-align: right;
     display: flex;
     flex-direction: column;
 }
-
-    .searchHeader form {
-        padding: 0.2rem;
-    }
 
     .searchHeader label {
         float: left;
@@ -292,7 +298,7 @@ footer {
 
 .foodItem {
     display: grid;
-    grid-template-columns: 1fr 4rem 2.5rem;
+    grid-template-columns: 1fr 4rem 3rem;
 }
 
     .foodItem:hover {
