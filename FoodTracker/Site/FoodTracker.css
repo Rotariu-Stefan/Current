@@ -196,14 +196,10 @@ footer {
 
 .mealsArea {
     flex: auto;
-    display: flex;
-    flex-direction: column;
     overflow: auto;
 }
 
 .mealArea {
-    display: flex;
-    flex-direction: column;
 }
 
 .mealTitle, .mealTotal, .macroRes {
@@ -212,8 +208,6 @@ footer {
 }
 
 .foodEntries {
-    display: flex;
-    flex-direction: column;
 }
 
 .foodEntry {
