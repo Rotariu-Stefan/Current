@@ -262,32 +262,32 @@ footer {
 
     #searchArea form {
         padding: 0.2rem;
+        text-align: right;
     }
 
-.searchHeader {
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-}
+        #searchArea form label {
+            float: left;
+        }
 
-    .searchHeader label {
-        float: left;
-    }
-
-    .searchHeader .search {
+    #searchArea .search {
         height: 2rem;
         width: 100%;
         font-size: 1rem;
         font-weight: bold;
     }
 
-    .searchHeader .amount {
+    #searchArea .amountSize {
         height: 2rem;
         width: 30%;
         padding: 0 0.2rem;
         font-size: 1rem;
         font-weight: bold;
     }
+
+.foodItem {
+    display: grid;
+    grid-template-columns: 1fr 4rem 3rem;
+}
 
 .searchResults {
     flex: auto;
@@ -296,15 +296,18 @@ footer {
     overflow: auto;
 }
 
-.foodItem {
-    display: grid;
-    grid-template-columns: 1fr 4rem 3rem;
+.foodItem:hover {
+    color: coral;
+    background-color: saddlebrown;
+}
+.buffer{
+    height:3rem;
 }
 
-    .foodItem:hover {
-        color: coral;
-        background-color: saddlebrown;
-    }
+.searchEntry {
+    text-align: center;
+    font-size: 1.1rem;
+}
 
 /*#endregion SearchArea Block*/
 
@@ -337,6 +340,7 @@ footer {
 .ftButton {
     padding: 0.5rem;
     margin: 0.1rem;
+    width: 100%;
     background-color: #BB6666;
     font-size: 1rem;
     font-weight: bold;
