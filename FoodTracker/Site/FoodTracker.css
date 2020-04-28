@@ -315,7 +315,6 @@ footer {
 
 /*#region FoodDetailsArea Block*/
 #foodDetailsArea {
-    padding: 0.2rem;
     text-align: center;
     display: flex;
     flex-direction: column;
