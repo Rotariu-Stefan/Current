@@ -76,9 +76,9 @@ nav {
 }
 
 main {
-    padding: 5px;
+    padding: 0.3rem;
     display: grid;
-    grid-gap: 5px;
+    grid-gap: 0.3rem;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     align-content: center;
 }
@@ -94,7 +94,7 @@ main {
         justify-items: center;
     }
 
-    #dayArea, #searchArea, #fooditemArea {
+    #dayArea, #searchArea, #foodDetailsArea {
         width: 35rem;
     }
 }
@@ -122,7 +122,18 @@ footer {
     }
 
 #profileArea {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
+
+    #profileArea > :first-child {
+        grid-column: span 2;
+        text-align: center;
+    }
+
+    #profileArea img {
+        height: 2rem;
+    }
 
 #title {
     font-size: 3rem;
@@ -360,7 +371,7 @@ footer {
     font-weight: bold;
 }
 
-.boxShow {
+.boxShowX {
     margin: 1px;
     border: 1px solid red;
     border-radius: 5px;
