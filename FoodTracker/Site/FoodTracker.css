@@ -315,7 +315,6 @@ footer {
 
 /*#region FoodDetailsArea Block*/
 #foodDetailsArea {
-    text-align: center;
     display: flex;
     flex-direction: column;
 }
@@ -328,6 +327,10 @@ footer {
         border: 1px solid red;
         border-collapse: collapse;
     }
+
+.foodDetailsHeader > :first-child {
+    text-align: center;
+}
 
 .foodPic {
     width: 100%;
