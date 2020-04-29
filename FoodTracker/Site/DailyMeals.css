@@ -142,7 +142,7 @@ main {
     display: flex;
     flex-direction: column;
     overflow: auto;
-    background-color: #FFF1E0;
+    background-color: rgba(255, 241, 224, 0.5);
 }
 
 .foodItem {
@@ -176,7 +176,7 @@ main {
         width: 100%;
     }
 
-    #foodDetailsArea table, td, th {
+    #foodDetailsArea table, #foodDetailsArea td, #foodDetailsArea th {
         border: 1px solid red;
         border-collapse: collapse;
     }

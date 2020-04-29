@@ -33,7 +33,7 @@ body {
     width: 100%;
     height: 100%;
     padding: 0.3rem 0.6rem;
-    background: url(SitePics/FTBack.jpg) no-repeat center center fixed;
+    background: url(SitePics/FTBack2.jpg) no-repeat center center fixed;
     background-size: cover;
     font-family: Calibri;
     color: #550000;
@@ -42,7 +42,7 @@ body {
     grid-template-rows: auto auto 1fr auto;
 }
 
-    /*body:after {
+/*body:after {
         content: "";
         position: fixed;
         top: 0;
@@ -57,8 +57,7 @@ body {
 
 .subblock {
     padding: 1px;
-    background-color: bisque;
-    opacity: 0.85;
+    background-color: rgba(255, 228, 196, 0.4);
 }
 /*#endregion Page*/
 
@@ -152,7 +151,7 @@ footer {
     font-weight: bold;
 }
 
-.boxShow {
+.boxShowS {
     margin: 1px;
     border: 1px solid red;
     border-radius: 5px;

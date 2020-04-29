@@ -12,12 +12,13 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
 }
-h1{
-    margin:1rem;
-    text-align:center;
-}
+
+    #regform h1, #logform h1 {
+        margin: 1rem;
+        text-align: center;
+    }
 
 .fields {
     width: 70%;
@@ -25,7 +26,7 @@ h1{
     font-size: 1.5rem;
 }
 
-    .fields input {
+    .fields input, .fields select, .fields option {
         font-size: 1.5rem;
     }
 
@@ -40,7 +41,7 @@ h1{
     grid-template-columns: auto 1fr;
 }
 
-    .personal img, button {
+    .personal img, .personal button {
         width: 8rem;
     }
 
@@ -57,10 +58,11 @@ h1{
 .warning {
     font-size: 1.2rem;
     text-decoration: underline;
-    font-weight:bold;
-    text-align:center;
+    font-weight: bold;
+    text-align: center;
     color: red;
 }
+
 .loglinks {
     width: 100%;
     display: flex;
