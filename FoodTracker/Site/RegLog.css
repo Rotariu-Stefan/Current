@@ -1,0 +1,69 @@
+﻿/*#region Main*/
+main {
+    padding: 0.3rem;
+    display: grid;
+    grid-template-columns: minmax(30rem, 50rem);
+    align-content: center;
+    justify-content: center;
+}
+
+#regform, #logform {
+    min-height: 40rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content:center;
+}
+h1{
+    margin:1rem;
+    text-align:center;
+}
+
+.fields {
+    width: 70%;
+    display: grid;
+    font-size: 1.5rem;
+}
+
+    .fields input {
+        font-size: 1.5rem;
+    }
+
+    .fields .detail {
+        font-size: 1rem;
+    }
+
+.personal {
+    padding: 0.5rem;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: auto 1fr;
+}
+
+    .personal img, button {
+        width: 8rem;
+    }
+
+    .personal span {
+        height: 15%;
+    }
+
+    .personal textarea {
+        resize: none;
+        width: 100%;
+        height: 85%;
+    }
+
+.warning {
+    font-size: 1.2rem;
+    text-decoration: underline;
+    font-weight:bold;
+    text-align:center;
+    color: red;
+}
+.loglinks {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+/*#endregion Main*/

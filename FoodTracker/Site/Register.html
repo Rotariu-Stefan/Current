@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="stylesheet" type="text/css" href="FoodTracker.css" />
+    <link rel="stylesheet" type="text/css" href="RegLog.css" />
     <title>Sv FoodTracker</title>
 </head>
 <body>
@@ -33,31 +34,47 @@
         <a href="MainPages/GlobalData.html" class="navlink textHigh">Global Data</a>
     </nav>
     <main class="boxShow">
-        <form class="subblock">
-            <h1>Please Complete ALL fields to Register!</h1>
-            Username:<input type="text" name="username"/>*
-            Email:<input type="email" name="email"/>*
-            Password:<input type="password" name="password" />*
-            Confirm Password:<input type="password" name="cpass" />*
-            First Name:<input type="text" name="firstname" />
-            Last Name:<input type="text" name="lastname" />
-            Date Of Birth:<input type="date" name="dob"/>
-            Sex:<input type="checkbox" name="sex" />Male<input type="checkbox" name="sex" />
-            Short Description:<input type="text" value="Say who you are in a brief description.." name="desc" multiple />
-            Diet Plans?
-            -Pick a Diet from the following if any of them apply to You - Can always change it later!
-            (This Choice is simply for tracking stats - Will Not affect your results/recommendations.)
-            <select>
-                <option>Paleo</option>
-                <option>Keto</option>
-                <option>Mediterranian</option>
-                <option>Vegan</option>
-                <option>Carnivore</option>
-                <option>Low Carb</option>
-                <option>Low Fat</option>
-                <option>PSMF</option>
-            </select>
-            <input type="submit"/>
+        <form id="regform" class="subblock boxShow">
+            <h1 class="lineDown">Please Complete ALL fields to Register!</h1>
+            <div class="fields">
+                <span>Username: </span><input type="text" name="username" />
+                <span class="warning">How DARE You, Sir!</span>
+                <span>Email:</span> <input type="email" name="email" />
+                <span>Password: </span><input type="password" name="password" />
+                <span class="detail">Password must be at least 6characters long and have both numbers and letters!</span>
+                <span>Confirm Password: </span><input type="password" name="cpass" />
+                <span>First Name: </span><input type="text" name="firstname" />
+                <span>Last Name: </span><input type="text" name="lastname" />
+                <span>Date Of Birth: </span><input type="date" name="dob" />
+                <div>
+                    <span>Sex: </span><input type="radio" name="sex" value="male" /><span>Male </span>
+                    <input type="radio" name="sex" value="female" /><span>Female</span>
+                </div>
+                <div class="personal">
+                    <div>
+                        <img src="SitePics/profileEmpty.png" /><br />
+                        <button>Browse</button>
+                    </div>
+                    <div>
+                        <span>Short Description:</span><br />
+                        <textarea>Say who you are in a few short phrases.</textarea>
+                    </div>
+                </div>
+                <span>Diet Plans?</span>
+                <select>
+                    <option>Paleo</option>
+                    <option>Keto</option>
+                    <option>Mediterranian</option>
+                    <option>Vegan</option>
+                    <option>Carnivore</option>
+                    <option>Low Carb</option>
+                    <option>Low Fat</option>
+                    <option>PSMF</option>
+                </select>
+                <span class="detail">-Pick a Diet from list if any of them apply to You - Can always change it later!</span>
+                <span class="detail">(This Choice is simply for tracking stats - Will Not affect results &recommendations)</span>
+                <input class="ftButton" type="submit" value="Register" />
+            </div>
         </form>
     </main>
     <footer class="subblock boxShow">
