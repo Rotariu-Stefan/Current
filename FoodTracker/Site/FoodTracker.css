@@ -162,12 +162,11 @@ footer {
 }
 
 .ftButton {
-    padding: 0.5rem;
+    padding: 0.3rem;
     margin: 0.1rem;
-    width: 100%;
     background-color: #BB6666;
     font-size: 1rem;
     font-weight: bold;
-    border: 2px solid black;
+    border-color:black;
 }
 /*#endregion Misc Classes*/

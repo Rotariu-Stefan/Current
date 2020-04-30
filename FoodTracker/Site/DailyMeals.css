@@ -46,20 +46,13 @@ main {
         font-weight: bold;
     }
 
-    .datepick button {
-        width: 2rem;
-        background-color: #BB6666;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
 .mealsArea {
     flex: auto;
     overflow: auto;
 }
 
 .mealArea {
-    margin-top:1rem;
+    margin-top: 1rem;
 }
 
 .mealTitle, .mealTotal, .macroRes {
@@ -67,8 +60,11 @@ main {
     font-weight: bold;
 }
 
-.foodEntries {
-}
+    .mealTitle img {
+        float: right;
+        padding: 0 0.5rem;
+        border: 1px solid black;
+    }
 
 .foodEntry {
     display: grid;
@@ -218,4 +214,8 @@ main {
     .note label {
         font-size: 0.8rem;
     }
+
+.hidden {
+    display: none;
+}
 /*#endregion Main Misc*/
