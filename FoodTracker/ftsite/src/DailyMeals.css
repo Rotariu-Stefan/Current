@@ -1,0 +1,221 @@
+﻿/*#region Main Outline*/
+main {
+    padding: 0.3rem;
+    display: grid;
+    grid-gap: 0.3rem;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    align-content: center;
+}
+
+@media only screen and (min-width: 1245px) {
+    main {
+        grid-template-columns: repeat(3, minmax(20rem, 1fr));
+    }
+}
+
+@media only screen and (min-width: 376px) and (max-width: 430px), (min-width: 1630px), (min-width: 270px) and (max-width: 307px) {
+    main {
+        justify-items: center;
+    }
+
+    #dayArea, #searchArea, #foodDetailsArea {
+        width: 35rem;
+    }
+}
+
+#dayArea, #searchArea, #foodDetailsArea {
+    height: 40rem;
+    padding: 0.2rem;
+}
+/*#endregion Main Outline*/
+
+/*#region DayArea Block*/
+#dayArea {
+    display: flex;
+    flex-direction: column;
+}
+
+.datepick {
+    text-align: center;
+}
+
+    .datepick input {
+        height: 2rem;
+        font-size: 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+
+.mealsArea {
+    flex: auto;
+    overflow: auto;
+}
+
+.mealArea {
+    margin-top: 1rem;
+}
+
+.mealTitle, .mealTotal, .macroRes {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+    .mealTitle img {
+        float: right;
+        padding: 0 0.5rem;
+        border: 1px solid black;
+    }
+
+.foodEntry {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 5rem;
+}
+
+    .foodEntry:hover {
+        color: coral;
+        background-color: saddlebrown;
+    }
+
+.name_brand {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+    .name_brand:hover {
+        white-space: normal;
+        word-break: break-all;
+    }
+
+.macroRes {
+    grid-column: span 3;
+    justify-self: center;
+}
+
+.mealTotal {
+    text-align: center;
+}
+
+    .mealTotal span {
+        width: 0px;
+        white-space: nowrap;
+        float: left;
+    }
+/*#endregion DayArea Block*/
+
+/*#region SearchArea Block*/
+#searchArea {
+    display: flex;
+    flex-direction: column;
+}
+
+    #searchArea form {
+        padding: 0.2rem;
+        text-align: right;
+    }
+
+        #searchArea form label {
+            float: left;
+        }
+
+    #searchArea .search {
+        height: 2rem;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    #searchArea .amountSize {
+        height: 2rem;
+        width: 30%;
+        padding: 0 0.2rem;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+.searchResults {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    background-color: rgba(255, 241, 224, 0.5);
+}
+
+.foodItem {
+    display: grid;
+    grid-template-columns: 1fr 4rem 3rem;
+}
+
+    .foodItem:hover {
+        color: coral;
+        background-color: saddlebrown;
+    }
+
+.buffer {
+    height: 2.2rem;
+}
+
+.searchEntry {
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+/*#endregion SearchArea Block*/
+
+/*#region FoodDetailsArea Block*/
+#foodDetailsArea {
+    display: flex;
+    flex-direction: column;
+}
+
+    #foodDetailsArea table {
+        width: 100%;
+    }
+
+    #foodDetailsArea table, #foodDetailsArea td, #foodDetailsArea th {
+        border: 1px solid red;
+        border-collapse: collapse;
+    }
+
+.foodDetailsHeader > :first-child {
+    text-align: center;
+}
+
+.foodPic {
+    width: 100%;
+    margin: 0.3rem 0;
+    max-height: 40%;
+}
+
+.foodInfo {
+    flex: auto;
+    overflow: auto;
+}
+/*#endregion FoodDetailsArea Block*/
+
+/*#region Main Misc*/
+.note {
+    display: flex;
+    align-items: center;
+}
+
+    .note img {
+        width: 2rem;
+        height: 2rem;
+        padding-right: 0.2rem;
+    }
+
+    .note span {
+        padding-right: 0.2rem;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .note label {
+        font-size: 0.8rem;
+    }
+
+.hidden {
+    display: none;
+}
+/*#endregion Main Misc*/

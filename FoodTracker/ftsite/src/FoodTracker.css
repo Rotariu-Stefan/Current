@@ -1,0 +1,172 @@
+﻿/*#region Page Outline*/
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    font-size: 15px;
+}
+
+@media only screen and (min-width: 3000px) {
+    html {
+        font-size: 35px;
+    }
+}
+
+@media only screen and (max-width: 750px) {
+    html {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 350px) {
+    html {
+        font-size: 7px;
+    }
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    padding: 0.3rem 0.6rem;
+    background: url(SitePics/FTBack2.jpg) no-repeat center center fixed;
+    background-size: cover;
+    font-family: Calibri;
+    color: #550000;
+    display: grid;
+    grid-gap: 0.15rem;
+    grid-template-rows: auto auto 1fr auto;
+}
+
+/*body:after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: url(SitePics/FTBack2.jpg) no-repeat center center fixed;
+        background-size: cover;
+        opacity: 0.5;
+        z-index: -1;
+    }*/
+
+.subblock {
+    padding: 1px;
+    background-color: rgba(255, 228, 196, 0.4);
+}
+/*#endregion Page*/
+
+/*#region Page Sections*/
+header {
+    min-width: 100%;
+    display: flex;
+}
+
+nav {
+    min-width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+footer {
+    min-width: 100%;
+    text-align: center;
+}
+/*#endregion Page Section*/
+
+/*#region Top Section*/
+.logo {
+    padding: 2px;
+    width: 5rem;
+    height: 5rem;
+}
+
+#titleArea {
+    flex: auto;
+}
+
+    #titleArea > a {
+        color: #550000;
+        text-decoration: none;
+    }
+
+#profileArea {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+    #profileArea > :first-child {
+        grid-column: span 2;
+        text-align: center;
+    }
+
+    #profileArea img {
+        height: 2rem;
+    }
+
+#title {
+    font-size: 3rem;
+    text-decoration: underline;
+}
+
+#subtitle {
+    font-size: 1rem;
+    font-style: italic;
+}
+
+.navlink {
+    padding: 1px;
+    text-align: center;
+    color: #550000;
+    text-decoration: none;
+}
+
+    .navlink:visited {
+        color: #884444;
+    }
+
+    .navlink:hover {
+        color: coral;
+        background-color: saddlebrown;
+    }
+/*#endregion Top Section*/
+
+/*#region Bottom Section*/
+#author {
+    margin: 1px;
+    padding: 1px;
+    font-size: 1rem;
+}
+/*#endregion Bottom Section*/
+
+/*#region Misc Classes*/
+.textHigh {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.boxShowS {
+    margin: 1px;
+    border: 1px solid red;
+    border-radius: 5px;
+}
+
+.lineDown {
+    border-bottom: 1px solid black;
+}
+
+.ftButton {
+    padding: 0.3rem;
+    margin: 0.1rem;
+    background-color: #BB6666;
+    font-size: 1rem;
+    font-weight: bold;
+    border-color:black;
+}
+/*#endregion Misc Classes*/
