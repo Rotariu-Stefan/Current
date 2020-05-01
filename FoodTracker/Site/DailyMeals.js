@@ -22,8 +22,9 @@ addButton.addEventListener("click",
     () => addFoodEntry(foodEntriesSets.length - 1, "1", "avocado", "1/1/1", "11/11/11"));
 
 const mealToggleView = (mealIndex) => {
+    console.log("MEAL INDEX:" + mealIndex);
     foodEntriesSets[mealIndex].classList.toggle("hidden");
-};
+}
 
 const dropThings = document.querySelectorAll(".mealTitle img");
 dropThings.forEach((x, i) => x.addEventListener("click", () => mealToggleView(i)));
@@ -35,15 +36,20 @@ const addDefaultMeal = () => {
 
     const mealTitle = mealArea.appendChild(document.createElement("div"));
     mealTitle.classList = "mealTitle lineDown";
-    //mealTitle.appendChild(document.createTextNode(mealName));
-    mealTitle.innerText = "Meal" + foodEntriesSets.length;
+    mealTitle.innerText = "Meal" + (foodEntriesSets.length + 1);
     const dots = mealTitle.appendChild(document.createElement("img"));
     dots.setAttribute("src", "PLACEHOLDER IMAGE");
     dots.setAttribute("alt", "...");
 
     const note = mealArea.appendChild(document.createElement("div"));
     note.classList = "note lineDown";
-    note.innerText = "Llalalalala placeholder";
+    const notei = note.appendChild(document.createElement("img"));
+    notei.setAttribute("src", "SitePics/star.png");
+    notei.setAttribute("alt", "[STAR]");
+    const notel = note.appendChild(document.createElement("label"));
+    const notels = notel.appendChild(document.createElement("span"));
+    notels.innerText = "Meal Note Title";
+    notel.appendChild(document.createTextNode("Note Text asd asd dsa"));
 
     const foodEntries = mealArea.appendChild(document.createElement("div"));
     foodEntries.classList = "foodEntries lineDown";
@@ -54,6 +60,9 @@ const addDefaultMeal = () => {
     someText.innerText = "Meal Total";
     someText = mealTotal.appendChild(document.createElement("label"));
     someText.innerText = "0/0/0";
+
+    let WTF = foodEntriesSets.length;
+    dots.addEventListener("click", () => mealToggleView(WTF));
 
     foodEntriesSets = document.querySelectorAll(".mealsArea .foodEntries");
 };
