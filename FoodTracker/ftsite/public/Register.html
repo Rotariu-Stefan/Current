@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Sv FoodTracker</title>
+</head>
+<body>
+    <header class="subblock boxShow">
+        <img src="SitePics/head.png" alt="[NO LOGO]" class="logo" />
+        <div id="titleArea">
+            <a href="MainPages/home.html">
+                <h1 id="title">FoodTracker</h1>
+                <h3 id="subtitle">Define and Track your Food and diet goals on Your own terms!</h3>
+            </a>
+        </div>
+        <div id="profileArea" class="boxShow">
+            <a href="">
+                Guest<br />
+                <img src="SitePics/profileEmpty.png" alt="[NO PIC]" />
+            </a>
+            <a href="Register.html" class="navlink">Register</a>
+            <a href="Login.html" class="navlink">Login</a>
+        </div>
+    </header>
+    <nav class="subblock boxShow">
+        <a href="index.html" class="navlink textHigh">Daily Meals</a>|
+        <a href="MainPages/YourFood.html" class="navlink textHigh">Your Food</a>|
+        <a href="MainPages/YourPlans.html" class="navlink textHigh">Your Plans</a>|
+        <a href="MainPages/YourStats.html" class="navlink textHigh">Your Stats</a>|
+        <a href="MainPages/GlobalStats.html" class="navlink textHigh">Global Stats</a>|
+        <a href="MainPages/GlobalData.html" class="navlink textHigh">Global Data</a>
+    </nav>
+    <main class="boxShow">
+        <form id="regform" class="subblock boxShow">
+            <h1 class="lineDown">Please Complete ALL fields to Register!</h1>
+            <div class="fields">
+                <span>Username: </span><input type="text" name="username" />
+                <span class="warning">How DARE You, Sir!</span>
+                <span>Email:</span> <input type="email" name="email" />
+                <span>Password: </span><input type="password" name="password" />
+                <span class="detail">Password must be at least 6characters long and have both numbers and letters!</span>
+                <span>Confirm Password: </span><input type="password" name="cpass" />
+                <span>First Name: </span><input type="text" name="firstname" />
+                <span>Last Name: </span><input type="text" name="lastname" />
+                <span>Date Of Birth: </span><input type="date" name="dob" />
+                <div>
+                    <span>Sex: </span><input type="radio" name="sex" value="male" /><span>Male </span>
+                    <input type="radio" name="sex" value="female" /><span>Female</span>
+                </div>
+                <div class="personal">
+                    <div>
+                        <img src="SitePics/profileEmpty.png" /><br />
+                        <button>Browse</button>
+                    </div>
+                    <div>
+                        <span>Short Description:</span><br />
+                        <textarea placeholder="Say who you are in a few short phrases.."></textarea>
+                    </div>
+                </div>
+                <span>Diet Plans?</span>
+                <select>
+                    <option>Paleo</option>
+                    <option>Keto</option>
+                    <option>Mediterranian</option>
+                    <option>Vegan</option>
+                    <option>Carnivore</option>
+                    <option>Low Carb</option>
+                    <option>Low Fat</option>
+                    <option>PSMF</option>
+                </select>
+                <span class="detail">-Pick a Diet from list if any of them apply to You - Can always change it later!</span>
+                <span class="detail">(This Choice is simply for tracking stats - Will Not affect results &recommendations)</span>
+                <input class="ftButton" type="submit" value="Register" />
+            </div>
+        </form>
+    </main>
+    <footer class="subblock boxShow">
+        <h3 id="author">Made by Rotariu Stefan<sub> - StravoS</sub></h3>
+    </footer>
+</body>
+</html>
