@@ -1,5 +1,7 @@
-import '/src/FoodTracker.css';
-import './RegLog.css';
-import * as serviceWorker from './serviceWorker';
+﻿const loginButton = document.querySelector("#logform");
+const warn = document.querySelector(".warning");
 
-serviceWorker.unregister();
+loginButton.addEventListener("submit", (e) => {
+    e.preventDefault();
+    warn.innerText = "NO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\n"
+});
