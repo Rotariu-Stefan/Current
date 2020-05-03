@@ -1,5 +1,5 @@
 ﻿/*#region Main*/
-main {
+.mainRegLog {
     padding: 0.3rem;
     display: grid;
     grid-template-columns: minmax(30rem, 50rem);

@@ -1,33 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import { BrowserRouter } from 'react-router-dom';
+import Header from './Sections/Header';
+import Nav from './Sections/Nav';
+import Main from './Sections/Main';
+import Footer from './Sections/Footer';
 
 ReactDOM.render(
-    <App />,
-  document.getElementById('foodDetailsArea')
-);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+    <BrowserRouter>
+        <Header />
+        <Nav />
+        <Main />
+        <Footer />
+    </BrowserRouter>,
+    document.querySelector("#root"));

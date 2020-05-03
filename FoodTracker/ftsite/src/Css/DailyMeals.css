@@ -1,5 +1,5 @@
 ﻿/*#region Main Outline*/
-main {
+.mainDailyMeals {
     padding: 0.3rem;
     display: grid;
     grid-gap: 0.3rem;
@@ -8,13 +8,13 @@ main {
 }
 
 @media only screen and (min-width: 1245px) {
-    main {
+    .mainDailyMeals {
         grid-template-columns: repeat(3, minmax(20rem, 1fr));
     }
 }
 
 @media only screen and (min-width: 376px) and (max-width: 430px), (min-width: 1630px), (min-width: 270px) and (max-width: 307px) {
-    main {
+    .mainDailyMeals {
         justify-items: center;
     }
 

@@ -1,9 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\public",
     "\\src",
-    "\\src\\components"
+    "\\src\\Components",
+    "\\src\\Css",
+    "\\src\\MainPages",
+    "\\src\\Sections"
   ],
-  "SelectedNode": "\\src\\index.js",
+  "SelectedNode": "\\src\\Components\\FoodItem.js",
   "PreviewInSolutionExplorer": false
 }
