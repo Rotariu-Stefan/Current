@@ -7,7 +7,7 @@ const Header = () => {
         <header className="subblock boxShow">
             <img src="SitePics/head.png" alt="[NO LOGO]" className="logo" />
             <div id="titleArea">
-                <NavLink to="/Home">
+                <NavLink to="/">
                     <h1 id="title">FoodTracker</h1>
                     <h3 id="subtitle">Define and Track your Food and diet goals on Your own terms!</h3>
                 </NavLink>

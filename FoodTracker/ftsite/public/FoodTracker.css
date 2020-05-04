@@ -162,6 +162,11 @@ footer {
     border-radius: 5px;
 }
 
+.highlight {
+    border: 3px double coral;
+    border-radius: 10px;
+}
+
 .lineDown {
     border-bottom: 1px solid black;
 }

@@ -19,7 +19,7 @@ import Error from '../MainPages/Error';
 const Main = () => {
     return (
         <Switch>
-            <Route path="/Home" component={Home} />
+            <Route path="/" component={Home} exact/>
             <Route path="/DailyMeals" component={DailyMeals} />
             <Route path="/YourFood" component={YourFood} />
             <Route path="/YourPlans" component={YourPlans} />
