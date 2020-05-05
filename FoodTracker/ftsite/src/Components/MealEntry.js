@@ -11,8 +11,8 @@ class MealEntry extends React.Component {
             name: name === undefined ? this.nameDef : name,
             foodEntries: [],
             foodKey: 1,
-            topClasses: "mealArea boxShow",
-            foodEntriesClasses: "foodEntries lineDown"
+            topHightlight: "",
+            foodEntriesHidden: ""
         };
 
         this.state.foodEntries = [<FoodEntry key="0" amount="100g" name_brand="cottage cheese @delaco" macros="4.5/2/12" macrores="111/111/111" />];
@@ -26,23 +26,22 @@ class MealEntry extends React.Component {
         });
     }
 
-    highlight = () => {
-        this.setState({ topClasses: this.state.topClasses === "mealArea boxShow" ? "mealArea boxShow highlight" : "mealArea boxShow" });
-    }
+    highlight = () => this.setState({
+        topHightlight: this.state.topHightlight === "" ? " highlight" : ""
+    });
 
-    toggleFoodEntries = (ev) => {
-        console.log("DOTS!!!");
-        this.setState({ foodEntriesClasses: this.state.foodEntriesClasses === "foodEntries lineDown" ? "foodEntries lineDown hidden" : "foodEntries lineDown" });
-    }
+    toggleFoodEntries = (ev) => this.setState({
+        foodEntriesHidden: this.state.foodEntriesHidden === "" ? " hidden" : ""
+    });
 
     render = () => {
         return (
-            <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={this.state.topClasses}>
+            <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"mealArea boxShow" + this.state.topHightlight}>
                 <div className="mealTitle">{this.state.name === undefined ? this.nameDef : this.state.name}<img onClick={this.toggleFoodEntries} src="PLACEHOLDER DROPDOWN" alt="..." /></div>
                 <hr />
                 <Note />
                 <hr />
-                <div className={this.state.foodEntriesClasses}>
+                <div className={"foodEntries lineDown" + this.state.foodEntriesHidden}>
                     {this.state.foodEntries}
                 </div>
                 <div className="mealTotal">
