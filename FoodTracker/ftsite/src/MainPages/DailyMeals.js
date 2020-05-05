@@ -35,7 +35,6 @@ class DailyMeals extends React.Component {
     }
 
     onRemoveMeal = (ev, senderKey) => {
-        console.log("REMOVE FROM: ", senderKey);
         for (let i = 0; i < this.state.mealEntries.length; i++)
             if (this.state.mealEntries[i].key === senderKey) {
                 this.setState({

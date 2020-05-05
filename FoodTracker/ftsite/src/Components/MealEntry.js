@@ -3,16 +3,16 @@ import FoodEntry from './FoodEntry';
 import Note from './Note';
 
 class MealEntry extends React.Component {
-    constructor({ name }) {
+    constructor(props) {
         super();
         this.nameDef = "Meal";
 
         this.state = {
-            name: name === undefined ? this.nameDef : name,
+            name: props.name === undefined ? this.nameDef : props.name,
             foodEntries: [],
             foodKey: 1,
-            topHightlight: "",
-            foodEntriesHidden: ""
+            highlight: false,
+            min: false
         };
 
         this.state.foodEntries.push(<FoodEntry key="0" amount="100g" name_brand="cottage cheese @delaco" macros="4.5/2/12" macrores="111/111/111" />);
@@ -27,28 +27,28 @@ class MealEntry extends React.Component {
     }
 
     toggleHighlight = () => this.setState({
-        topHightlight: this.state.topHightlight === "" ? " highlight" : ""
+        highlight: !this.state.highlight
     });
 
-    toggleFoodEntries = (ev) => {
+    toggleMinMax = (ev) => {
         this.setState({
-            foodEntriesHidden: this.state.foodEntriesHidden === "" ? " hidden" : ""
+            min: !this.state.min
         });
         ev.stopPropagation();
     }
 
     render = () => {
         return (
-            <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"mealArea boxShow" + this.state.topHightlight}>
+            <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"mealArea boxShow" + (this.state.highlight ? " highlight" : "")}>
                 <div className="mealTitle">{this.state.name === undefined ? this.nameDef : this.state.name}
                     <img onClick={(ev) => this.props.removeMeal(ev, this._reactInternalFiber.key)} src="PLACEHOLDER DROPDOWN" alt="X" />
-                    <img onClick={this.toggleFoodEntries} src="PLACEHOLDER DROPDOWN" alt="..." />
+                    <img onClick={this.toggleMinMax} src="PLACEHOLDER DROPDOWN" alt={this.state.min ? "+" : "-"} />
                 </div>
 
                 <hr />
                 <Note />
                 <hr />
-                <div className={"foodEntries lineDown" + this.state.foodEntriesHidden}>
+                <div className={"foodEntries lineDown" + (this.state.min ? " hidden" : "")}>
                     {this.state.foodEntries}
                 </div>
                 <div className="mealTotal">
