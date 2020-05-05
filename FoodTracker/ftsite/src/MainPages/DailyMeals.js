@@ -13,41 +13,56 @@ class DailyMeals extends React.Component {
         this.state = {
             mealEntries: [],
             mealKey: 1,
-            mealEntriesRef: [React.createRef()],
-            selectedIndex: 0,
+            selectedMeal: React.createRef(),
             foodSItems: [],
         };
 
-        this.state.mealEntries = [<MealEntry selectedChanged={this.onSelectedChanged} ref={this.state.mealEntriesRef[0]} key="0" />];
+        this.state.mealEntries.push(<MealEntry selectedChanged={this.onSelectedChanged} removeMeal={this.onRemoveMeal} ref={this.state.selectedMeal} key="0" />);
+
         for (let i = 0; i < 10; i++) {
             this.state.foodSItems.push(<FoodItem macros={`${i}/${i}/${i}`} per={(i + 1) * 10} key={i} />);
         };
     }
 
     addNewMealEntry = (ev) => {
-        this.state.mealEntriesRef.push(React.createRef());
-        const newMeal = <MealEntry selectedChanged={this.onSelectedChanged} ref={this.state.mealEntriesRef[this.state.mealKey]} name={"Meal" + this.state.mealKey} key={this.state.mealKey} />;
+        const newMeal = <MealEntry selectedChanged={this.onSelectedChanged} removeMeal={this.onRemoveMeal} name={"Meal" + this.state.mealKey} key={this.state.mealKey} />;
         this.state.mealEntries.push(newMeal);
 
         this.setState({
             mealEntries: this.state.mealEntries,
             mealKey: this.state.mealKey + 1,
-            mealEntriesRef: this.state.mealEntriesRef
         });
     }
 
+    onRemoveMeal = (ev, senderKey) => {
+        console.log("REMOVE FROM: ", senderKey);
+        for (let i = 0; i < this.state.mealEntries.length; i++)
+            if (this.state.mealEntries[i].key === senderKey) {
+                this.setState({
+                    mealEntries: this.state.mealEntries.filter((meal) => meal.key !== senderKey),
+                });
+                break;
+            }
+        if (this.state.selectedMeal !== null && this.state.selectedMeal._reactInternalFiber.key === senderKey)
+            this.setState({
+                selectedMeal: null
+            });
+        ev.stopPropagation();
+    }
+
     addNewFoodEntry = (ev) => {
-        this.state.mealEntriesRef[this.state.selectedIndex].current.addNewFoodEntry(ev);
+        this.state.selectedMeal.addNewFoodEntry(ev);
     }
 
     onSelectedChanged = (ev, sender) => {
-        for (let i = 0; i < this.state.mealEntriesRef.length; i++)
-            if (sender === this.state.mealEntriesRef[i].current)
-                if (this.state.selectedIndex !== i) {
-                    this.state.mealEntriesRef[this.state.selectedIndex].current.highlight();
-                    this.state.mealEntriesRef[i].current.highlight();
-                    this.setState({ selectedIndex: i });
-                }
+        if (sender !== this.state.selectedMeal) {
+            if (this.state.selectedMeal !== null)
+                this.state.selectedMeal.toggleHighlight();
+            sender.toggleHighlight();
+            this.setState({
+                selectedMeal: sender
+            });
+        }
     }
 
     render() {
@@ -130,7 +145,12 @@ class DailyMeals extends React.Component {
     }
 
     componentDidMount() {
-        this.state.mealEntriesRef[0].current.highlight();
+        if (this.state.selectedMeal.current !== undefined) {
+            this.state.selectedMeal.current.toggleHighlight();
+            this.setState({
+                selectedMeal: this.state.selectedMeal.current
+            });
+        }
     }
 }
 

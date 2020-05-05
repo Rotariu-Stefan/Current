@@ -15,7 +15,7 @@ class MealEntry extends React.Component {
             foodEntriesHidden: ""
         };
 
-        this.state.foodEntries = [<FoodEntry key="0" amount="100g" name_brand="cottage cheese @delaco" macros="4.5/2/12" macrores="111/111/111" />];
+        this.state.foodEntries.push(<FoodEntry key="0" amount="100g" name_brand="cottage cheese @delaco" macros="4.5/2/12" macrores="111/111/111" />);
     }
 
     addNewFoodEntry = (ev) => {
@@ -26,18 +26,25 @@ class MealEntry extends React.Component {
         });
     }
 
-    highlight = () => this.setState({
+    toggleHighlight = () => this.setState({
         topHightlight: this.state.topHightlight === "" ? " highlight" : ""
     });
 
-    toggleFoodEntries = (ev) => this.setState({
-        foodEntriesHidden: this.state.foodEntriesHidden === "" ? " hidden" : ""
-    });
+    toggleFoodEntries = (ev) => {
+        this.setState({
+            foodEntriesHidden: this.state.foodEntriesHidden === "" ? " hidden" : ""
+        });
+        ev.stopPropagation();
+    }
 
     render = () => {
         return (
             <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"mealArea boxShow" + this.state.topHightlight}>
-                <div className="mealTitle">{this.state.name === undefined ? this.nameDef : this.state.name}<img onClick={this.toggleFoodEntries} src="PLACEHOLDER DROPDOWN" alt="..." /></div>
+                <div className="mealTitle">{this.state.name === undefined ? this.nameDef : this.state.name}
+                    <img onClick={(ev) => this.props.removeMeal(ev, this._reactInternalFiber.key)} src="PLACEHOLDER DROPDOWN" alt="X" />
+                    <img onClick={this.toggleFoodEntries} src="PLACEHOLDER DROPDOWN" alt="..." />
+                </div>
+
                 <hr />
                 <Note />
                 <hr />
