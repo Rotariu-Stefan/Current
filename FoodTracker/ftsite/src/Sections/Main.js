@@ -29,7 +29,7 @@ const Main = () => {
             <Route path="/GlobalData" component={GlobalData} />
             <Route path="/Login" component={Login} />
             <Route path="/Register" component={Register} />
-            <Route component={Error} />
+            //<Route component={Error} />
         </Switch>
     );
 }
