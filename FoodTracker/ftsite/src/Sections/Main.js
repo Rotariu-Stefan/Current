@@ -17,19 +17,20 @@ import Register from '../MainPages/Register';
 import Error from '../MainPages/Error';
 
 const Main = () => {
-    return ( <DailyMeals />
-        //<Switch>
-        //    <Route path="/" component={Home} exact/>
-        //    <Route path="/DailyMeals" component={DailyMeals} />
-        //    <Route path="/YourFood" component={YourFood} />
-        //    <Route path="/YourPlans" component={YourPlans} />
-        //    <Route path="/YourStats" component={YourStats} />
-        //    <Route path="/GlobalStats" component={GlobalStats} />
-        //    <Route path="/GlobalData" component={GlobalData} />
-        //    <Route path="/Login" component={Login} />
-        //    <Route path="/Register" component={Register} />
-        //    <Route component={Error} />
-        //</Switch>
+    return (
+        //<DailyMeals />
+        <Switch>
+            <Route path="/" component={Home} exact/>
+            <Route path="/DailyMeals" component={DailyMeals} />
+            <Route path="/YourFood" component={YourFood} />
+            <Route path="/YourPlans" component={YourPlans} />
+            <Route path="/YourStats" component={YourStats} />
+            <Route path="/GlobalStats" component={GlobalStats} />
+            <Route path="/GlobalData" component={GlobalData} />
+            <Route path="/Login" component={Login} />
+            <Route path="/Register" component={Register} />
+            <Route component={Error} />
+        </Switch>
     );
 }
 

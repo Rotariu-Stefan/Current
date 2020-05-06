@@ -1,15 +1,15 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Nav = () => {
     return (
         <nav className="subblock boxShow">
-            <NavLink className="navlink textHigh" to="/DailyMeals">Daily Meals</NavLink>|
-                <NavLink className="navlink textHigh" to="/YourFood">Your Food</NavLink>|
-                <NavLink className="navlink textHigh" to="/YourPlans">Your Plans</NavLink>|
-                <NavLink className="navlink textHigh" to="/YourStats">Your Stats</NavLink>|
-                <NavLink className="navlink textHigh" to="/GlobalStats">Global Stats</NavLink>|
-                <NavLink className="navlink textHigh" to="/GlobalData">Global Data</NavLink>
+            <Link className="navlink textHigh" to="/DailyMeals">Daily Meals</Link>|
+            <Link className="navlink textHigh" to="/YourFood">Your Food</Link>|
+            <Link className="navlink textHigh" to="/YourPlans">Your Plans</Link>|
+            <Link className="navlink textHigh" to="/YourStats">Your Stats</Link>|
+            <Link className="navlink textHigh" to="/GlobalStats">Global Stats</Link>|
+            <Link className="navlink textHigh" to="/GlobalData">Global Data</Link>
         </nav>
     );
 }
