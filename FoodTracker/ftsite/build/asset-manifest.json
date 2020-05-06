@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "./static/css/main.b39c2f75.chunk.css",
-    "main.js": "./static/js/main.e9391863.chunk.js",
-    "main.js.map": "./static/js/main.e9391863.chunk.js.map",
-    "runtime-main.js": "./static/js/runtime-main.68301743.js",
-    "runtime-main.js.map": "./static/js/runtime-main.68301743.js.map",
-    "static/js/2.0b84af94.chunk.js": "./static/js/2.0b84af94.chunk.js",
-    "static/js/2.0b84af94.chunk.js.map": "./static/js/2.0b84af94.chunk.js.map",
-    "index.html": "./index.html",
-    "precache-manifest.d69e779baad136605a263904bd845a84.js": "./precache-manifest.d69e779baad136605a263904bd845a84.js",
-    "service-worker.js": "./service-worker.js",
-    "static/css/main.b39c2f75.chunk.css.map": "./static/css/main.b39c2f75.chunk.css.map",
-    "static/js/2.0b84af94.chunk.js.LICENSE.txt": "./static/js/2.0b84af94.chunk.js.LICENSE.txt"
+    "main.css": "/Current/FoodTracker/ftsite/build/static/css/main.b39c2f75.chunk.css",
+    "main.js": "/Current/FoodTracker/ftsite/build/static/js/main.65453a6f.chunk.js",
+    "main.js.map": "/Current/FoodTracker/ftsite/build/static/js/main.65453a6f.chunk.js.map",
+    "runtime-main.js": "/Current/FoodTracker/ftsite/build/static/js/runtime-main.929710bf.js",
+    "runtime-main.js.map": "/Current/FoodTracker/ftsite/build/static/js/runtime-main.929710bf.js.map",
+    "static/js/2.0b84af94.chunk.js": "/Current/FoodTracker/ftsite/build/static/js/2.0b84af94.chunk.js",
+    "static/js/2.0b84af94.chunk.js.map": "/Current/FoodTracker/ftsite/build/static/js/2.0b84af94.chunk.js.map",
+    "index.html": "/Current/FoodTracker/ftsite/build/index.html",
+    "precache-manifest.74ff7652ca96df8feefac236997a3e57.js": "/Current/FoodTracker/ftsite/build/precache-manifest.74ff7652ca96df8feefac236997a3e57.js",
+    "service-worker.js": "/Current/FoodTracker/ftsite/build/service-worker.js",
+    "static/css/main.b39c2f75.chunk.css.map": "/Current/FoodTracker/ftsite/build/static/css/main.b39c2f75.chunk.css.map",
+    "static/js/2.0b84af94.chunk.js.LICENSE.txt": "/Current/FoodTracker/ftsite/build/static/js/2.0b84af94.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.68301743.js",
+    "static/js/runtime-main.929710bf.js",
     "static/js/2.0b84af94.chunk.js",
     "static/css/main.b39c2f75.chunk.css",
-    "static/js/main.e9391863.chunk.js"
+    "static/js/main.65453a6f.chunk.js"
   ]
 }
