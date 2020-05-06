@@ -7,7 +7,7 @@ const Note = ({ grade, title, text }) => {
 
     return (
         <div className="note boxShow">
-            <img src="SitePics/star.png" alt={"[STAR]" + grade === undefined ? gradeDef : grade} />
+            <img src="Current/FoodTracker/ftsite/build/SitePics/star.png" alt={"[STAR]" + grade === undefined ? gradeDef : grade} />
             <label><span>{title === undefined ? titleDef : title}</span>
                 {text === undefined ? textDef : text}</label>
         </div>

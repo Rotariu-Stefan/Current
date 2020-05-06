@@ -22,7 +22,7 @@ const Register = () => {
                     </div>
                     <div className="personal">
                         <div>
-                            <img src="SitePics/profileEmpty.png" alt="[NO PIC]" /><br />
+                            <img src="Current/FoodTracker/ftsite/build/SitePics/profileEmpty.png" alt="[NO PIC]" /><br />
                             <button>Browse</button>
                         </div>
                         <div>

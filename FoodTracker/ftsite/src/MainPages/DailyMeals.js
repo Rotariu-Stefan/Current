@@ -114,7 +114,7 @@ class DailyMeals extends React.Component {
                         <hr />
                         <Note />
                     </div>
-                    <img src="FoodPics/cottage cheese @delaco.jpg" className="foodPic boxShow" alt="[NO FOOD PIC]" />
+                    <img src="Current/FoodTracker/ftsite/build/FoodPics/cottage cheese @delaco.jpg" className="foodPic boxShow" alt="[NO FOOD PIC]" />
                     <div className="foodInfo">
                         <table>
                             <thead>
