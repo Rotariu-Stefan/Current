@@ -11,9 +11,9 @@ const main = React.createRef();
 
 ReactDOM.render(
     [
-        <Header navClick={(navText) => main.current.changePage(navText)} />,
-        <Nav navClick={(navText) => main.current.changePage(navText)} />,
-        <Main ref={main} page="Home" />,
-        <Footer />
+        <Header key="H" navClick={(navText) => main.current.changePage(navText)} />,
+        <Nav key="N" navClick={(navText) => main.current.changePage(navText)} />,
+        <Main key="M" ref={main} page="Home" />,
+        <Footer key="F" />
     ],
     document.querySelector("#root"));

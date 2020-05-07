@@ -40,7 +40,7 @@ class MealEntry extends React.Component {
     render = () => {
         return (
             <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"mealArea boxShow" + (this.state.highlight ? " highlight" : "")}>
-                <div className="mealTitle">{this.state.name === undefined ? this.nameDef : this.state.name}
+                <div className="mealTitle">{this.state.name}
                     <img onClick={(ev) => this.props.removeMeal(ev, this._reactInternalFiber.key)} src="PLACEHOLDER DROPDOWN" alt="X" />
                     <img onClick={this.toggleMinMax} src="PLACEHOLDER DROPDOWN" alt={this.state.min ? "+" : "-"} />
                 </div>
@@ -53,7 +53,7 @@ class MealEntry extends React.Component {
                 </div>
                 <div className="mealTotal">
                     <span>Meal Total:</span>
-                    <label>321/123/213</label>
+                    <span>321/123/213</span>
                 </div>
             </div>
         );
