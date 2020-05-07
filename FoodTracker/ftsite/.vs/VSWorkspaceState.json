@@ -1,10 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\build",
     "\\src",
-    "\\src\\Sections"
+    "\\src\\Components",
+    "\\src\\MainPages"
   ],
-  "SelectedNode": "\\build",
+  "SelectedNode": "\\src\\MainPages\\Register.js",
   "PreviewInSolutionExplorer": false
 }

@@ -67,5 +67,8 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
+    color: rebeccapurple;
+    text-decoration: underline;
+    cursor: pointer;
 }
 /*#endregion Main*/

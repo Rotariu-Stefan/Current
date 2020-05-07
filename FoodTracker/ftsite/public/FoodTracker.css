@@ -96,16 +96,14 @@ footer {
     flex: auto;
 }
 
-    #titleArea > a {
-        color: #550000;
-        text-decoration: none;
-    }
-
 #profileArea {
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
 
+    #profileArea * {
+        cursor: pointer;
+    }
     #profileArea > :first-child {
         grid-column: span 2;
         text-align: center;
@@ -114,6 +112,10 @@ footer {
     #profileArea img {
         height: 2rem;
     }
+
+#titleArea {
+    cursor: pointer;
+}
 
 #title {
     font-size: 3rem;
@@ -139,6 +141,7 @@ footer {
     .navlink:hover {
         color: coral;
         background-color: saddlebrown;
+        cursor: pointer;
     }
 /*#endregion Top Section*/
 
@@ -177,6 +180,6 @@ footer {
     background-color: #BB6666;
     font-size: 1rem;
     font-weight: bold;
-    border-color:black;
+    border-color: black;
 }
 /*#endregion Misc Classes*/

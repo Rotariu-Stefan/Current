@@ -50,7 +50,10 @@ class DailyMeals extends React.Component {
     }
 
     addNewFoodEntry = (ev) => {
-        this.state.selectedMeal.addNewFoodEntry(ev);
+        if (this.state.selectedMeal === null)
+            alert("Must select a Meal !");
+        else
+            this.state.selectedMeal.addNewFoodEntry(ev);
     }
 
     onSelectedChanged = (ev, sender) => {
@@ -114,7 +117,7 @@ class DailyMeals extends React.Component {
                         <hr />
                         <Note />
                     </div>
-                    <img src="Current/FoodTracker/ftsite/build/FoodPics/cottage cheese @delaco.jpg" className="foodPic boxShow" alt="[NO FOOD PIC]" />
+                    <img src="FoodPics/cottage cheese @delaco.jpg" className="foodPic boxShow" alt="[NO FOOD PIC]" />
                     <div className="foodInfo">
                         <table>
                             <thead>

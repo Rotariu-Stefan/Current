@@ -1,13 +1,13 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+//import { NavLink } from 'react-router-dom';
 
 import "../Css/RegLog.css";
 
 class Login extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
-            warningMsg : "Incorrect username/password! How DARE You, Sir!"
+            warningMsg: "Incorrect username/password! How DARE You, Sir!"
         }
     }
 
@@ -33,9 +33,15 @@ class Login extends React.Component {
                         <span className="warning">{this.state.warningMsg}</span>
                         <input className="ftButton" type="submit" value="Login" />
                     </div>
+                    {/*
                     <div className="loglinks">
                         <NavLink to="/">Forgot Password?</NavLink>
                         <NavLink to="/Register">New here? Go Register!</NavLink>
+                    </div>
+                    */}
+                    <div className="loglinks">
+                        <span onClick={() => this.props.navClick("Home")}>Forgot Password?</span>
+                        <span onClick={() => this.props.navClick("Register")}>New here? Go Register!</span>
                     </div>
                 </form>
             </main>

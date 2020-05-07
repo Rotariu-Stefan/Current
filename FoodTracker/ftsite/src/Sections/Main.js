@@ -1,9 +1,4 @@
-//import React from 'react';
-//import logo from './logo.svg';
-//import './App.css';
-
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
 
 import Home from "../MainPages/Home";
 import DailyMeals from '../MainPages/DailyMeals';
@@ -16,22 +11,65 @@ import Login from '../MainPages/Login';
 import Register from '../MainPages/Register';
 import Error from '../MainPages/Error';
 
-const Main = () => {
-    return (
-        //<DailyMeals />
-        <Switch>
-            <Route path="/" component={Home} exact/>
-            <Route path="/DailyMeals" component={DailyMeals} />
-            <Route path="/YourFood" component={YourFood} />
-            <Route path="/YourPlans" component={YourPlans} />
-            <Route path="/YourStats" component={YourStats} />
-            <Route path="/GlobalStats" component={GlobalStats} />
-            <Route path="/GlobalData" component={GlobalData} />
-            <Route path="/Login" component={Login} />
-            <Route path="/Register" component={Register} />
-            <Route component={Error} />
-        </Switch>
-    );
+//import { Route, Switch } from 'react-router-dom';
+//
+//const Main = () => {
+//    return (
+//        <Switch>
+//            <Route path="/" component={Home} exact/>
+//            <Route path="/DailyMeals" component={DailyMeals} />
+//            <Route path="/YourFood" component={YourFood} />
+//            <Route path="/YourPlans" component={YourPlans} />
+//            <Route path="/YourStats" component={YourStats} />
+//            <Route path="/GlobalStats" component={GlobalStats} />
+//            <Route path="/GlobalData" component={GlobalData} />
+//            <Route path="/Login" component={Login} />
+//            <Route path="/Register" component={Register} />
+//            <Route component={Error} />
+//        </Switch>
+//    );
+//}
+
+class Main extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            page: props.page
+        };
+    }
+
+    changePage = (newPage) => {
+        if (this.state.page !== newPage)
+            this.setState({
+                page: newPage
+            });
+    }
+
+    render = () => {
+        switch (this.state.page) {
+            case "Home":
+                return <Home />;
+            case "DailyMeals":
+                return <DailyMeals />;
+            case "YourFood":
+                return <YourFood />;
+            case "YourPlans":
+                return <YourPlans />;
+            case "YourStats":
+                return <YourStats />;
+            case "GlobalStats":
+                return <GlobalStats />;
+            case "GlobalData":
+                return <GlobalData />;
+            case "Register":
+                return <Register />;
+            case "Login":
+                return <Login navClick={(navText) => this.changePage(navText)} />;
+            default:
+                return <Error />;
+        }
+    }
 }
 
 export default Main;

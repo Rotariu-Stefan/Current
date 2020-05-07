@@ -4,7 +4,7 @@ import Note from './Note';
 
 class MealEntry extends React.Component {
     constructor(props) {
-        super();
+        super(props);
         this.nameDef = "Meal";
 
         this.state = {
