@@ -18,12 +18,12 @@ import React from 'react';
 const Nav = ({ navClick }) => {
     return (
         <nav className="subblock boxShow">
-            <span onClick={() => navClick("DailyMeals")} className="navlink textHigh">DailyMeals</span>|
-            <span onClick={() => navClick("YourFood")} className="navlink textHigh">YourFood</span>|
-            <span onClick={() => navClick("YourPlans")} className="navlink textHigh">YourPlans</span>|
-            <span onClick={() => navClick("YourStats")} className="navlink textHigh">YourStats</span>|
-            <span onClick={() => navClick("GlobalStats")} className="navlink textHigh">GlobalStats</span>|
-            <span onClick={() => navClick("GlobalData")} className="navlink textHigh">GlobalData</span>
+            <span onClick={() => navClick("DailyMeals")} className="navlink textHigh">Daily Meals</span>|
+            <span onClick={() => navClick("YourFood")} className="navlink textHigh">Your Food</span>|
+            <span onClick={() => navClick("YourPlans")} className="navlink textHigh">Your Plans</span>|
+            <span onClick={() => navClick("YourStats")} className="navlink textHigh">Your Stats</span>|
+            <span onClick={() => navClick("GlobalStats")} className="navlink textHigh">Global Stats</span>|
+            <span onClick={() => navClick("GlobalData")} className="navlink textHigh">Global Data</span>
         </nav>
     );
 }
