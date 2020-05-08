@@ -15,6 +15,7 @@ class DailyMeals extends React.Component {
             mealKey: 1,
             selectedMeal: React.createRef(),
             foodSItems: [],
+            selectedDay: new Date()
         };
 
         this.state.mealEntries.push(<MealEntry selectedChanged={this.onSelectedChanged} removeMeal={this.onRemoveMeal} ref={this.state.selectedMeal} key="0" />);
@@ -75,7 +76,7 @@ class DailyMeals extends React.Component {
                         <div className="datepick boxShow">
                             <label className="textHigh">Day: </label>
                             <button className="ftButton">{"<"}</button>
-                            <input type="date" name="day" />
+                            <input id="selectedDay" type="date" />
                             <button className="ftButton">{">"}</button>
                         </div>
                         <hr />
@@ -90,15 +91,15 @@ class DailyMeals extends React.Component {
                 <div id="searchArea" className="subblock boxShow">
                     <div className="searchInput boxShow">
                         <label className="textHigh">Search Food: </label>
-                        <input type="checkbox" name="yourFood" /> ALL Food
-                <input className="search" type="text" name="search" placeholder="search" />
+                        <input type="checkbox" /> ALL Food
+                <input className="search" type="text" placeholder="search" />
                     </div>
                     <div className="searchResults boxShow">
                         {this.state.foodSItems}
                     </div>
                     <div className="amountInput boxShow">
                         <label className="textHigh">Amount: </label>
-                        <input className="amountSize" type="text" defaultValue="100" name="amount" />
+                        <input className="amountSize" type="text" placeholder="100" />
                         <select>
                             <option>Grams</option>
                             <option>ML</option>
@@ -152,6 +153,8 @@ class DailyMeals extends React.Component {
     }
 
     componentDidMount() {
+        document.getElementById('selectedDay').valueAsDate = this.state.selectedDay;
+
         if (this.state.selectedMeal.current !== undefined) {
             this.state.selectedMeal.current.toggleHighlight();
             this.setState({

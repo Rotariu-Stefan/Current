@@ -2,9 +2,6 @@ import React from 'react';
 import "../Css/RegLog.css";
 
 class Register extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     onRegister = (ev) => {
         ev.preventDefault();
