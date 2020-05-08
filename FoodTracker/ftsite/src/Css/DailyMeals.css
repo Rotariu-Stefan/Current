@@ -113,29 +113,29 @@
     flex-direction: column;
 }
 
-    #searchArea form {
-        padding: 0.2rem;
-        text-align: right;
+.searchInput, .amountInput {
+    padding: 0.2rem;
+    text-align: right;
+}
+
+    .searchInput label, .amountInput label {
+        float: left;
     }
 
-        #searchArea form label {
-            float: left;
-        }
+#searchArea .search {
+    height: 2rem;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: bold;
+}
 
-    #searchArea .search {
-        height: 2rem;
-        width: 100%;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-    #searchArea .amountSize {
-        height: 2rem;
-        width: 30%;
-        padding: 0 0.2rem;
-        font-size: 1rem;
-        font-weight: bold;
-    }
+#searchArea .amountSize {
+    height: 2rem;
+    width: 30%;
+    padding: 0 0.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+}
 
 .searchResults {
     flex: auto;
@@ -186,10 +186,19 @@
 }
 
 .foodPic {
-    width: 100%;
-    margin: 0.3rem 0;
-    max-height: 40%;
+    max-height: 50%;
+    text-align: center;
 }
+
+    .foodPic img {
+        width: auto;
+        height: auto;
+        max-height: 100%;
+        max-width: 100%;
+        padding: 0.2rem;
+        text-align: center;
+        opacity: 0.9;
+    }
 
 .foodInfo {
     flex: auto;

@@ -72,13 +72,15 @@ class DailyMeals extends React.Component {
             <main className="mainDailyMeals boxShow">
                 <div id="dayArea" className="subblock boxShow">
                     <div className="dayHeader">
-                        <form className="datepick boxShow">
+                        <div className="datepick boxShow">
                             <label className="textHigh">Day: </label>
                             <button className="ftButton">{"<"}</button>
                             <input type="date" name="day" />
                             <button className="ftButton">{">"}</button>
-                        </form>
+                        </div>
+                        <hr />
                         <Note />
+                        <hr />
                     </div>
                     <div className="mealsArea">
                         {this.state.mealEntries}
@@ -86,15 +88,15 @@ class DailyMeals extends React.Component {
                     <button onClick={() => this.addNewMealEntry()} className="newMeal ftButton">NEW MEAL</button>
                 </div>
                 <div id="searchArea" className="subblock boxShow">
-                    <form className="boxShow">
+                    <div className="searchInput boxShow">
                         <label className="textHigh">Search Food: </label>
                         <input type="checkbox" name="yourFood" /> ALL Food
                 <input className="search" type="text" name="search" placeholder="search" />
-                    </form>
+                    </div>
                     <div className="searchResults boxShow">
                         {this.state.foodSItems}
                     </div>
-                    <form className="boxShow">
+                    <div className="amountInput boxShow">
                         <label className="textHigh">Amount: </label>
                         <input className="amountSize" type="text" defaultValue="100" name="amount" />
                         <select>
@@ -102,7 +104,7 @@ class DailyMeals extends React.Component {
                             <option>ML</option>
                             <option>Pieces</option>
                         </select>
-                    </form>
+                    </div>
                     <div className="buffer"></div>
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
@@ -116,8 +118,11 @@ class DailyMeals extends React.Component {
                         <div className="textHigh boxShow">cottage cheese @delaco</div>
                         <hr />
                         <Note />
+                        <hr />
                     </div>
-                    <img src="FoodPics/cottage cheese @delaco.jpg" className="foodPic boxShow" alt="[NO FOOD PIC]" />
+                    <div className="foodPic boxShow">
+                        <img src="FoodPics/cottage cheese @delaco.jpg" alt="[NO FOOD PIC]" />
+                    </div>
                     <div className="foodInfo">
                         <table>
                             <thead>
