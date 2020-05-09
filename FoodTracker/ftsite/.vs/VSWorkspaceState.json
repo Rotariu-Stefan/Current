@@ -3,8 +3,9 @@
     "",
     "\\build",
     "\\src",
-    "\\src\\Components"
+    "\\src\\Css",
+    "\\src\\MainPages"
   ],
-  "SelectedNode": "\\src\\Components\\Note.js",
+  "SelectedNode": "\\src\\MainPages\\DailyMeals.js",
   "PreviewInSolutionExplorer": false
 }
