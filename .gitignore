@@ -1,4 +1,4 @@
 *.exe
 *.bat
 *.com
-*/.vs
+.vs/
