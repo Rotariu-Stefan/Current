@@ -4,8 +4,9 @@
     "\\build",
     "\\src",
     "\\src\\Css",
-    "\\src\\MainPages"
+    "\\src\\MainPages",
+    "\\src\\Sections"
   ],
-  "SelectedNode": "\\src\\MainPages\\DailyMeals.js",
+  "SelectedNode": "\\src\\Sections\\Header.js",
   "PreviewInSolutionExplorer": false
 }

@@ -6,6 +6,15 @@ import Main from './Sections/Main';
 import Footer from './Sections/Footer';
 
 //import { BrowserRouter } from 'react-router-dom';
+//
+//ReactDOM.render(
+//    <BrowserRouter>
+//        <Header />
+//        <Nav />
+//        <Main />
+//        <Footer />
+//    </BrowserRouter>,
+//    document.querySelector("#root"));
 
 const main = React.createRef();
 
