@@ -102,7 +102,6 @@ class DailyMeals extends React.Component {
                         <input className="amountSize" type="text" placeholder="100" />
                         <select>
                             <option>Grams</option>
-                            <option>ML</option>
                             <option>Pieces</option>
                         </select>
                     </div>
