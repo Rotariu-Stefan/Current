@@ -6,13 +6,13 @@ DROP TABLE IF EXISTS Notes;
 DROP TABLE IF EXISTS Users;
 
 CREATE TABLE Users(
-	UserID INT PRIMARY KEY IDENTITY,
+	UserID INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	Username VARCHAR(50) NOT NULL,
 	Email VARCHAR(30) NOT NULL UNIQUE,
 	Firstname VARCHAR(30) NOT NULL,
 	Lastname VARCHAR(30) NOT NULL,
-	DoB DATETIME NOT NULL,
-	Sex BIT NOT NULL,
+	DoB DATE NOT NULL,
+	Sex BIT(1) NOT NULL,
 	Describe VARCHAR(200) NULL,
 	Pic VARCHAR(50) NULL,
 	Default_Meals VARCHAR(100) NOT NULL DEFAULT 'Meal1,Meal2',
@@ -71,6 +71,13 @@ CREATE TABLE MealData(
 	CONSTRAINT FK_MealData_Food FOREIGN KEY(FoodID) REFERENCES FoodItems(FoodID)
 );
 
+SELECT a.attname
+FROM   pg_index i
+JOIN   pg_attribute a ON a.attrelid = i.indrelid
+                     AND a.attnum = ANY(i.indkey)
+WHERE  i.indrelid = 'Users'::regclass
+AND    i.indisprimary;
+
 CREATE TABLE DishData(
 	DishID INT NOT NULL,
 	IngredientID INT NOT NULL,
@@ -82,10 +89,9 @@ CREATE TABLE DishData(
 	CONSTRAINT FK_DishData_Food FOREIGN KEY(IngredientID) REFERENCES FoodItems(FoodID)
 );
 
-INSERT INTO Users 
-VALUES ('StravoS', 'stravos11@gmail.com', 'Stefan', 'Rotariu', '1987/12/17', 1, 'Da Owner!', null, default, 'SV', 'passwordlol'),
-	('Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', 0, 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapasslol'),
-	('Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1986/08/03', 1, 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'trolololol');
+INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', 'Rotariu', '1987/12/17', B'1', 'Da Owner!', null, default, 'SV', 'passwordlol');
+INSERT INTO Users VALUES (default, 'Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', B'0', 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapasslol');
+INSERT INTO Users VALUES (default, 'Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1986/08/03', B'1', 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'trolololol');
 
 /*INSERT INTO Notes
 SELECT u.UserID, 'Magic', 5, 'Omg it''s magical', null
