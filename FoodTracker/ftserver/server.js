@@ -1,41 +1,33 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
 const pg = require('pg');
-const fs = require('fs');
+const cors = require('cors');
+const dbtop = require('./dbtop');
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log("Running on:", process.env.PORT || 3000);
+const server = express();
+server.listen(process.env.PORT || 3000, () => {
+    console.log("Running on port:", process.env.PORT || 3000);
 });
 
 let reqTotal = 0;
-app.use((req, res, next) => {
-    reqTotal++;
-    console.log("Total Requests:", reqTotal);
+server.use((req, res, next) => {
+    console.log("Total Requests:", ++reqTotal);
     next();
 });
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.use(cors());
 
-app.get("/", (req, res) => {
-    const user = {
-        user: "SV",
-        job: "LUL"
+server.get("/", (req, res) => {
+    try {
+        console.log("-----------ftserver Received @/ --- GET Req:", req.headers);
+        res.json("Welcome to the party! A Hero is kU!");
+
+    } catch (err) {
+        res.status(400).json("Error at Root!");
+        console.log("___________ERROR___________\n", err.message);
     }
-    res.send(user);
 });
-
-app.get("/aaa", (req, res) => {
-    res.send("GET @aaa LUL!!");
-});
-app.post("/aaa", (req, res) => {
-    console.log("POST BODY:", req.body);
-    res.send("POST @aaa LUL!!");
-});
-
-//process.argv.forEach(function (val, index, array) {
-//    console.log(index + ': ' + val);
-//});
 
 const client = new pg.Client({
     connectionString: process.env.DATABASE_URL || process.argv[2],
@@ -43,88 +35,31 @@ const client = new pg.Client({
         rejectUnauthorized: false
     }
 });
+client.connect();
 
-const init = fs.readFileSync("ft_initDB.sql").toString();
-
-const initDB = async () => {
+server.post("/login", async (req, res) => {
     try {
-        await client.connect();
+        console.log("-----------ftserver Received @/login --- POST Req:", req.body);
+        const username = req.body.username;
+        const pass = req.body.pass;
+        console.log(username, pass);
 
-        const res = await client.query(init);
-        console.log(res);
+        const qres = await client.query("SELECT * FROM users WHERE username=$1 AND pass=$2;", [username, pass]);
+        //await client.end();
 
-        await client.end();
+        console.log("QRES:", qres.rows);
+        if (qres.rows.length === 1) {
+            res.json(`Welcome, ${qres.rows[0].firstname} ${qres.rows[0].lastname} !`);
+        }
+        else {
+            res.json("Invalid Login Info!");
+        }
+
     } catch (err) {
-        console.log("___________ERROR___________\n", err.stack);
+        res.status(400).json("Error at Login!");
+        console.log("___________ERROR___________\n", err.message);
     }
-}
+});
 
-//initDB();
-
-const qSV = {
-    name: "SV",
-    text: "SELECT * FROM users u WHERE u.username=$1",
-    values: ["StravoS"],
-    rowMode: "array",
-};
-const qUsers = {
-    text: "SELECT * FROM users;",
-    rowMode: "array",
-}
-const qNotes = {
-    text: "SELECT * FROM notes;",
-    rowMode: "array",
-}
-const qMeals = {
-    text: "SELECT * FROM meals;",
-    rowMode: "array",
-}
-const qFoodItems = {
-    text: "SELECT * FROM fooditems;",
-    rowMode: "array",
-}
-const qMealData = {
-    text: "SELECT * FROM mealdata;",
-    rowMode: "array",
-}
-const qDishData = {
-    text: "SELECT * FROM dishdata;",
-    rowMode: "array",
-}
-
-const showDB = async () => {
-    try {
-        await client.connect();
-
-
-        let res = await client.query(qUsers);
-        console.log("\nUsers:\n___________________");
-        res.rows.forEach(entry => console.log(entry.join(" | ")));
-
-        res = await client.query(qNotes);
-        console.log("\nNotes:\n___________________");
-        res.rows.forEach(entry => console.log(entry.join(" | ")));
-
-        res = await client.query(qMeals);
-        console.log("\nMeals:\n___________________");
-        res.rows.forEach(entry => console.log(entry.join(" | ")));
-
-        res = await client.query(qFoodItems);
-        console.log("\nFoodItems:\n___________________");
-        res.rows.forEach(entry => console.log(entry.join(" | ")));
-
-        res = await client.query(qMealData);
-        console.log("\nMealData:\n___________________");
-        res.rows.forEach(entry => console.log(entry.join(" | ")));
-
-        res = await client.query(qDishData);
-        console.log("\nDishData:\n___________________");
-        res.rows.forEach(entry => console.log(entry.join(" | ")));
-
-        await client.end();
-    } catch (err) {
-        console.log("___________ERROR___________\n", err.stack);
-    }
-};
-
-showDB();
+//dbtop.showDB(process.argv[2]);
+//dbtop.initDB(process.argv[2]);

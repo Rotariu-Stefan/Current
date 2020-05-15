@@ -11,14 +11,34 @@ class Login extends React.Component {
         }
     }
 
-    onLogin = (ev) => {
-        ev.preventDefault();
-        if (this.state.warningMsg.startsWith("Incor"))
-            this.setState({ warningMsg: "NO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~NO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\nNO GORIAC ALLOWED!! GO AWAY! G A O A Z A ~~~\n" });
-        else if (this.state.warningMsg.startsWith("NO GORI"))
-            this.setState({ warningMsg: "G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~G A O A Z A ~~~" });
-        else if (this.state.warningMsg.startsWith("G A O"))
-            this.setState({ warningMsg: "Meh..." });
+    getServerURL = () => {
+        return "http://localhost:3000/";
+    }
+
+    onLogin = async (ev) => {
+        try {
+            ev.preventDefault();
+            const inputs = document.querySelectorAll("#logform input");
+            const usernameText = inputs[0].value;
+            const passText = inputs[1].value;
+
+            let res = await fetch(this.getServerURL() + "login/", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: usernameText,
+                    pass: passText
+                })
+            });
+            res = await res.json();
+            this.setState({
+                warningMsg: res.toString()
+            });
+        } catch (err) {
+            console.log("___________ERROR___________\n", err.message);
+        }
     }
 
     render = () => {

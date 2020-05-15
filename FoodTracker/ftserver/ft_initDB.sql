@@ -82,9 +82,9 @@ CREATE TABLE DishData(
 	CONSTRAINT FK_DishData_Food FOREIGN KEY(IngredientID) REFERENCES FoodItems(FoodID)
 );
 
-INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', 'Rotariu', '1987/12/17', B'1', 'Da Owner!', null, default, 'SV', 'passwordlol');
-INSERT INTO Users VALUES (default, 'Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', B'0', 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapasslol');
-INSERT INTO Users VALUES (default, 'Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1986/08/03', B'1', 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'trolololol');
+INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', 'Rotariu', '1987/12/17', B'1', 'Da Owner!', null, default, 'SV', 'svpass');
+INSERT INTO Users VALUES (default, 'Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', B'0', 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapass');
+INSERT INTO Users VALUES (default, 'Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1986/08/03', B'1', 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'goripass');
 
 INSERT INTO Notes (UserID, Title, Score, NoteText, OfDay)
 SELECT u.UserID, 'Magic', 5, 'Omg it''s magical', null
