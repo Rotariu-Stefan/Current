@@ -1,5 +1,3 @@
-import React from 'react';
-
 //import { NavLink } from 'react-router-dom';
 //
 //const Header = () => {
@@ -24,6 +22,8 @@ import React from 'react';
 //    );
 //}
 
+import React from 'react';
+
 const Header = ({ navClick }) => {
     return (
         <header className="subblock boxShow">
@@ -37,8 +37,8 @@ const Header = ({ navClick }) => {
                     Guest<br />
                     <img src="SitePics/profileEmpty.png" alt="[NO PIC]" />
                 </span>
-                <span onClick={() => navClick("Register")} className="navlink">Register</span>
-                <span onClick={() => navClick("Login")} className="navlink">Login</span>
+                <span onClick={() => navClick("Register")} className="navlink">Reg/Prof</span>
+                <span onClick={() => navClick("Login")} className="navlink">Login/Out</span>
             </div>
         </header>
     );

@@ -1,10 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Header from './Sections/Header';
-import Nav from './Sections/Nav';
-import Main from './Sections/Main';
-import Footer from './Sections/Footer';
-
 //import { BrowserRouter } from 'react-router-dom';
 //
 //ReactDOM.render(
@@ -16,13 +9,29 @@ import Footer from './Sections/Footer';
 //    </BrowserRouter>,
 //    document.querySelector("#root"));
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Header from './Sections/Header';
+import Nav from './Sections/Nav';
+import Main from './Sections/Main';
+import Footer from './Sections/Footer';
+
 const main = React.createRef();
+const footer = React.createRef();
+let nrClicks = 0;
+
+const onIncClicks = () => {
+    nrClicks++;
+    footer.current.setState({
+        nrClicks
+    });
+}
 
 ReactDOM.render(
     [
-        <Header key="H" navClick={(navText) => main.current.changePage(navText)} />,
-        <Nav key="N" navClick={(navText) => main.current.changePage(navText)} />,
-        <Main key="M" ref={main} page="Home" />,
-        <Footer key="F" />
+        <Header navClick={(navText) => main.current.changePage(navText)} key="H" />,
+        <Nav navClick={(navText) => main.current.changePage(navText)} key="N" />,
+        <Main ref={main} incClicks={onIncClicks} key="M" />,
+        <Footer ref={footer} key="F" />
     ],
     document.querySelector("#root"));

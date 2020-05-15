@@ -1,16 +1,3 @@
-import React from 'react';
-
-import Home from "../MainPages/Home";
-import DailyMeals from '../MainPages/DailyMeals';
-import YourFood from '../MainPages/YourFood';
-import YourPlans from '../MainPages/YourPlans';
-import YourStats from '../MainPages/YourStats';
-import GlobalStats from '../MainPages/GlobalStats';
-import GlobalData from '../MainPages/GlobalData';
-import Login from '../MainPages/Login';
-import Register from '../MainPages/Register';
-import Error from '../MainPages/Error';
-
 //import { Route, Switch } from 'react-router-dom';
 //
 //const Main = () => {
@@ -30,16 +17,30 @@ import Error from '../MainPages/Error';
 //    );
 //}
 
+import React from 'react';
+
+import Home from "../MainPages/Home";
+import DailyMeals from '../MainPages/DailyMeals';
+import YourFood from '../MainPages/YourFood';
+import YourPlans from '../MainPages/YourPlans';
+import YourStats from '../MainPages/YourStats';
+import GlobalStats from '../MainPages/GlobalStats';
+import GlobalData from '../MainPages/GlobalData';
+import Login from '../MainPages/Login';
+import Register from '../MainPages/Register';
+import Error from '../MainPages/Error';
+
 class Main extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            page: props.page
+            page: props.page ? props.page : "Home"
         };
     }
 
     changePage = (newPage) => {
+        this.props.incClicks();
         if (this.state.page !== newPage)
             this.setState({
                 page: newPage
