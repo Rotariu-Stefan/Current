@@ -25,39 +25,51 @@ server.get("/", (req, res) => {
 
     } catch (err) {
         res.status(400).json("Error at Root!");
-        console.log("___________ERROR___________\n", err.message);
+        console.log("___________ERROR___________\n", err.message || err);
     }
 });
 
-const client = new pg.Client({
-    connectionString: process.env.DATABASE_URL || process.argv[2],
-    ssl: {
-        rejectUnauthorized: false
+const qrun = async (query, qparams) => {
+    try {
+        const client = new pg.Client({
+            connectionString: process.env.DATABASE_URL || process.argv[2],
+            ssl: {
+                rejectUnauthorized: false
+            }
+        });
+        await client.connect();
+
+        const qres = await client.query(query, qparams);
+        await client.end();
+
+        console.log(`${qres.command} suceeded! Rows affected: ${qres.rowCount}`);
+        console.log("Received query result:", qres.rows);
+        return qres;
+
+    } catch (err) {
+        console.log("___________ERROR___________\n", err.message || err);
+        return undefined;
     }
-});
-client.connect();
+}
 
 server.post("/login", async (req, res) => {
     try {
         console.log("-----------ftserver Received @/login --- POST Req:", req.body);
         const username = req.body.username;
         const pass = req.body.pass;
-        console.log(username, pass);
 
-        const qres = await client.query("SELECT * FROM users WHERE username=$1 AND pass=$2;", [username, pass]);
-        //await client.end();
+        const qres = await qrun("SELECT * FROM users WHERE username=$1 AND pass=$2;", [username, pass]);
+        if (qres === undefined)
+            throw "Query Failed!";
 
-        console.log("QRES:", qres.rows);
-        if (qres.rows.length === 1) {
+        if (qres.rows.length === 1)
             res.json(`Welcome, ${qres.rows[0].firstname} ${qres.rows[0].lastname} !`);
-        }
-        else {
+        else
             res.json("Invalid Login Info!");
-        }
 
     } catch (err) {
+        console.log("___________ERROR___________\n", err.message || err);
         res.status(400).json("Error at Login!");
-        console.log("___________ERROR___________\n", err.message);
     }
 });
 
