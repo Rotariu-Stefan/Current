@@ -11,27 +11,6 @@ const fs = require('fs');
 //    console.log(index + ': ' + val);
 //});
 
-
-const initDB = async (connStr) => {
-    try {
-        const client = new pg.Client({
-            connectionString: connStr,
-            ssl: {
-                rejectUnauthorized: false
-            }
-        });
-        await client.connect();
-
-        const init = fs.readFileSync("ft_initDB.sql").toString();
-        const res = await client.query(init);
-        console.log(res);
-
-        await client.end();
-    } catch (err) {
-        console.log("___________ERROR___________\n", err.stack);
-    }
-}
-
 const qSV = {
     name: "SV",
     text: "SELECT * FROM users u WHERE u.username=$1",
@@ -61,6 +40,26 @@ const qMealData = {
 const qDishData = {
     text: "SELECT * FROM dishdata;",
     rowMode: "array"
+}
+
+const initDB = async (connStr) => {
+    try {
+        const client = new pg.Client({
+            connectionString: connStr,
+            ssl: {
+                rejectUnauthorized: false
+            }
+        });
+        await client.connect();
+
+        const init = fs.readFileSync("ft_initDB.sql").toString();
+        const res = await client.query(init);
+        console.log(res);
+
+        await client.end();
+    } catch (err) {
+        console.log("___________ERROR___________\n", err.stack);
+    }
 }
 
 const showDB = async (connStr) => {
@@ -103,7 +102,30 @@ const showDB = async (connStr) => {
     }
 };
 
+const qrun = async (query, qparams) => {
+    try {
+        const client = new pg.Client({
+            connectionString: process.env.DATABASE_URL || process.argv[2],
+            ssl: {
+                rejectUnauthorized: false
+            }
+        });
+        await client.connect();
+        const qres = await client.query(query, qparams);
+        await client.end();
+
+        console.log(`${qres.command} suceeded! Rows affected: ${qres.rowCount}`);
+        console.log("Received query result:", qres.rows);
+        return qres;
+
+    } catch (err) {
+        console.log("___________ERROR___________\n", err.message || err);
+        return undefined;
+    }
+}
+
 module.exports = {
     initDB,
-    showDB
+    showDB,
+    qrun
 };

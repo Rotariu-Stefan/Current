@@ -100,19 +100,19 @@ FROM Users u
 WHERE u.Username='StravoS';
 
 INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal1Sv', '2020/02/22 11:11:11', 1, u.UserID, n.NoteID
+SELECT '_Meal1Sv', '2020/02/22', 1, u.UserID, n.NoteID
 FROM Users u, Notes n
 WHERE u.Username='StravoS' AND n.Title='Magic';
 INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal2Sv', '2020/02/22 17:11:11', 1, u.UserID, n.NoteID
+SELECT '_Meal2Sv', '2020/02/22', 1, u.UserID, n.NoteID
 FROM Users u, Notes n
 WHERE u.Username='StravoS' AND n.Title='Meh';
 INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal1Gr', '2020/02/23 12:12:12', 1, u.UserID, n.NoteID
+SELECT '_Meal1Gr', '2020/02/23', 1, u.UserID, n.NoteID
 FROM Users u, Notes n
 WHERE u.Username='Gori' AND n.Title='Bad';
 INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal2Gr', '2020/02/23 18:12:12', 1, u.UserID, n.NoteID
+SELECT '_Meal2Gr', '2020/02/23', 1, u.UserID, n.NoteID
 FROM Users u, Notes n
 WHERE u.Username='Gori' AND n.Title='Meh';
 

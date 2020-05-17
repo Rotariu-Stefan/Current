@@ -1,7 +1,8 @@
 import React from 'react';
-//import { NavLink } from 'react-router-dom';
-
 import "../Css/RegLog.css";
+import svData from '../svData.json';
+
+//import { NavLink } from 'react-router-dom';
 
 class Login extends React.Component {
     constructor(props) {
@@ -12,7 +13,7 @@ class Login extends React.Component {
     }
 
     getServerURL = () => {
-        return "http://localhost:3000/";
+        return svData.serverLink;
     }
 
     onLogin = async (ev) => {
