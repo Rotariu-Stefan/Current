@@ -43,7 +43,7 @@ server.post("/login", async (req, res) => {
         if (qres.rows.length === 1)
             res.json(qres.rows[0]);
         else
-            res.json("Invalid Login Info!");
+            res.json("Login Info you entered was Invalid!");
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
@@ -51,12 +51,11 @@ server.post("/login", async (req, res) => {
     }
 });
 
-server.get("/dailymeals", async (req, res) => {
+server.get("/dailymeals", async (req, res) => { //TODO: ALSO GET DAY NOTE!
     try {
         console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.body);
+        const { userid, day } = req.body;
 
-        const userid = req.body.userid;
-        const day = req.body.day;
         const qresM = await qrun("SELECT mealid, mealname, portion, noteid" +
             " FROM meals" +
             " WHERE userid= $1 AND timeeaten= $2;"
@@ -65,8 +64,8 @@ server.get("/dailymeals", async (req, res) => {
         const meals = qresM.rows;
         for (meal of meals) {
             if (meal.noteid !== null) {
-                qresN = await qrun("SELECT noteid, title, score, notetext" +
-                    " FROM notes n" +
+                const qresN = await qrun("SELECT noteid, title, score, notetext" +
+                    " FROM notes" +
                     " WHERE noteid=$1;"
                     , [meal.noteid])
                 meal.note = qresN.rows[0];
@@ -74,13 +73,13 @@ server.get("/dailymeals", async (req, res) => {
                 meal.note = null;
             delete meal.noteid;
 
-            qresF = await qrun("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount" +
+            const qresFE = await qrun("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount" +
                 " FROM fooditems f" +
                 " JOIN mealdata md ON f.foodid = md.foodid" +
                 " JOIN meals m ON m.mealid = md.mealid" +
                 " WHERE m.mealid=$1;"
                 , [meal.mealid]);
-            meal.foodentries = qresF.rows;
+            meal.foodentries = qresFE.rows;
         }
         res.json(meals);
 
@@ -90,32 +89,47 @@ server.get("/dailymeals", async (req, res) => {
     }
 });
 
-server.get("/foodsearch", async (req, res) => {
+server.get(["/dailymeals:search", "/yourfoods:search"], async (req, res) => {
     try {
-        console.log("-----------ftserver Received @/foodsearch --- GET Req:", req.body);
+        console.log("-----------ftserver Received @/dailymeals/foodsearch --- GET Req:", req.body);
+        const { userid, search, isAll } = req.body;
 
-        const userid = req.body.userid;
-        const search = req.body.search;
-        const all = req.body.all;
-
-        if (all) {
-            const qres = await qrun("SELECT *" +
-                " FROM fooditems" +
-                " WHERE (foodname+brand) LIKE '%$1%';"
+        let qresFI;
+        if (isAll) {
+            qresFI = await qrun("SELECT *" +
+                " FROM fooditems f" +
+                " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%');"
                 , [search]);
         } else {
-            const qres = await qrun("SELECT *" +
+            qresFI = await qrun("SELECT *" +
                 " FROM fooditems" +
-                " WHERE (foodname+brand) LIKE '%$1%' AND userid=$2;"
+                " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
+                " AND userid= $2;"
                 , [search, userid]);
         }
 
-        res.json(meals);
+        for (fooditem of qresFI.rows) {
+            if (fooditem.noteid !== null) {
+                qresN = await qrun("SELECT noteid, title, score, notetext" +
+                    " FROM notes" +
+                    " WHERE noteid=$1;"
+                    , [fooditem.noteid])
+                fooditem.note = qresN.rows[0];
+            } else
+                fooditem.note = null;
+            delete fooditem.noteid;
+        }
+
+        res.json(qresFI.rows);
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
-        res.status(400).json("Error at FoodSearch!");
+        res.status(400).json("Error at DailyMeals : FoodSearch!");
     }
+});
+
+server.get("/yourfoods", async (req, res) => {
+    //TODO!
 });
 
     //dbtop.showDB(process.argv[2]);
