@@ -124,7 +124,6 @@ namespace FoodTracker_TextLoadDB
                     writer.Write((food as Dish).ToStringFull() + "\n\n");
             foreach (DayEntry day in Days)
                 writer.Write(day + "\n\n");
-            writer.WriteLine("LOOOOOOOOOOOL!!!");
             writer.Close();
 
             timer.Stop();

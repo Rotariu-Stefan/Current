@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const pg = require('pg');
 const cors = require('cors');
-const { initDB, showDB, qrun } = require('./dbtop');
+const { initDB, loadFromFile, showDB, qrun } = require('./dbtop');
 
 const server = express();
 server.listen(process.env.PORT || 3001, () => {
@@ -376,7 +376,7 @@ server.post("/yourfoods", async (req, res) => {
         console.log("___________ERROR___________\n", err.message || err);
         res.status(400).json("Error at YourFoods !");
     }
-});//TOOD
+});//TODO
 
 server.delete("/yourfoods", async (req, res) => {
     try {
@@ -389,9 +389,9 @@ server.delete("/yourfoods", async (req, res) => {
         console.log("___________ERROR___________\n", err.message || err);
         res.status(400).json("Error at YourFoods !");
     }
-});//TOOD
+});//TODO
 
-
+loadFromFile("./NUTcalc.text");
 //showDB(process.argv[2]);
 //initDB(process.argv[2]);
     //; (async () => {
