@@ -36,15 +36,15 @@ server.post("/login", async (req, res) => {
 
         const username = req.body.username;
         const pass = req.body.pass;
-        const qres = await qrun("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, default_day.meals, access" +
+        const qsel = await qrun("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, default_day.meals, access" +
             " FROM users" +
             " WHERE username= $1 AND pass= $2;"
             , [username, pass]);
 
-        if (qres.rows.length === 1)
-            res.json(qres.rows[0]);
+        if (qsel.rows.length === 1)
+            res.json(qsel.rows[0]);
         else
-            res.json("Login Info you entered was Invalid!");
+            res.json("Invalid Info at Login - Wrong username/password!");
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
@@ -57,39 +57,40 @@ server.get("/dailymeals", async (req, res) => {
         console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.body);
         const { userid, date } = req.body;
 
-        const qresM = await qrun("SELECT mealid, mealname, portion, noteid" +
+        const qselM = await qrun("SELECT mealid, mealname, portion, noteid" +
             " FROM meals" +
             " WHERE userid= $1 AND timeeaten= $2;"
             , [userid, date]);
 
         const day = {};
-        const qresN = await qrun("SELECT noteid, title, score, notetext" +
-            " FROM notes" +
-            " WHERE ofday=$1;"
+        const qselN = await qrun("SELECT n.noteid, n.title, n.score, n.notetext" +
+            " FROM notes n" +
+            " JOIN daynotes dn ON dn.noteid = n.noteid" +
+            " WHERE dn.daydate=$1;"
             , [date])
-        if (qresN.rowCount === 1)
-            day.note = qresN.rows[0];
+        if (qselN.rowCount === 1)
+            day.note = qselN.rows[0];
         else
-            day.note = null;
+            day.noteid = null;
 
-        day.meals = qresM.rows;
+        day.meals = qselM.rows;
         for (meal of day.meals) {
             if (meal.noteid) {
-                const qresNM = await qrun("SELECT noteid, title, score, notetext" +
+                const qselNM = await qrun("SELECT noteid, title, score, notetext" +
                     " FROM notes" +
                     " WHERE noteid=$1;"
                     , [meal.noteid])
-                meal.note = qresNM.rows[0];
+                meal.note = qselNM.rows[0];
             } else
-                meal.note = null;
+                meal.noteid = null;
             delete meal.noteid;
 
-            const qresFE = await qrun("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
+            const qselFE = await qrun("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
                 " FROM fooditems f" +
                 " JOIN mealdata md ON f.foodid = md.foodid" +
                 " WHERE md.mealid=$1;"
                 , [meal.mealid]);
-            meal.foodentries = qresFE.rows;
+            meal.foodentries = qselFE.rows;
         }
         res.json(day);
 
@@ -104,33 +105,33 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
         console.log("-----------ftserver Received @../foodsearch --- GET Req:", req.body);
         const { userid, search, isAll } = req.body;
 
-        let qresFI;
+        let qselFI;
         if (isAll) {
-            qresFI = await qrun("SELECT *" +
+            qselFI = await qrun("SELECT *" +
                 " FROM fooditems f" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%');"
                 , [search]);
         } else {
-            qresFI = await qrun("SELECT *" +
+            qselFI = await qrun("SELECT *" +
                 " FROM fooditems" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
                 " AND userid= $2;"
                 , [search, userid]);
         }
 
-        for (fooditem of qresFI.rows) {
+        for (fooditem of qselFI.rows) {
             if (fooditem.noteid) {
-                qresN = await qrun("SELECT noteid, title, score, notetext" +
+                qselN = await qrun("SELECT noteid, title, score, notetext" +
                     " FROM notes" +
                     " WHERE noteid=$1;"
                     , [fooditem.noteid])
-                fooditem.note = qresN.rows[0];
+                fooditem.note = qselN.rows[0];
             } else
                 fooditem.note = null;
             delete fooditem.noteid;
         }
 
-        res.json(qresFI.rows);
+        res.json(qselFI.rows);
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
@@ -145,20 +146,20 @@ server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], async (req, res
 
         const details = { foodid };
         if (noteid) {
-            const qresN = await qrun("SELECT noteid, title, score, notetext" +
+            const qselN = await qrun("SELECT noteid, title, score, notetext" +
                 " FROM notes" +
                 " WHERE noteid=$1;"
                 , [noteid])
-            details.note = qresN.rows[0];
+            details.note = qselN.rows[0];
         }
 
         if (isdish) {
-            const qresFE = await qrun("SELECT dd.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, dd.amount, dd.measure" +
+            const qselFE = await qrun("SELECT dd.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, dd.amount, dd.measure" +
                 " FROM fooditems f" +
                 " JOIN dishdata dd ON f.foodid = dd.ingredientid" +
                 " WHERE dd.dishid=$1;"
                 , [foodid]);
-            details.composition = qresFE.rows;
+            details.composition = qselFE.rows;
         }
         res.json(details);
 
@@ -173,11 +174,11 @@ server.get("/yourfoods", async (req, res) => {
         console.log("-----------ftserver Received @yourfoods --- GET Req:", req.body);
         const { userid } = req.body;
 
-        const qresF = await qrun("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid" +
+        const qselF = await qrun("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid" +
             " FROM fooditems f" +
             " WHERE f.userid=$1;"
             , [userid]);
-        res.json(qresF.rows);
+        res.json(qselF.rows);
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
@@ -190,14 +191,18 @@ server.put("/register", async (req, res) => {
         console.log("-----------ftserver Received @register --- PUT Req:", req.body);
         const { username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass } = req.body;
 
-        //TODO check if exists. Return invalid smthn if it does
+        const qselU = await qrun("SELECT userid" +
+            "FROM users WHERE email= $1 OR username=$2;", [email, username]);
+        if (qselU.rowCount === 0) {
 
-        const qinsU = await qrun("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
-            " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
-            " RETURNING userid;"
-            , [username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass]);
+            const qinsU = await qrun("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
+                " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
+                " RETURNING userid;"
+                , [username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass]);
 
-        res.json({ userid: qinsU.rows[0].userid });
+            res.json({ userid: qinsU.rows[0].userid });
+        } else
+            res.json("Invalid info at Register - Username or Email entered is in use!");
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
@@ -208,15 +213,13 @@ server.put("/register", async (req, res) => {
 server.put("/yourfoods", async (req, res) => {
     try {
         console.log("-----------ftserver Received @yourfoods --- PUT Req:", req.body);
-        const { foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, composition } = req.body;
-
-        //TODO: IF foodid EXISTS DELETE fooditem AND INSERT NEW FOR THAT food ID
+        const {foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, composition } = req.body;
 
         const returnData = { foodid: undefined };
         if (noteid === undefined) {
             const { title, score, notetext } = note;
-            const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext, ofday)" +
-                " VALUES($1, $2, $3, $4, null)" +
+            const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext)" +
+                " VALUES($1, $2, $3, $4)" +
                 " RETURNING noteid;"
                 , [userid, title, score, notetext]);
             returnData.noteid = qinsN.rows[0].noteid;
@@ -258,19 +261,23 @@ server.put("/dailymeals", async (req, res) => {
         console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
         const { date, userid, noteid, note, meals } = req.body;
 
-        //TODO: IF mealid(s) EXISTS DELETE meal(s) AND INSERT NEW FOR THAT meal ID(s)
+        const qdelM = await qrun("DELETE FROM meals WHERE timeeaten=$1;", [date]);
 
         const returnData = { date, userid };
         if (noteid === undefined) {
             const { title, score, notetext } = note;
-            const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext, ofday)" +
-                " VALUES($1, $2, $3, $4, $5)" +
+            const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext)" +
+                " VALUES($1, $2, $3, $4)" +
                 " RETURNING noteid;"
-                , [userid, title, score, notetext, date]);
+                , [userid, title, score, notetext]);
             returnData.noteid = qinsN.rows[0].noteid;
         }
         else
             returnData.noteid = noteid;
+        if (returnData.noteid)
+            await qrun("INSERT INTO daynotes (daydate, noteid)" +
+                " VALUES($1, $2);"
+                , [date, returnData.noteid]);
 
         returnData.meals = [];
         for (meal of meals) {
@@ -280,8 +287,8 @@ server.put("/dailymeals", async (req, res) => {
 
             if (meal.noteid === undefined) {
                 const { title, score, notetext } = meal.note;
-                const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext, ofday)" +
-                    " VALUES($1, $2, $3, $4, null)" +
+                const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext)" +
+                    " VALUES($1, $2, $3, $4" +
                     " RETURNING noteid;"
                     , [userid, title, score, notetext]);
                 returnMeal.noteid = qinsN.rows[0].noteid;
@@ -318,7 +325,7 @@ server.put("/dailymeals", async (req, res) => {
 server.post("/profile", async (req, res) => {
     try {
         console.log("-----------ftserver Received @profile --- POST Req:", req.body);
-        const { userid, username, email, firstname, lastname, dob, sex, describe, pic} = req.body;
+        const { userid, username, email, firstname, lastname, dob, sex, describe, pic } = req.body;
 
         const qupd = await qrun("UPDATE users" +
             " SET username=$1, email=$2, firstname=$3, lastname=$4, dob=$5, sex=$6, describe=$7, pic=$8" +
@@ -338,11 +345,11 @@ server.post("/profile/changepass", async (req, res) => {
         console.log("-----------ftserver Received @profile/changepass --- POST Req:", req.body);
         const { userid, oldpass, newpass } = req.body;
 
-        const qres = await qrun("SELECT userid" +
+        const qsel = await qrun("SELECT userid" +
             " FROM users" +
             " WHERE userid=$1 AND pass=$2;"
             , [userid, oldpass])
-        if (qres.rowCount === 1) {
+        if (qsel.rowCount === 1) {
             const qupd = await qrun("UPDATE users" +
                 " SET pass=$1" +
                 " WHERE userid=$2;"
@@ -350,13 +357,39 @@ server.post("/profile/changepass", async (req, res) => {
             res.json("User password changed!");
         }
         else
-            res.json("Invalid Credentials! Cannot change password!");        
+            res.json("Invalid Info at ChangePass - Credentials don't Match!");
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
         res.status(400).json("Error at Password Change !");
     }
 });
+
+server.post("/yourfoods", async (req, res) => {
+    try {
+        console.log("-----------ftserver Received @yourfoods --- POST Req:", req.body);
+        const { foodid, foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, composition } = req.body;
+
+        //TODO: UPDATE FOODITEM WITH foodid
+
+    } catch (err) {
+        console.log("___________ERROR___________\n", err.message || err);
+        res.status(400).json("Error at YourFoods !");
+    }
+});//TOOD
+
+server.delete("/yourfoods", async (req, res) => {
+    try {
+        console.log("-----------ftserver Received @yourfoods --- DELETE Req:", req.body);
+        const { foodid } = req.body;
+
+        //TODO: DELETE FOODITEM WITH foodid
+
+    } catch (err) {
+        console.log("___________ERROR___________\n", err.message || err);
+        res.status(400).json("Error at YourFoods !");
+    }
+});//TOOD
 
 
 //showDB(process.argv[2]);

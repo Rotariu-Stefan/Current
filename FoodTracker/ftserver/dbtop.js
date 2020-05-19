@@ -41,6 +41,10 @@ const qDishData = {
     text: "SELECT * FROM dishdata;",
     rowMode: "array"
 }
+const qDayNotes = {
+    text: "SELECT * FROM daynotes;",
+    rowMode: "array"
+}
 
 const initDB = async (connStr) => {
     try {
@@ -96,6 +100,10 @@ const showDB = async (connStr) => {
         console.log("\nDishData:\n___________________");
         res.rows.forEach(entry => console.log(entry.join(" | ")));
 
+        res = await client.query(qDayNotes);
+        console.log("\nDayNotes:\n___________________");
+        res.rows.forEach(entry => console.log(entry.join(" | ")));
+
         await client.end();
     } catch (err) {
         console.log("___________ERROR___________\n", err.stack);
@@ -117,7 +125,7 @@ const qrun = async (query, qparams) => {
         console.log(`${qres.command} suceeded! Rows affected: ${qres.rowCount}`);
         console.log("Received query result:", qres.rows);
         return qres;
-
+        
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
         return undefined;

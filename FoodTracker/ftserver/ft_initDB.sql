@@ -7,8 +7,8 @@ DROP TABLE IF EXISTS Users;
 
 CREATE TABLE Users(
 	UserID INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	Username VARCHAR(50) NOT NULL,
-	Email VARCHAR(30) NOT NULL,
+	Username VARCHAR(50) NOT NULL UNIQUE,
+	Email VARCHAR(30) NOT NULL UNIQUE,
 	Firstname VARCHAR(30) NOT NULL,
 	Lastname VARCHAR(30) NOT NULL,
 	DoB DATE NOT NULL,
@@ -27,7 +27,6 @@ CREATE TABLE Notes(
 	Title VARCHAR(20) NOT NULL DEFAULT 'Untitled',
 	Score INT NOT NULL DEFAULT 0,
 	NoteText VARCHAR(200) NULL,
-	OfDay DATE NULL,
 	CONSTRAINT CH_Score CHECK(Score BETWEEN -5 AND 5),
 	CONSTRAINT FK_Notes_MadeBy FOREIGN KEY(UserID) REFERENCES Users(UserID)
 );
@@ -71,6 +70,12 @@ CREATE TABLE MealData(
 	CONSTRAINT FK_MealData_Food FOREIGN KEY(FoodID) REFERENCES FoodItems(FoodID) ON DELETE SET DEFAULT
 );
 
+CREATE TABLE DayNotes(
+	DayDate DATE NOT NULL PRIMARY KEY,
+	NoteID INT NOT NULL,
+	CONSTRAINT FK_DayNotes_Note FOREIGN KEY(NoteID) REFERENCES Notes(NoteID)
+);
+
 CREATE TABLE DishData(
 	EntryID INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	DishID INT NOT NULL,
@@ -86,16 +91,16 @@ INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', '
 INSERT INTO Users VALUES (default, 'Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', B'0', 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapass');
 INSERT INTO Users VALUES (default, 'Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1988/08/03', B'1', 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'goripass');
 
-INSERT INTO Notes (UserID, Title, Score, NoteText, OfDay)
-SELECT u.UserID, 'Magic', 5, 'Omg it''s magical', null
+INSERT INTO Notes (UserID, Title, Score, NoteText)
+SELECT u.UserID, 'Magic', 5, 'Omg it''s magical'
 FROM Users u
 WHERE u.Username='StravoS';
-INSERT INTO Notes (UserID, Title, Score, NoteText, OfDay)
-SELECT u.UserID, 'Meh', 0, 'Whatever...', null
+INSERT INTO Notes (UserID, Title, Score, NoteText)
+SELECT u.UserID, 'Meh', 0, 'Whatever...'
 FROM Users u
 WHERE u.Username='StravoS';
-INSERT INTO Notes (UserID, Title, Score, NoteText, OfDay)
-SELECT u.UserID, 'Bad', -5, 'Ouch...', null
+INSERT INTO Notes (UserID, Title, Score, NoteText)
+SELECT u.UserID, 'Bad', -5, 'Ouch...'
 FROM Users u
 WHERE u.Username='StravoS';
 
