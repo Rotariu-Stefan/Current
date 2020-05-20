@@ -18,6 +18,17 @@ server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 server.use(cors());
 
+let client;
+; (async () => {
+    client = new pg.Client({
+        connectionString: process.env.DATABASE_URL || process.argv[2],
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    await client.connect();
+})();
+
 server.get("/", (req, res) => {
     try {
         console.log("-----------ftserver Received @/ --- GET Req:", req.headers);
@@ -36,7 +47,7 @@ server.post("/login", async (req, res) => {
 
         const username = req.body.username;
         const pass = req.body.pass;
-        const qsel = await qrun("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, default_day.meals, access" +
+        const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, default_day.meals, access" +
             " FROM users" +
             " WHERE username= $1 AND pass= $2;"
             , [username, pass]);
@@ -57,13 +68,13 @@ server.get("/dailymeals", async (req, res) => {
         console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.body);
         const { userid, date } = req.body;
 
-        const qselM = await qrun("SELECT mealid, mealname, portion, noteid" +
+        const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
             " FROM meals" +
             " WHERE userid= $1 AND timeeaten= $2;"
             , [userid, date]);
 
         const day = {};
-        const qselN = await qrun("SELECT n.noteid, n.title, n.score, n.notetext" +
+        const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
             " FROM notes n" +
             " JOIN daynotes dn ON dn.noteid = n.noteid" +
             " WHERE dn.daydate=$1;"
@@ -76,7 +87,7 @@ server.get("/dailymeals", async (req, res) => {
         day.meals = qselM.rows;
         for (meal of day.meals) {
             if (meal.noteid) {
-                const qselNM = await qrun("SELECT noteid, title, score, notetext" +
+                const qselNM = await client.query("SELECT noteid, title, score, notetext" +
                     " FROM notes" +
                     " WHERE noteid=$1;"
                     , [meal.noteid])
@@ -85,7 +96,7 @@ server.get("/dailymeals", async (req, res) => {
                 meal.noteid = null;
             delete meal.noteid;
 
-            const qselFE = await qrun("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
+            const qselFE = await client.query("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
                 " FROM fooditems f" +
                 " JOIN mealdata md ON f.foodid = md.foodid" +
                 " WHERE md.mealid=$1;"
@@ -107,12 +118,12 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
 
         let qselFI;
         if (isAll) {
-            qselFI = await qrun("SELECT *" +
+            qselFI = await client.query("SELECT *" +
                 " FROM fooditems f" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%');"
                 , [search]);
         } else {
-            qselFI = await qrun("SELECT *" +
+            qselFI = await client.query("SELECT *" +
                 " FROM fooditems" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
                 " AND userid= $2;"
@@ -121,7 +132,7 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
 
         for (fooditem of qselFI.rows) {
             if (fooditem.noteid) {
-                qselN = await qrun("SELECT noteid, title, score, notetext" +
+                qselN = await client.query("SELECT noteid, title, score, notetext" +
                     " FROM notes" +
                     " WHERE noteid=$1;"
                     , [fooditem.noteid])
@@ -146,7 +157,7 @@ server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], async (req, res
 
         const details = { foodid };
         if (noteid) {
-            const qselN = await qrun("SELECT noteid, title, score, notetext" +
+            const qselN = await client.query("SELECT noteid, title, score, notetext" +
                 " FROM notes" +
                 " WHERE noteid=$1;"
                 , [noteid])
@@ -154,12 +165,12 @@ server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], async (req, res
         }
 
         if (isdish) {
-            const qselFE = await qrun("SELECT dd.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, dd.amount, dd.measure" +
+            const qselFE = await client.query("SELECT dd.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, dd.amount, dd.measure" +
                 " FROM fooditems f" +
                 " JOIN dishdata dd ON f.foodid = dd.ingredientid" +
                 " WHERE dd.dishid=$1;"
                 , [foodid]);
-            details.composition = qselFE.rows;
+            details.foodentries = qselFE.rows;
         }
         res.json(details);
 
@@ -174,7 +185,7 @@ server.get("/yourfoods", async (req, res) => {
         console.log("-----------ftserver Received @yourfoods --- GET Req:", req.body);
         const { userid } = req.body;
 
-        const qselF = await qrun("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid" +
+        const qselF = await client.query("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid" +
             " FROM fooditems f" +
             " WHERE f.userid=$1;"
             , [userid]);
@@ -191,11 +202,11 @@ server.put("/register", async (req, res) => {
         console.log("-----------ftserver Received @register --- PUT Req:", req.body);
         const { username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass } = req.body;
 
-        const qselU = await qrun("SELECT userid" +
+        const qselU = await client.query("SELECT userid" +
             "FROM users WHERE email= $1 OR username=$2;", [email, username]);
         if (qselU.rowCount === 0) {
 
-            const qinsU = await qrun("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
+            const qinsU = await client.query("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
                 " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
                 " RETURNING userid;"
                 , [username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass]);
@@ -213,12 +224,12 @@ server.put("/register", async (req, res) => {
 server.put("/yourfoods", async (req, res) => {
     try {
         console.log("-----------ftserver Received @yourfoods --- PUT Req:", req.body);
-        const {foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, composition } = req.body;
+        const { foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, foodentries } = req.body;
 
         const returnData = { foodid: undefined };
         if (noteid === undefined) {
             const { title, score, notetext } = note;
-            const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext)" +
+            const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
                 " VALUES($1, $2, $3, $4)" +
                 " RETURNING noteid;"
                 , [userid, title, score, notetext]);
@@ -227,7 +238,7 @@ server.put("/yourfoods", async (req, res) => {
         else
             returnData.noteid = noteid;
 
-        const qinsF = await qrun("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
+        const qinsF = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
             " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
             " RETURNING foodid;"
             , [foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, returnData.noteid]);
@@ -236,9 +247,9 @@ server.put("/yourfoods", async (req, res) => {
 
         if (isdish) {
             returnData.entryids = [];
-            for (entry of composition) {
+            for (entry of foodentries) {
                 const { foodid, amount, measure } = entry;
-                const qinsDD = await qrun("INSERT INTO dishdata (dishid, ingredientid, amount, measure)" +
+                const qinsDD = await client.query("INSERT INTO dishdata (dishid, ingredientid, amount, measure)" +
                     " VALUES($1, $2, $3, $4)" +
                     " RETURNING entryid;"
                     , [returnData.foodid, foodid, amount, measure]);
@@ -261,12 +272,12 @@ server.put("/dailymeals", async (req, res) => {
         console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
         const { date, userid, noteid, note, meals } = req.body;
 
-        const qdelM = await qrun("DELETE FROM meals WHERE timeeaten=$1;", [date]);
+        const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1;", [date]);
 
         const returnData = { date, userid };
         if (noteid === undefined) {
             const { title, score, notetext } = note;
-            const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext)" +
+            const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
                 " VALUES($1, $2, $3, $4)" +
                 " RETURNING noteid;"
                 , [userid, title, score, notetext]);
@@ -275,7 +286,7 @@ server.put("/dailymeals", async (req, res) => {
         else
             returnData.noteid = noteid;
         if (returnData.noteid)
-            await qrun("INSERT INTO daynotes (daydate, noteid)" +
+            await client.query("INSERT INTO daynotes (daydate, noteid)" +
                 " VALUES($1, $2);"
                 , [date, returnData.noteid]);
 
@@ -287,7 +298,7 @@ server.put("/dailymeals", async (req, res) => {
 
             if (meal.noteid === undefined) {
                 const { title, score, notetext } = meal.note;
-                const qinsN = await qrun("INSERT INTO notes (userid, title, score, notetext)" +
+                const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
                     " VALUES($1, $2, $3, $4" +
                     " RETURNING noteid;"
                     , [userid, title, score, notetext]);
@@ -296,7 +307,7 @@ server.put("/dailymeals", async (req, res) => {
             else
                 returnMeal.noteid = meal.noteid;
 
-            const qinsM = await qrun("INSERT INTO meals (mealname, timeeaten, portion, userid, noteid)" +
+            const qinsM = await client.query("INSERT INTO meals (mealname, timeeaten, portion, userid, noteid)" +
                 " VALUES($1, $2, $3, $4, $5)" +
                 " RETURNING mealid;"
                 , [mealname, date, portion, userid, returnMeal.noteid]);
@@ -305,7 +316,7 @@ server.put("/dailymeals", async (req, res) => {
             returnMeal.entryids = [];
             for (entry of foodentries) {
                 const { foodid, amount, measure } = entry;
-                const qinsMD = await qrun("INSERT INTO mealdata (mealid, foodid, amount, measure)" +
+                const qinsMD = await client.query("INSERT INTO mealdata (mealid, foodid, amount, measure)" +
                     " VALUES($1, $2, $3, $4)" +
                     " RETURNING entryid"
                     , [returnMeal.mealid, foodid, amount, measure]);
@@ -327,7 +338,7 @@ server.post("/profile", async (req, res) => {
         console.log("-----------ftserver Received @profile --- POST Req:", req.body);
         const { userid, username, email, firstname, lastname, dob, sex, describe, pic } = req.body;
 
-        const qupd = await qrun("UPDATE users" +
+        const qupd = await client.query("UPDATE users" +
             " SET username=$1, email=$2, firstname=$3, lastname=$4, dob=$5, sex=$6, describe=$7, pic=$8" +
             " WHERE userid=$9;"
             , [username, email, firstname, lastname, dob, sex, describe, pic, userid]);
@@ -345,12 +356,12 @@ server.post("/profile/changepass", async (req, res) => {
         console.log("-----------ftserver Received @profile/changepass --- POST Req:", req.body);
         const { userid, oldpass, newpass } = req.body;
 
-        const qsel = await qrun("SELECT userid" +
+        const qsel = await client.query("SELECT userid" +
             " FROM users" +
             " WHERE userid=$1 AND pass=$2;"
             , [userid, oldpass])
         if (qsel.rowCount === 1) {
-            const qupd = await qrun("UPDATE users" +
+            const qupd = await client.query("UPDATE users" +
                 " SET pass=$1" +
                 " WHERE userid=$2;"
                 , [newpass, userid]);
@@ -391,10 +402,8 @@ server.delete("/yourfoods", async (req, res) => {
     }
 });//TODO
 
-loadFromFile("./NUTcalc.text");
-//showDB(process.argv[2]);
-//initDB(process.argv[2]);
-    //; (async () => {
-    //    const test = await qrun("SELECT * FROM users");
-    //    console.log(test.rows);
-    //})();
+; (async () => {
+    await initDB(process.argv[2]);
+    await loadFromFile("./NUTcalc.text");
+    await showDB(process.argv[2]);
+})();

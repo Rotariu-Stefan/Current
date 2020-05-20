@@ -1,5 +1,6 @@
 const pg = require('pg');
 const fs = require('fs');
+const fetch = require('node-fetch');
 
 //const client = new pg.Client({
 //    connectionString: process.env.DATABASE_URL || process.argv[2],
@@ -134,134 +135,173 @@ const qrun = async (query, qparams) => {
 
 const loadFromFile = async (filename) => {
     try {
-        const entry = "(?<Amount>^\\d+([\\./]{1}\\d+)?(g\\b|ml\\b|\\b)) " +
+        const entry = "(?<Amount>^\\d+([\\./]{1}\\d+)?(g\\b|\\b)) " +
             "(?<Name>[^@]+) (@" +
             "(?<Brand>.+) )?" +
             "(?<Macros>[\\d\\.]{1,5}/[\\d\\.]{1,5}/[\\d\\.]{1,5}$)";
-        const entryResult = "^=(?<Macros>[\\d\\.]{1,5}/[\\d\\.]{1,5}/[\\d\\.]{1,5}$)";
-        const mealResult = "^(?<Name>.*)" +
+        //const entryResult = "^=(?<Macros>[\\d\\.]{1,5}/[\\d\\.]{1,5}/[\\d\\.]{1,5}$)";
+        const dishResult = "^\\>===(?<Amount>\\d+(g\\b|\\b)) " +
+            "(?<Name>[^@]+) (@" +
+            "(?<Brand>.+) )?" +
+            "(?<Macros>[\\d\\.]{1,5}/[\\d\\.]{1,5}/[\\d\\.]{1,5}$)";
+        const mealResultO = "^(?<Name>.*)" +
             "(?<Portion>(=====)|(===(\\d+/\\d+|\\d+|\\d+\\.\\d+)==))" +
             "(?<Macros>[\\d\\.]{1,5}//[\\d\\.]{1,5}//[\\d\\.]{1,5}) ?" +
             "(?<Note>([~\\+\\-]+)?(\\(.*\\))?$)?";
-        const dayResult = "(?<Date>^\\d\\d/\\d\\d/\\d{4})\\-\\-\\-\\>" +
+        const mealResult = "^(?<Name>.*)===" +
+            "(?<Portion>\\d+/\\d+|\\d+|\\d+\\.\\d+)==" +
+            "(?<Macros>[\\d\\.]{1,5}//[\\d\\.]{1,5}//[\\d\\.]{1,5}) ?" +
+            "(?<Note>([~\\+\\-]+)?(\\(.*\\))?$)?";
+        const dayResult = "(?<DayDate>^\\d\\d/\\d\\d/\\d{4})\\-\\-\\-\\>" +
             "(?<Macros>[\\d\\.]{1,5}\\|\\|[\\d\\.]{1,5}\\|\\|[\\d\\.]{1,5}) ?" +
             "(?<Note>([~\\+\\-]+)?(\\(.*\\))?$)?";
-        const dishResult = "^\\>===(?<Amount>\\d+(g\\b|ml\\b|\\b)) " +
-            "(?<Name>[^@]+) (@" +
-            "(?<Brand>.+) )?" +
-            "(?<Macros>[\\d\\.]{1,5}/[\\d\\.]{1,5}/[\\d\\.]{1,5}$)";
         //const dayActiv = "(?<Activ>^((\\+SALA)|(\\+SAUNA)|(\\+EXS))+)$";
-        const dayEnd = "(?<DayEnd>^\\-{3,}$)";
+        //const dayEnd = "(?<DayEnd>^\\-{3,}$)";
 
         const lines = fs.readFileSync(filename).toString().split("\n");
+
         console.log("START");
 
-        let day = {
-            date: undefined,
-            userid: undefined,
-            note: {
-                title: "Untitled",
-                score: 0,
-                notetext: null
-            },
-            meals: []
-        };
-        let meal = {
-            mealname: undefined,
-            portion: undefined,
-            note: {
-                title: "Untitled",
-                score: 0,
-                notetext: null
-            },
-            foodentries: []
-        };
-        let foodentry = {
-            foodid: undefined,
-            amount: undefined,
-            measure: undefined,
-            //foodname: undefined,
-            //brand: undefined,
-            //fat: undefined,
-            //carbs: undefined,
-            //protein: undefined,
-            //note: null
-        }
-        let dish = {
-            amount: undefined,
-            measure: undefined,
-            foodname: undefined,
-            brand: undefined,
-            fat: undefined,
-            carbs: undefined,
-            protein: undefined,
-            sizeinfo: undefined,
-            userid: 1,
-            pic: null,
-            price: 11,
-            isdish: true,
-            noteid: null,
-            composition: []
-        };
-        let fooditem = {
-            foodname: undefined,
-            brand: undefined,
-            fat: undefined,
-            carbs: undefined,
-            protein: undefined,
-            sizeinfo: undefined,
-            userid: 1,
-            pic: null,
-            price: 11,
-            isdish: false,
-            noteid: null,
-            composition: null
-        }
+        const fooditems_entered = [];
+
+        let foodentries_current = [];
+        let meals_current = [];
 
         let match;
         for (line of lines) {
+
             match = line.match(entry);
             if (match) {
                 //console.log("Entry-->Line:", line, "Groups:", match.groups);
                 const { Amount, Name, Brand } = match.groups;
                 const macros = match.groups.Macros.split("/");
-                fooditem.foodname = Name;
-                fooditem.brand = Brand;
-                fooditem.fat = macros[0];
-                fooditem.carbs = macros[1];
-                fooditem.protein = macros[2];
-                fooditem.sizeinfo = Amount.includes("g") ? 0 : null;
 
+                let entered = false;
+                for (f of fooditems_entered)
+                    if (f.foodname === Name && f.brand === Brand) {
+                        entered = true;
+                        foodentries_current.push({
+                            foodid: f.foodid,
+                            amount: Number(Amount.replace("g", "")),
+                            measure: Amount.includes("g") ? "Grams" : "Pieces"
+                        })
+                        break;
+                    }
+                if (!entered) {
+                    const fooditem = {
+                        foodname: Name,
+                        brand: Brand,
+                        fat: macros[0], carbs: macros[1], protein: macros[2],
+                        sizeinfo: Amount.includes("g") ? 0 : null,
+                        userid: 1, pic: null, price: 11,
+                        isdish: false,
+                        noteid: null,
+                        foodentries: null
+                    };
 
+                    let res = await fetch(getServerURL() + "/yourfoods", {
+                        method: "put",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(fooditem)
+                    });
+                    res = await res.json();
+
+                    fooditems_entered.push({ foodname: Name, brand: Brand, foodid: res.foodid });
+                    foodentries_current.push({
+                        foodid: res.foodid,
+                        amount: Number(Amount.replace("g", "")),
+                        measure: Amount.includes("g") ? "Grams" : "Pieces"
+                    });
+                }
             }
 
+            match = line.match(dishResult);
+            if (match) {
+                //console.log("DishResult-->Line:", line, "Groups:", match.groups);
+                const { Amount, Name, Brand, Macros } = match.groups;
+                const macros = Macros.split("/");
 
-            //match = line.match(entryResult);
-            //if (match)
-            //    console.log("EntryResult-->Line:", line, "Groups:", match.groups);
+                const fooditem_dish = {
+                    foodname: Name,
+                    brand: Brand,
+                    fat: macros[0], carbs: macros[1], protein: macros[2],
+                    sizeinfo: Amount.includes("g") ? Number(Amount.replace("g", "")) : null,
+                    userid: 1, pic: null, price: 11,
+                    isdish: true,
+                    noteid: null,
+                    foodentries: foodentries_current
+                };
 
-            //match = line.match(dishResult);
-            //if (match)
-            //    console.log("DishResult-->Line:", line, "Groups:", match.groups);
+                let res = await fetch(getServerURL() + "/yourfoods", {
+                    method: "put",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(fooditem_dish)
+                });
+                res = await res.json();
 
-            //match = line.match(mealResult);
-            //if (match)
-            //    console.log("MealResult-->Line:", line, "Groups:", match.groups);
+                fooditems_entered.push({ foodname: Name, brand: Brand, foodid: res.foodid });
+                foodentries_current = [];
+            }
 
-            //match = line.match(dayResult);
-            //if (match)
-            //    console.log("DayResult-->Line:", line, "Groups:", match.groups);
+            match = line.match(mealResult);
+            if (match) {
+                //console.log("MealResult-->Line:", line, "Groups:", match.groups);
+                const { Name, Portion, Note } = match.groups;
+                const macros = match.groups.Macros.split("//");
 
-            //match = line.match(dayEnd);
-            //if (match)
-            //    console.log("DayEnd-->Line:", line, "Groups:", match.groups.DayEnd);
+
+
+                const meal = {
+                    mealname: Name,
+                    portion: Portion,
+                    foodentries: foodentries_current
+                };
+                if (Note)
+                    meal.note = getNoteObj(Note);
+                else
+                    meal.noteid = null;
+
+                meals_current.push(meal);
+                foodentries_current = [];
+            }
+
+            match = line.match(dayResult);
+            if (match) {
+                //console.log("DayResult-->Line:", line, "Groups:", match.groups);
+                const { DayDate, Note, Macros } = match.groups;
+                const macros = Macros.split("||");
+                const dt = DayDate.split("/");
+
+                const day = {
+                    date: new Date(`${dt[2]}-${dt[1]}-${dt[0]}`),
+                    userid: 1,
+                    meals: meals_current
+                };
+                if (Note)
+                    day.note = getNoteObj(Note);
+                else
+                    day.noteid = null;
+
+                let res = await fetch(getServerURL() + "/dailymeals", {
+                    method: "put",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(day)
+                });
+                res = await res.json();
+                //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DAY<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", day);
+                //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DAY-RES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", res);
+                meals_current = [];
+            }
         }
+        console.log("FOODITEMS_ENTERED:", fooditems_entered);
 
         console.log("END");
-
-
-
-
 
     } catch (err) {
         console.log("___________ERROR___________\n", err.message || err);
@@ -269,10 +309,37 @@ const loadFromFile = async (filename) => {
     }
 };
 
+const getNoteObj = (noteText) => {
+    if (!noteText)
+        return null;
+
+    let nscore = "", ntext = "";
+
+    const parstart = noteText.indexOf("(");
+    if (parstart === -1)
+        nscore = noteText;
+    else if (parstart === 0)
+        ntext = noteText.substring(1, noteText.length - 1);
+    else {
+        nscore = noteText.substring(0, parstart);
+        ntext = noteText.substring(parstart + 1, noteText.length - 1);
+    }
+    const note = { title: "Untitled", score: 0, notetext: ntext };
+    for (let c of nscore)
+        if (c === "-")
+            note.score--;
+        else if (c === "+")
+            note.score++;
+
+
+    return note;
+};
 
 
 
-
+const getServerURL = () => {
+    return "http://localhost:3001";
+};
 
 module.exports = {
     initDB,
