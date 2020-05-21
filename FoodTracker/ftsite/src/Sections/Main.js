@@ -66,7 +66,7 @@ class Main extends React.Component {
             case "Register":
                 return <Register />;
             case "Login":
-                return <Login navClick={(navText) => this.changePage(navText)} />;
+                return <Login app={this.props.app} navClick={(navText) => this.changePage(navText)} />;
             default:
                 return <Error />;
         }

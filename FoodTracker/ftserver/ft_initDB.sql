@@ -92,50 +92,50 @@ INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', '
 INSERT INTO Users VALUES (default, 'Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', B'0', 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapass');
 INSERT INTO Users VALUES (default, 'Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1988/08/03', B'1', 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'goripass');
 
-INSERT INTO Notes (UserID, Title, Score, NoteText)
-SELECT u.UserID, 'Magic', 5, 'Omg it''s magical'
-FROM Users u
-WHERE u.Username='StravoS';
-INSERT INTO Notes (UserID, Title, Score, NoteText)
-SELECT u.UserID, 'Meh', 0, 'Whatever...'
-FROM Users u
-WHERE u.Username='StravoS';
-INSERT INTO Notes (UserID, Title, Score, NoteText)
-SELECT u.UserID, 'Bad', -5, 'Ouch...'
-FROM Users u
-WHERE u.Username='StravoS';
+--INSERT INTO Notes (UserID, Title, Score, NoteText)
+--SELECT u.UserID, 'Magic', 5, 'Omg it''s magical'
+--FROM Users u
+--WHERE u.Username='StravoS';
+--INSERT INTO Notes (UserID, Title, Score, NoteText)
+--SELECT u.UserID, 'Meh', 0, 'Whatever...'
+--FROM Users u
+--WHERE u.Username='StravoS';
+--INSERT INTO Notes (UserID, Title, Score, NoteText)
+--SELECT u.UserID, 'Bad', -5, 'Ouch...'
+--FROM Users u
+--WHERE u.Username='StravoS';
 
-INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal1Sv', '2020/02/22', 1, u.UserID, n.NoteID
-FROM Users u, Notes n
-WHERE u.Username='StravoS' AND n.Title='Magic';
-INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal2Sv', '2020/02/22', 1, u.UserID, n.NoteID
-FROM Users u, Notes n
-WHERE u.Username='StravoS' AND n.Title='Meh';
-INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal1Gr', '2020/02/23', 1, u.UserID, n.NoteID
-FROM Users u, Notes n
-WHERE u.Username='Gori' AND n.Title='Bad';
-INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
-SELECT '_Meal2Gr', '2020/02/23', 1, u.UserID, n.NoteID
-FROM Users u, Notes n
-WHERE u.Username='Gori' AND n.Title='Meh';
+--INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
+--SELECT '_Meal1Sv', '2020/02/22', 1, u.UserID, n.NoteID
+--FROM Users u, Notes n
+--WHERE u.Username='StravoS' AND n.Title='Magic';
+--INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
+--SELECT '_Meal2Sv', '2020/02/22', 1, u.UserID, n.NoteID
+--FROM Users u, Notes n
+--WHERE u.Username='StravoS' AND n.Title='Meh';
+--INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
+--SELECT '_Meal1Gr', '2020/02/23', 1, u.UserID, n.NoteID
+--FROM Users u, Notes n
+--WHERE u.Username='Gori' AND n.Title='Bad';
+--INSERT INTO Meals (MealName, TimeEaten, Portion, UserID, NoteID)
+--SELECT '_Meal2Gr', '2020/02/23', 1, u.UserID, n.NoteID
+--FROM Users u, Notes n
+--WHERE u.Username='Gori' AND n.Title='Meh';
 
-INSERT INTO FoodItems VALUES (default, '_Vrajeala', 'Sv', 11, 11, 11, 11, (SELECT UserID FROM Users WHERE Username='StravoS'), null, -11, false, (SELECT NoteID FROM Notes WHERE Title='Magic'));
-INSERT INTO FoodItems VALUES (default, '_Crap', 'Bodega', 1, 99, 1, 0, (SELECT UserID FROM Users WHERE Username='Gori'), null, 99, false, (SELECT NoteID FROM Notes WHERE Title='Bad'));
-INSERT INTO FoodItems VALUES (default, '_CevaCeva', 'Mama', 25, 1, 24, null, (SELECT UserID FROM Users WHERE Username='Mama'), null, 23, true, (SELECT NoteID FROM Notes WHERE Title='Meh'));
+--INSERT INTO FoodItems VALUES (default, '_Vrajeala', 'Sv', 11, 11, 11, 11, (SELECT UserID FROM Users WHERE Username='StravoS'), null, -11, false, (SELECT NoteID FROM Notes WHERE Title='Magic'));
+--INSERT INTO FoodItems VALUES (default, '_Crap', 'Bodega', 1, 99, 1, 0, (SELECT UserID FROM Users WHERE Username='Gori'), null, 99, false, (SELECT NoteID FROM Notes WHERE Title='Bad'));
+--INSERT INTO FoodItems VALUES (default, '_CevaCeva', 'Mama', 25, 1, 24, null, (SELECT UserID FROM Users WHERE Username='Mama'), null, 23, true, (SELECT NoteID FROM Notes WHERE Title='Meh'));
 
-INSERT INTO MealData (MealID, FoodID, Amount, Measure)
-VALUES (1, 1, 2, 'Pieces'),
-	(1, 3, 80, 'Grams'),
-	(2, 1, 1, 'Pieces'),
-	(2, 2, 1, 'Pieces'),
-	(3, 2, 2, 'Pieces'),
-	(3, 3, 120, 'Grams'),
-	(4, 2, 1, 'Pieces'),
-	(4, 1, 100, 'Grams');
+--INSERT INTO MealData (MealID, FoodID, Amount, Measure)
+--VALUES (1, 1, 2, 'Pieces'),
+--	(1, 3, 80, 'Grams'),
+--	(2, 1, 1, 'Pieces'),
+--	(2, 2, 1, 'Pieces'),
+--	(3, 2, 2, 'Pieces'),
+--	(3, 3, 120, 'Grams'),
+--	(4, 2, 1, 'Pieces'),
+--	(4, 1, 100, 'Grams');
 
-INSERT INTO DishData (DishID, IngredientID, Amount, Measure)
-VALUES (3,1,100,'Grams'),
-	(3,2,1,'Pieces');
+--INSERT INTO DishData (DishID, IngredientID, Amount, Measure)
+--VALUES (3,1,100,'Grams'),
+--	(3,2,1,'Pieces');

@@ -9,11 +9,11 @@ server.listen(process.env.PORT || 3001, () => {
     console.log("Running on port:", process.env.PORT || 3001);
 });
 
-let reqTotal = 0;
-server.use((req, res, next) => {
-    console.log("Total Requests:", ++reqTotal);
-    next();
-});
+//let reqTotal = 0;
+//server.use((req, res, next) => {
+//    console.log("Total Requests:", ++reqTotal);
+//    next();
+//});
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 server.use(cors());
@@ -47,9 +47,9 @@ server.post("/login", async (req, res) => {
 
         const username = req.body.username;
         const pass = req.body.pass;
-        const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, default_day.meals, access" +
+        const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access" +
             " FROM users" +
-            " WHERE username= $1 AND pass= $2;"
+            " WHERE (username=$1 OR email=$1) AND pass=$2;"
             , [username, pass]);
 
         if (qsel.rows.length === 1)
@@ -70,7 +70,7 @@ server.get("/dailymeals", async (req, res) => {
 
         const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
             " FROM meals" +
-            " WHERE userid= $1 AND timeeaten= $2;"
+            " WHERE userid= $1 AND timeeaten=$2;"
             , [userid, date]);
 
         const day = {};
@@ -92,9 +92,8 @@ server.get("/dailymeals", async (req, res) => {
                     " WHERE noteid=$1;"
                     , [meal.noteid])
                 meal.note = qselNM.rows[0];
-            } else
-                meal.noteid = null;
-            delete meal.noteid;
+                delete meal.noteid;
+            }
 
             const qselFE = await client.query("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
                 " FROM fooditems f" +
@@ -126,7 +125,7 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
             qselFI = await client.query("SELECT *" +
                 " FROM fooditems" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
-                " AND userid= $2;"
+                " AND userid=$2;"
                 , [search, userid]);
         }
 
@@ -185,9 +184,9 @@ server.get("/yourfoods", async (req, res) => {
         console.log("-----------ftserver Received @yourfoods --- GET Req:", req.body);
         const { userid } = req.body;
 
-        const qselF = await client.query("SELECT f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid" +
-            " FROM fooditems f" +
-            " WHERE f.userid=$1;"
+        const qselF = await client.query("SELECT *" +
+            " FROM fooditems" +
+            " WHERE userid=$1;"
             , [userid]);
         res.json(qselF.rows);
 
@@ -203,7 +202,7 @@ server.put("/register", async (req, res) => {
         const { username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass } = req.body;
 
         const qselU = await client.query("SELECT userid" +
-            "FROM users WHERE email= $1 OR username=$2;", [email, username]);
+            "FROM users WHERE email=$1 OR username=$2;", [email, username]);
         if (qselU.rowCount === 0) {
 
             const qinsU = await client.query("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
@@ -223,7 +222,7 @@ server.put("/register", async (req, res) => {
 
 server.put("/yourfoods", async (req, res) => {
     try {
-        console.log("-----------ftserver Received @yourfoods --- PUT Req:", req.body);
+        //console.log("-----------ftserver Received @yourfoods --- PUT Req:", req.body);
         const { foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, foodentries } = req.body;
 
         const returnData = { foodid: undefined };
@@ -262,14 +261,14 @@ server.put("/yourfoods", async (req, res) => {
         res.json(returnData);
 
     } catch (err) {
-        console.log("___________ERROR___________\n", err.message || err);
+        console.log("___________ERROR___________put @yourfoods\n", err.stack || err);
         res.status(400).json("Error at YourFoods !");
     }
 });
 
 server.put("/dailymeals", async (req, res) => {
     try {
-        console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
+        //console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
         const { date, userid, noteid, note, meals } = req.body;
 
         const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1;", [date]);
@@ -299,7 +298,7 @@ server.put("/dailymeals", async (req, res) => {
             if (meal.noteid === undefined) {
                 const { title, score, notetext } = meal.note;
                 const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
-                    " VALUES($1, $2, $3, $4" +
+                    " VALUES($1, $2, $3, $4)" +
                     " RETURNING noteid;"
                     , [userid, title, score, notetext]);
                 returnMeal.noteid = qinsN.rows[0].noteid;
@@ -325,10 +324,11 @@ server.put("/dailymeals", async (req, res) => {
             returnData.meals.push(returnMeal);
         }
 
+        console.log("DAY ENTERED!");
         res.json(returnData);
 
     } catch (err) {
-        console.log("___________ERROR___________\n", err.message || err);
+        console.log("___________ERROR___________put @dailymeals\n", err.stack || err);
         res.status(400).json("Error at DailyMeals !");
     }
 });
@@ -402,8 +402,6 @@ server.delete("/yourfoods", async (req, res) => {
     }
 });//TODO
 
-; (async () => {
-    await initDB(process.argv[2]);
-    await loadFromFile("./NUTcalc.text");
-    await showDB(process.argv[2]);
-})();
+//; (async () => {
+//    await showDB(process.argv[2]);
+//})();

@@ -4,16 +4,20 @@ import svData from '../svData.json';
 
 //import { NavLink } from 'react-router-dom';
 
+const refs = {};
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
+        refs.app = props.app;
+
         this.state = {
-            warningMsg: "Incorrect username/password! How DARE You, Sir!"
-        }
+            warningMsg: props.app.state.user.username
+        };
     }
 
     getServerURL = () => {
-        return svData.serverLink;
+        return "http://localhost:3001";//svData.serverLink;
     }
 
     onLogin = async (ev) => {
@@ -23,7 +27,7 @@ class Login extends React.Component {
             const usernameText = inputs[0].value;
             const passText = inputs[1].value;
 
-            let res = await fetch(this.getServerURL() + "login/", {
+            let res = await fetch(this.getServerURL() + "/login", {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json"
@@ -33,10 +37,24 @@ class Login extends React.Component {
                     pass: passText
                 })
             });
-            res = await res.json();
-            this.setState({
-                warningMsg: res.toString()
-            });
+            if (res.status === 200) {
+                res = await res.json();
+                if (typeof res === "string")
+                    this.setState({
+                        warningMsg: res
+                    });
+                else {
+                    this.setState({
+                        warningMsg: `Welcome, ${res.firstname} ${res.lastname} !`
+                    });
+                    refs.app.updateUser(res);
+                }
+            }
+            else {
+                console.log(await res.json());
+            }
+
+
         } catch (err) {
             console.log("___________ERROR___________\n", err.message);
         }
@@ -69,4 +87,5 @@ class Login extends React.Component {
         );
     }
 }
+
 export default Login;

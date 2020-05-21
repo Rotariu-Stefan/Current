@@ -59,7 +59,7 @@ const initDB = async (connStr) => {
 
         const init = fs.readFileSync("ft_initDB.sql").toString();
         const res = await client.query(init);
-        console.log(res);
+        console.log("INIT SUCCEEDED!");
 
         await client.end();
     } catch (err) {
@@ -144,10 +144,6 @@ const loadFromFile = async (filename) => {
             "(?<Name>[^@]+) (@" +
             "(?<Brand>.+) )?" +
             "(?<Macros>[\\d\\.]{1,5}/[\\d\\.]{1,5}/[\\d\\.]{1,5}$)";
-        const mealResultO = "^(?<Name>.*)" +
-            "(?<Portion>(=====)|(===(\\d+/\\d+|\\d+|\\d+\\.\\d+)==))" +
-            "(?<Macros>[\\d\\.]{1,5}//[\\d\\.]{1,5}//[\\d\\.]{1,5}) ?" +
-            "(?<Note>([~\\+\\-]+)?(\\(.*\\))?$)?";
         const mealResult = "^(?<Name>.*)===" +
             "(?<Portion>\\d+/\\d+|\\d+|\\d+\\.\\d+)==" +
             "(?<Macros>[\\d\\.]{1,5}//[\\d\\.]{1,5}//[\\d\\.]{1,5}) ?" +
@@ -160,19 +156,19 @@ const loadFromFile = async (filename) => {
 
         const lines = fs.readFileSync(filename).toString().split("\n");
 
-        console.log("START");
-
         const fooditems_entered = [];
 
         let foodentries_current = [];
         let meals_current = [];
 
+        console.log("START");
         let match;
         for (line of lines) {
 
             match = line.match(entry);
             if (match) {
-                //console.log("Entry-->Line:", line, "Groups:", match.groups);
+                //console.log("FOODENTRY-->LINE:", line);
+                //console.log("GROUPS:", match.groups);
                 const { Amount, Name, Brand } = match.groups;
                 const macros = match.groups.Macros.split("/");
 
@@ -219,7 +215,8 @@ const loadFromFile = async (filename) => {
 
             match = line.match(dishResult);
             if (match) {
-                //console.log("DishResult-->Line:", line, "Groups:", match.groups);
+                //console.log("DISHRESULT-->LINE:", line);
+                //console.log("GROUPS:", match.groups);
                 const { Amount, Name, Brand, Macros } = match.groups;
                 const macros = Macros.split("/");
 
@@ -227,7 +224,7 @@ const loadFromFile = async (filename) => {
                     foodname: Name,
                     brand: Brand,
                     fat: macros[0], carbs: macros[1], protein: macros[2],
-                    sizeinfo: Amount.includes("g") ? Number(Amount.replace("g", "")) : null,
+                    sizeinfo: Amount.includes("g") ? number(Amount.replace("g", "")) : null,
                     userid: 1, pic: null, price: 11,
                     isdish: true,
                     noteid: null,
@@ -249,11 +246,10 @@ const loadFromFile = async (filename) => {
 
             match = line.match(mealResult);
             if (match) {
-                //console.log("MealResult-->Line:", line, "Groups:", match.groups);
+                //console.log("MEALRESULT-->LINE:", line);
+                //console.log("GROUPS:", match.groups);
                 const { Name, Portion, Note } = match.groups;
                 const macros = match.groups.Macros.split("//");
-
-
 
                 const meal = {
                     mealname: Name,
@@ -264,14 +260,14 @@ const loadFromFile = async (filename) => {
                     meal.note = getNoteObj(Note);
                 else
                     meal.noteid = null;
-
                 meals_current.push(meal);
                 foodentries_current = [];
             }
 
             match = line.match(dayResult);
             if (match) {
-                //console.log("DayResult-->Line:", line, "Groups:", match.groups);
+                //console.log("DAYRESULT-->LINE:", line);
+                //console.log("GROUPS:", match.groups);
                 const { DayDate, Note, Macros } = match.groups;
                 const macros = Macros.split("||");
                 const dt = DayDate.split("/");
@@ -293,14 +289,11 @@ const loadFromFile = async (filename) => {
                     },
                     body: JSON.stringify(day)
                 });
+
                 res = await res.json();
-                //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DAY<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", day);
-                //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>DAY-RES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n", res);
                 meals_current = [];
             }
         }
-        console.log("FOODITEMS_ENTERED:", fooditems_entered);
-
         console.log("END");
 
     } catch (err) {
@@ -334,7 +327,6 @@ const getNoteObj = (noteText) => {
 
     return note;
 };
-
 
 
 const getServerURL = () => {
