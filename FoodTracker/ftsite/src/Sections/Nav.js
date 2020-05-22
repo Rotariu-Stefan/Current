@@ -1,4 +1,5 @@
 import React from 'react';
+import { app } from '../App';
 
 //import { NavLink } from 'react-router-dom';
 //
@@ -15,17 +16,19 @@ import React from 'react';
 //    );
 //}
 
-const Nav = ({ navClick }) => {
-    return (
-        <nav className="subblock boxShow">
-            <span onClick={() => navClick("DailyMeals")} className="navlink textHigh">Daily Meals</span>|
-            <span onClick={() => navClick("YourFood")} className="navlink textHigh">Your Food</span>|
-            <span onClick={() => navClick("YourPlans")} className="navlink textHigh">Your Plans</span>|
-            <span onClick={() => navClick("YourStats")} className="navlink textHigh">Your Stats</span>|
-            <span onClick={() => navClick("GlobalStats")} className="navlink textHigh">Global Stats</span>|
-            <span onClick={() => navClick("GlobalData")} className="navlink textHigh">Global Data</span>
-        </nav>
-    );
+class Nav extends React.Component {
+    render = () => {
+        return (
+            <nav className="subblock boxShow">
+                <span onClick={() => app.changeMainPage("DailyMeals")} className="navlink textHigh">Daily Meals</span>|
+            <span onClick={() => app.changeMainPage("YourFood")} className="navlink textHigh">Your Food</span>|
+            <span onClick={() => app.changeMainPage("YourPlans")} className="navlink textHigh">Your Plans</span>|
+            <span onClick={() => app.changeMainPage("YourStats")} className="navlink textHigh">Your Stats</span>|
+            <span onClick={() => app.changeMainPage("GlobalStats")} className="navlink textHigh">Global Stats</span>|
+            <span onClick={() => app.changeMainPage("GlobalData")} className="navlink textHigh">Global Data</span>
+            </nav>
+        );
+    };
 }
 
 export default Nav;

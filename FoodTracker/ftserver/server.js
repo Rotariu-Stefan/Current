@@ -65,20 +65,20 @@ server.post("/login", async (req, res) => {
 
 server.get("/dailymeals", async (req, res) => {
     try {
-        console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.body);
-        const { userid, date } = req.body;
+        console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.headers);
+        const { userid, reqdate } = req.headers;
 
         const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
             " FROM meals" +
             " WHERE userid= $1 AND timeeaten=$2;"
-            , [userid, date]);
+            , [userid, reqdate]);
 
         const day = {};
         const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
             " FROM notes n" +
             " JOIN daynotes dn ON dn.noteid = n.noteid" +
             " WHERE dn.daydate=$1;"
-            , [date])
+            , [reqdate])
         if (qselN.rowCount === 1)
             day.note = qselN.rows[0];
         else
@@ -112,11 +112,11 @@ server.get("/dailymeals", async (req, res) => {
 
 server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res) => {
     try {
-        console.log("-----------ftserver Received @../foodsearch --- GET Req:", req.body);
-        const { userid, search, isAll } = req.body;
+        console.log("-----------ftserver Received @../foodsearch --- GET Req:", req.headers);
+        const { userid, search, isall } = req.headers;
 
         let qselFI;
-        if (isAll) {
+        if (isall) {
             qselFI = await client.query("SELECT *" +
                 " FROM fooditems f" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%');"
@@ -128,6 +128,7 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
                 " AND userid=$2;"
                 , [search, userid]);
         }
+        console.log(userid, search, isall);
 
         for (fooditem of qselFI.rows) {
             if (fooditem.noteid) {
@@ -181,8 +182,8 @@ server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], async (req, res
 
 server.get("/yourfoods", async (req, res) => {
     try {
-        console.log("-----------ftserver Received @yourfoods --- GET Req:", req.body);
-        const { userid } = req.body;
+        console.log("-----------ftserver Received @yourfoods --- GET Req:", req.headers);
+        const { userid } = req.headers;
 
         const qselF = await client.query("SELECT *" +
             " FROM fooditems" +
@@ -402,6 +403,8 @@ server.delete("/yourfoods", async (req, res) => {
     }
 });//TODO
 
-//; (async () => {
-//    await showDB(process.argv[2]);
-//})();
+; (async () => {
+    //await showDB(process.argv[2]);
+
+
+})();

@@ -5,17 +5,24 @@ import Note from './Note';
 class MealEntry extends React.Component {
     constructor(props) {
         super(props);
-        this.nameDef = "Meal";
 
         this.state = {
-            name: props.name === undefined ? this.nameDef : props.name,
+            mealEntry: props.mealentry,
             foodEntries: [],
-            foodKey: 1,
+            selectedFoodEntry: React.createRef(),
             highlight: false,
             min: false
         };
 
-        this.state.foodEntries.push(<FoodEntry key="0" amount="100g" name_brand="cottage cheese @delaco" macros="4.5/2/12" macrores="111/111/111" />);
+        let isFirst = true;
+        for (let f of props.mealentry.foodentries) {
+            if (!isFirst)
+                this.state.foodEntries.push(<FoodEntry foodentry={f} key={f.foodid} />);
+            else {
+                this.state.foodEntries.push(<FoodEntry ref={this.state.selectedFoodEntry} foodentry={f} key={f.foodid} />);
+                isFirst = false;
+            }
+        }
     }
 
     addNewFoodEntry = (ev) => {
@@ -24,7 +31,7 @@ class MealEntry extends React.Component {
             foodEntries: this.state.foodEntries,
             foodKey: this.state.foodKey + 1,
         });
-    }
+    };
 
     toggleHighlight = () => this.setState({
         highlight: !this.state.highlight
@@ -35,7 +42,7 @@ class MealEntry extends React.Component {
             min: !this.state.min
         });
         ev.stopPropagation();
-    }
+    };
 
     render = () => {
         return (
@@ -57,7 +64,11 @@ class MealEntry extends React.Component {
                 </div>
             </div>
         );
-    }
+    };
+
+    componentDidMount = () => {
+
+    };
 }
 
 export default MealEntry;

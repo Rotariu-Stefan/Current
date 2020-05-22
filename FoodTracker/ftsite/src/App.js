@@ -7,60 +7,64 @@ import Footer from './Sections/Footer';
 const refs = {
     main: React.createRef(),
     footer: React.createRef(),
-    header: React.createRef()
+    header: React.createRef(),
+    nav: React.createRef()
 };
+
+let app = null;
 
 class App extends React.Component {
     constructor(props) {
         super(props);
+        this.defaultUser = {
+            userid: 0,
+            username: "Guest",
+            email: "guest@nomail.none",
+            firstname: "John",
+            lastname: "Doe",
+            dob: new Date(),
+            sex: 1,
+            describe: "placeholder",
+            pic: "profileEmpty.png",
+            default_meals: 'Breakfast,Lunch,Dinner',
+            access: "Guest"
+        };
 
         this.state = {
-            nrClicks: 0,
-
-
-
-            user: {
-                userid: 0,
-                username: "Guest",
-                email: "guest@nomail.none",
-                firstname: "John",
-                lastname: "Doe",
-                dob: new Date(),
-                sex: 1,
-                describe: "placeholder",
-                pic: "SitePics/profileEmpty.png",
-                default_meals: 'Breakfast,Lunch,Dinner',
-                access: "Guest"
-            }
+            currentUser: this.defaultUser
         };
+        app = this;
     }
 
     updateUser = (res) => {
-        this.setState({
-            user: res
-        });
-        console.log(this.state.user);
+        const { defaultUser } = this;
+
+        if (res === null) {
+            this.setState({
+                currentUser: defaultUser
+            });
+            refs.header.current.updateUser(false, defaultUser.username, defaultUser.pic);
+        }
+        else {
+            this.setState({
+                currentUser: res
+            });
+            refs.header.current.updateUser(true, res.username, res.pic);
+        }
     };
 
-    onIncClicks = () => {
-        this.setState({
-            nrClicks: this.state.nrClicks + 1
-        });
-        refs.footer.current.setState({
-            nrClicks: this.state.nrClicks
-        });
-    };
+    changeMainPage = (newPage) => refs.main.current.changePage(newPage);
 
     render = () => {
         return (
             [
-                <Header ref={refs.header} user={this.state.user} navClick={(navText) => refs.main.current.changePage(navText)} key="H" />,
-                <Nav navClick={(navText) => refs.main.current.changePage(navText)} key="N" />,
-                <Main ref={refs.main} app={this} incClicks={this.onIncClicks} page="Login" key="M" />,
+                <Header ref={refs.header} key="H" />,
+                <Nav ref={refs.nav} key="N" />,
+                <Main ref={refs.main} page="DailyMeals" key="M" />,
                 <Footer ref={refs.footer} key="F" />
             ]
         );
     };
 }
 
-export default App;
+export { App, app };

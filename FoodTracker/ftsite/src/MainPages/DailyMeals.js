@@ -5,34 +5,98 @@ import MealEntry from '../Components/MealEntry';
 import FoodEntry from '../Components/FoodEntry';
 import FoodItem from '../Components/FoodItem';
 import Note from '../Components/Note';
+import { app } from '../App';
+
+const getServerURL = () => {
+    return "http://localhost:3001"; //svData.serverLink;
+}
 
 class DailyMeals extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        ; (async () => {
+            super(props);
 
-        this.state = {
-            mealEntries: [],
-            mealKey: 1,
-            selectedMeal: React.createRef(),
-            foodSItems: [],
-            selectedDay: new Date()
-        };
+            this.state = {
+                selectedDay: new Date('2020-03-12'),
+                dayEntry: {},
+                sFoodItems: [],
+                mealEntries: [],
+                selectedMeal: React.createRef()
+            };
 
-        this.state.mealEntries.push(<MealEntry selectedChanged={this.onSelectedChanged} removeMeal={this.onRemoveMeal} ref={this.state.selectedMeal} key="0" />);
+            let res = await this.getDailyMeals(this.state.selectedDay);
 
-        for (let i = 0; i < 10; i++) {
-            this.state.foodSItems.push(<FoodItem macros={`${i}/${i}/${i}`} per={(i + 1) * 10} key={i} />);
-        };
+            let isFirst = true;
+            for (let m of res.meals)
+                if (!isFirst)
+                    this.state.mealEntries.push(<MealEntry selectedChanged={this.onSelectedMealChanged} removeMeal={this.onRemoveMeal} mealentry={m} key={m.mealid} />);
+                else {
+                    this.state.mealEntries.push(<MealEntry ref={this.state.selectedMeal} selectedChanged={this.onSelectedMealChanged} removeMeal={this.onRemoveMeal} mealentry={m} key={m.mealid} />);
+                    isFirst = false;
+                }
+            this.setState({
+                dayEntry: res
+            });
+
+            res = await this.getSFoodItems(app.state.currentUser.userid, null, false);
+            for (let f of res)
+                this.state.sFoodItems.push(<FoodItem name_brand={`${f.foodname} @${f.brand}`}
+                    macros={`${f.fat}/${f.carbs}/${f.protein}`}
+                    per={f.sizeinfo === null ? `1` : `100g`} key={f.foodid} />);
+            this.setState({
+                selectedMeal: this.state.selectedMeal.current,
+                sFoodItems: this.state.sFoodItems
+            });
+
+            this.state.selectedMeal.toggleHighlight();
+        })();
+    }
+
+    getDailyMeals = async (reqDate) => {
+        let res = await fetch(getServerURL() + "/dailymeals", {
+            method: "get",
+            headers: {
+                "content-type": "application/json",
+                "reqdate": `${reqDate.getFullYear()}-${reqDate.getMonth() + 1 > 10 ? (reqDate.getMonth() + 1).toString() : "0" + (reqDate.getMonth() + 1).toString()}-${reqDate.getDate() > 10 ? reqDate.getDate().toString() : "0" + reqDate.getDate().toString()}`,
+                "userid": 1,
+            }
+        });
+        res = await res.json();
+        return res;
+    }
+
+    getSFoodItems = async (userId, searchTerm, isall) => {
+        let res;
+        if (searchTerm === null)
+            res = await fetch(getServerURL() + "/yourfoods", {
+                method: "get",
+                headers: {
+                    "content-type": "application/json",
+                    "userid": 1
+                }
+            });
+        else
+            res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
+                method: "get",
+                headers: {
+                    "content-type": "application/json",
+                    "userid": userId,
+                    "search": searchTerm,
+                    "isall": isall
+                }
+            });
+        res = await res.json();
+        return res;
     }
 
     addNewMealEntry = (ev) => {
-        const newMeal = <MealEntry selectedChanged={this.onSelectedChanged} removeMeal={this.onRemoveMeal} name={"Meal" + this.state.mealKey} key={this.state.mealKey} />;
+        const newMeal = <MealEntry selectedChanged={this.onSelectedMealChanged} removeMeal={this.onRemoveMeal} name={"NewMeal"} key={0/*TODO:Selected Last MealID+1????*/} />;
         this.state.mealEntries.push(newMeal);
 
         this.setState({
             mealEntries: this.state.mealEntries,
-            mealKey: this.state.mealKey + 1,
         });
+        console.log(this.state.selectedMeal);
     }
 
     onRemoveMeal = (ev, senderKey) => {
@@ -57,9 +121,9 @@ class DailyMeals extends React.Component {
             this.state.selectedMeal.addNewFoodEntry(ev);
     }
 
-    onSelectedChanged = (ev, sender) => {
+    onSelectedMealChanged = (ev, sender) => {
         if (sender !== this.state.selectedMeal) {
-            if (this.state.selectedMeal !== null)
+            if (this.state.selectedMeal)
                 this.state.selectedMeal.toggleHighlight();
             sender.toggleHighlight();
             this.setState({
@@ -92,10 +156,12 @@ class DailyMeals extends React.Component {
                     <div className="searchInput boxShow">
                         <label className="textHigh">Search Food: </label>
                         <input type="checkbox" /> ALL Food
-                <input className="search" type="text" placeholder="search" />
+                        <button className="ftButton"
+                            onClick={() => this.getSFoodItems(1, document.querySelector(".search").value, false)}> {"|Find>>"} </button>
+                        <input className="search" type="text" placeholder="search terms" />
                     </div>
                     <div className="searchResults boxShow">
-                        {this.state.foodSItems}
+                        {this.state.sFoodItems}
                     </div>
                     <div className="amountInput boxShow">
                         <label className="textHigh">Amount: </label>
@@ -153,13 +219,6 @@ class DailyMeals extends React.Component {
 
     componentDidMount() {
         document.getElementById('selectedDay').valueAsDate = this.state.selectedDay;
-
-        if (this.state.selectedMeal.current !== undefined) {
-            this.state.selectedMeal.current.toggleHighlight();
-            this.setState({
-                selectedMeal: this.state.selectedMeal.current
-            });
-        }
     }
 }
 

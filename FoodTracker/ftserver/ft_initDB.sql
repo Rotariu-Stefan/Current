@@ -88,7 +88,7 @@ CREATE TABLE DayNotes(
 	CONSTRAINT FK_DayNotes_Note FOREIGN KEY(NoteID) REFERENCES Notes(NoteID)
 );
 
-INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', 'Rotariu', '1987/12/17', B'1', 'Da Owner!', null, default, 'SV', 'svpass');
+INSERT INTO Users VALUES (default, 'StravoS', 'stravos11@gmail.com', 'Stefan', 'Rotariu', '1987/12/17', B'1', 'Da Owner!', 'StravoS.jpg', default, 'SV', 'svpass');
 INSERT INTO Users VALUES (default, 'Mama', 'mama@email.com', 'Rodica', 'Rotariu', '1960/03/29', B'0', 'Da Mother!', null, 'Breakfast,Lunch,Dinner', 'User', 'mamapass');
 INSERT INTO Users VALUES (default, 'Gori', 'gori@email.com', 'Alexandru', 'Mircea', '1988/08/03', B'1', 'Da Lag!', null, 'Lag1,Lag2', 'Admin', 'goripass');
 

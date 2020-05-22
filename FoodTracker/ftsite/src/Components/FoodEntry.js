@@ -1,19 +1,39 @@
 import React from 'react';
 
-const FoodEntry = ({
-    amount = 0,
-    name_brand = "nothing @sv",
-    macros = "0/0/1",
-    macrores = "00/00/111"
-}) => {
-    return (
-        <div className="foodEntry lineDown">
-            <span className="amount">{amount}</span>
-            <span className="name_brand">{name_brand}</span>
-            <span className="macro">{macros}</span>
-            <span className="macroRes">{macrores}</span>
-        </div>
-    );
+class FoodEntry extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            foodEntry: props.foodentry
+        };
+    }
+
+    render = () => {
+        const { foodEntry } = this.state;
+
+        if (foodEntry) {
+            const { foodname, brand, amount, fat, carbs, protein, sizeinfo } = foodEntry;
+
+            return (
+                <div className="foodEntry lineDown">
+                    <span className="amount">{amount}</span>
+                    <span className="name_brand">{`${foodname} ${brand ? "@" + brand : ""}`}</span>
+                    <span className="macro">{`${fat}/${carbs}/${protein}`}</span>
+                    <span className="macroRes">{`${(fat * amount / (sizeinfo === null ? 1 : 100)).toFixed(1)}
+                        /${(carbs * amount / (sizeinfo === null ? 1 : 100)).toFixed(1)}
+                        /${(protein * amount / (sizeinfo === null ? 1 : 100)).toFixed(1)}`}
+                    </span>
+                </div>
+            );
+        }
+        else
+            return "I dunno";   //TODO: Figure out why the hell this is sometimes happening..
+    }
+    componentDidMount = () => {
+        //console.log(this.props.foodentry);
+    };
 }
 
 export default FoodEntry;

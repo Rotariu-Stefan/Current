@@ -1,23 +1,21 @@
 import React from 'react';
 import "../Css/RegLog.css";
-import svData from '../svData.json';
+import { app } from '../App';
+//import svData from '../svData.json'; SO I DON'T GET THE STUPID WARNING"
 
 //import { NavLink } from 'react-router-dom';
-
-const refs = {};
 
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        refs.app = props.app;
 
         this.state = {
-            warningMsg: props.app.state.user.username
+            warningMsg: null
         };
     }
 
     getServerURL = () => {
-        return "http://localhost:3001";//svData.serverLink;
+        return "http://localhost:3001"; //svData.serverLink;
     }
 
     onLogin = async (ev) => {
@@ -44,10 +42,8 @@ class Login extends React.Component {
                         warningMsg: res
                     });
                 else {
-                    this.setState({
-                        warningMsg: `Welcome, ${res.firstname} ${res.lastname} !`
-                    });
-                    refs.app.updateUser(res);
+                    app.updateUser(res);
+                    app.changeMainPage("DailyMeals");
                 }
             }
             else {
@@ -69,7 +65,7 @@ class Login extends React.Component {
                         <span>Username/Email: </span><input type="text" name="username" />
                         <span>Password: </span><input type="password" name="password" />
                         <span>Remember Me? <input type="checkbox" name="member" /></span>
-                        <span className="warning">{this.state.warningMsg}</span>
+                        <span className={this.state.warningMsg === null ? "hidden" : "warning"}>{this.state.warningMsg}</span>
                         <input className="ftButton" type="submit" value="Login" />
                     </div>
                     {/*
@@ -79,8 +75,8 @@ class Login extends React.Component {
                     </div>
                     */}
                     <div className="loglinks">
-                        <span onClick={() => this.props.navClick("Home")}>Forgot Password?</span>
-                        <span onClick={() => this.props.navClick("Register")}>New here? Go Register!</span>
+                        <span onClick={() => app.changeMainPage("Home")}>Forgot Password?</span>
+                        <span onClick={() => app.changeMainPage("Register")}>New here? Go Register!</span>
                     </div>
                 </form>
             </main>

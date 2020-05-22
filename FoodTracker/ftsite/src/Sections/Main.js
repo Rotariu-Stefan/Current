@@ -26,6 +26,7 @@ import YourPlans from '../MainPages/YourPlans';
 import YourStats from '../MainPages/YourStats';
 import GlobalStats from '../MainPages/GlobalStats';
 import GlobalData from '../MainPages/GlobalData';
+import Profile from '../MainPages/Profile';
 import Login from '../MainPages/Login';
 import Register from '../MainPages/Register';
 import Error from '../MainPages/Error';
@@ -40,8 +41,9 @@ class Main extends React.Component {
     }
 
     changePage = (newPage) => {
-        this.props.incClicks();
-        if (this.state.page !== newPage)
+        const { page } = this.state;
+
+        if (page !== newPage)
             this.setState({
                 page: newPage
             });
@@ -63,10 +65,12 @@ class Main extends React.Component {
                 return <GlobalStats />;
             case "GlobalData":
                 return <GlobalData />;
+            case "Profile":
+                return <Profile />;
             case "Register":
                 return <Register />;
             case "Login":
-                return <Login app={this.props.app} navClick={(navText) => this.changePage(navText)} />;
+                return <Login />;
             default:
                 return <Error />;
         }

@@ -28,7 +28,7 @@ class Register extends React.Component {
                         </div>
                         <div className="personal">
                             <div>
-                                <img src="SitePics/profileEmpty.png" alt="[NO PIC]" /><br />
+                                <img src="UserPics/profileEmpty.png" alt="[NO PIC]" /><br />
                                 <button>Browse</button>
                             </div>
                             <div>
