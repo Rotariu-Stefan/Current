@@ -5,7 +5,7 @@ import svData from '../svData.json';
 
 //import { NavLink } from 'react-router-dom';
 
-getServerURL = () => {
+const getServerURL = () => {
     return svData.serverLink;
 }
 
