@@ -50,6 +50,21 @@ class MealEntry extends React.Component {
         ev.stopPropagation();
     };
 
+    getMacroResults = () => {
+        const { mealEntry } = this.state;
+
+        let fat=0, carbs=0, protein = 0;
+        let aux;
+        for (let f of mealEntry.foodentries) {
+            aux = f.sizeinfo === null ? 1 : 100;
+            fat += (f.fat * f.amount / aux);
+            carbs += (f.carbs * f.amount / aux);
+            protein += (f.protein * f.amount / aux);
+        }
+
+        return `${fat.toFixed(1)}//${carbs.toFixed(1)}//${protein.toFixed(1)}`;
+    }
+
     render = () => {
         const { mealEntry, isHighlighted, isMin, foodEntries } = this.state;
         const { mealname } = mealEntry;
@@ -69,8 +84,8 @@ class MealEntry extends React.Component {
                     {foodEntries}
                 </div>
                 <div className="mealTotal">
-                    <span>Meal Total:</span>
-                    <span>321/123/213</span>
+                    <span>Total:</span>
+                    <span>{this.getMacroResults()}</span>
                 </div>
             </div>
         );

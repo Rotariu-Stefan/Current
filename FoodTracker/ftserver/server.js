@@ -116,19 +116,19 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
         const { userid, search, isall } = req.headers;
 
         let qselFI;
-        if (isall) {
+        if (isall==="true") {
             qselFI = await client.query("SELECT *" +
-                " FROM fooditems f" +
+                " FROM fooditems" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%');"
                 , [search]);
         } else {
+            console.log("HERE!!", userid);
             qselFI = await client.query("SELECT *" +
                 " FROM fooditems" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
                 " AND userid=$2;"
                 , [search, userid]);
         }
-        console.log(userid, search, isall);
 
         for (fooditem of qselFI.rows) {
             if (fooditem.noteid) {

@@ -9,7 +9,7 @@ import { app } from '../App';
 import svData from '../svData.json';
 
 const getServerURL = () => {
-    return svData.serverLink;
+    return "http://localhost:3001";//svData.serverLink;
 }
 
 class DailyMeals extends React.Component {
@@ -87,25 +87,15 @@ class DailyMeals extends React.Component {
         const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
 
         let res;
-        if (document.querySelector(".search") && document.querySelector(".search").value !== "")
-            res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
-                method: "get",
-                headers: {
-                    "content-type": "application/json",
-                    "userid": userId,
-                    "search": document.querySelector(".search").value,
-                    "isall": document.querySelector("#isAll").checked
-                }
-            });
-        else
-            res = await fetch(getServerURL() + "/yourfoods", {
-                method: "get",
-                headers: {
-                    "content-type": "application/json",
-                    "userid": userId
-                }
-            });
-
+        res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
+            method: "get",
+            headers: {
+                "content-type": "application/json",
+                "userid": userId,
+                "search": document.querySelector(".search") ? document.querySelector(".search").value : "",
+                "isall": document.querySelector("#isAll") ? document.querySelector("#isAll").checked : false
+            }
+        });
         res = await res.json();
 
         this.state.sFoodItems = [];
@@ -215,7 +205,7 @@ class DailyMeals extends React.Component {
     };
 
     render = () => {
-        const { mealEntries, selectedDay } = this.state;
+        const { mealEntries } = this.state;
 
         return (
             <main className="mainDailyMeals boxShow">

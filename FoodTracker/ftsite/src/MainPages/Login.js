@@ -43,7 +43,7 @@ class Login extends React.Component {
                     });
                 else {
                     app.updateUser(res);
-                    app.changeMainPage("DailyMeals");
+                    app.changeMainPage("Profile");
                 }
             }
             else {
