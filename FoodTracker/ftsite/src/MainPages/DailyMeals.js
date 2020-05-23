@@ -9,7 +9,7 @@ import { app } from '../App';
 import svData from '../svData.json';
 
 const getServerURL = () => {
-    return "http://localhost:3001";//svData.serverLink;
+    return svData.serverLink;
 }
 
 class DailyMeals extends React.Component {

@@ -5,6 +5,10 @@ import svData from '../svData.json';
 
 //import { NavLink } from 'react-router-dom';
 
+getServerURL = () => {
+    return svData.serverLink;
+}
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -14,10 +18,6 @@ class Login extends React.Component {
         };
     }
 
-    getServerURL = () => {
-        return svData.serverLink;
-    }
-
     onLogin = async (ev) => {
         try {
             ev.preventDefault();
@@ -25,7 +25,7 @@ class Login extends React.Component {
             const usernameText = inputs[0].value;
             const passText = inputs[1].value;
 
-            let res = await fetch(this.getServerURL() + "/login", {
+            let res = await fetch(getServerURL() + "/login", {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json"
