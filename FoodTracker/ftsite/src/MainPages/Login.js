@@ -1,7 +1,7 @@
 import React from 'react';
 import "../Css/RegLog.css";
 import { app } from '../App';
-//import svData from '../svData.json'; SO I DON'T GET THE STUPID WARNING"
+import svData from '../svData.json';
 
 //import { NavLink } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ class Login extends React.Component {
     }
 
     getServerURL = () => {
-        return "http://localhost:3001"; //svData.serverLink;
+        return svData.serverLink;
     }
 
     onLogin = async (ev) => {
@@ -49,7 +49,6 @@ class Login extends React.Component {
             else {
                 console.log(await res.json());
             }
-
 
         } catch (err) {
             console.log("___________ERROR___________\n", err.message);

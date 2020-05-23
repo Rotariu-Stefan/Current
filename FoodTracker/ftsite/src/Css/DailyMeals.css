@@ -51,6 +51,11 @@
     overflow: auto;
 }
 
+.dayAreaButtons{
+    display:flex;
+    justify-content:space-around; 
+}
+
 .mealArea {
     margin-top: 1rem;
 }
@@ -72,7 +77,7 @@
 
 .foodEntry {
     display: grid;
-    grid-template-columns: 2.5rem 1fr 6rem;
+    grid-template-columns: 2.5rem 1fr 6.2rem;
 }
 
     .foodEntry:hover {
@@ -155,6 +160,12 @@
         background-color: saddlebrown;
     }
 
+.feSelected {
+    color: coral;
+    background-color: saddlebrown;
+    border:1px solid coral;
+}
+
 .buffer {
     height: 2.2rem;
 }
@@ -206,7 +217,7 @@
 }
 /*#endregion FoodDetailsArea Block*/
 
-/*#region Main Misc*/
+/*#region Note*/
 .note {
     display: flex;
     align-items: center;
@@ -227,8 +238,4 @@
     .note span:last-child {
         font-size: 0.8rem;
     }
-
-.hidden {
-    display: none;
-}
-/*#endregion Main Misc*/
+/*#endregion Note*/

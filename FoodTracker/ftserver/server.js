@@ -9,11 +9,11 @@ server.listen(process.env.PORT || 3001, () => {
     console.log("Running on port:", process.env.PORT || 3001);
 });
 
-//let reqTotal = 0;
-//server.use((req, res, next) => {
-//    console.log("Total Requests:", ++reqTotal);
-//    next();
-//});
+let reqTotal = 0;
+server.use((req, res, next) => {
+    console.log("Total Requests:", ++reqTotal);
+    next();
+});
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 server.use(cors());
@@ -152,8 +152,8 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
 
 server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], async (req, res) => {
     try {
-        console.log("-----------ftserver Received @../fooddetails --- GET Req:", req.body);
-        const { isdish, foodid, noteid } = req.body;
+        console.log("-----------ftserver Received @../fooddetails --- GET Req:", req.headers);
+        const { isdish, foodid, noteid } = req.headers;
 
         const details = { foodid };
         if (noteid) {
@@ -223,7 +223,7 @@ server.put("/register", async (req, res) => {
 
 server.put("/yourfoods", async (req, res) => {
     try {
-        //console.log("-----------ftserver Received @yourfoods --- PUT Req:", req.body);
+        console.log("-----------ftserver Received @yourfoods --- PUT Req:", req.body);
         const { foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, foodentries } = req.body;
 
         const returnData = { foodid: undefined };
@@ -269,7 +269,7 @@ server.put("/yourfoods", async (req, res) => {
 
 server.put("/dailymeals", async (req, res) => {
     try {
-        //console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
+        console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
         const { date, userid, noteid, note, meals } = req.body;
 
         const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1;", [date]);
@@ -405,6 +405,5 @@ server.delete("/yourfoods", async (req, res) => {
 
 ; (async () => {
     //await showDB(process.argv[2]);
-
 
 })();
