@@ -67,13 +67,27 @@ class DailyMeals extends React.Component {
         });
         res = await res.json();
 
-        this.state.mealEntries = [];
+        this.setState({
+            mealEntries: [],
+            selectedMeal: null
+        });
+        let first = true;
         for (let m of res.meals)
-            this.state.mealEntries.push(<MealEntry
-                selectedChanged={this.onSelectedMealChanged}
-                removeMeal={this.onRemoveMeal}
-                mealEntry={m}
-                key={mealCounter++} />);
+            if (!first)
+                this.state.mealEntries.push(<MealEntry
+                    selectedChanged={this.onSelectedMealChanged}
+                    removeMeal={this.onRemoveMeal}
+                    mealEntry={m}
+                    key={mealCounter++} />);
+            else {
+                this.state.mealEntries.push(<MealEntry
+                    signalSelect={true}
+                    selectedChanged={this.onSelectedMealChanged}
+                    removeMeal={this.onRemoveMeal}
+                    mealEntry={m}
+                    key={mealCounter++} />);
+                first = false;
+            }
 
         this.setState({
             selectedDay: document.querySelector("#selectedDay").value,
@@ -98,28 +112,50 @@ class DailyMeals extends React.Component {
         });
         res = await res.json();
 
-        this.state.sFoodItems = [];
+        this.setState({
+            sFoodItems: [],
+            selectedSFoodItem: null
+        });
+        let first = true;
         for (let f of res)
-            this.state.sFoodItems.push(<FoodItem
-                selectedChanged={this.onSelectedSFoodItemChanged}
-                foodItem={f}
-                key={f.foodid} />);
+            if (!first)
+                this.state.sFoodItems.push(<FoodItem
+                    selectedChanged={this.onSelectedSFoodItemChanged}
+                    foodItem={f}
+                    key={f.foodid} />);
+            else {
+                this.state.sFoodItems.push(<FoodItem
+                    signalSelect={true}
+                    selectedChanged={this.onSelectedSFoodItemChanged}
+                    foodItem={f}
+                    key={f.foodid} />);
+                first = false;
+            }
 
         this.setState({
             sFoodItems: this.state.sFoodItems
         });
     };
 
-    onAddNewMeal = (ev) => {
-        const { mealEntries, dayEntry } = this.state;
+    onAddNewMeal = (ev) => {    //TODO
+        const { mealEntries, dayEntry, selectedMeal } = this.state;
         let { mealCounter } = this.state;
 
-        mealEntries.push(<MealEntry selectedChanged={this.onSelectedMealChanged}
-            removeMeal={this.onRemoveMeal}
-            key={mealCounter++}
-        />);
+        if (selectedMeal)
+            mealEntries.push(<MealEntry
+                selectedChanged={this.onSelectedMealChanged}
+                removeMeal={this.onRemoveMeal}
+                key={mealCounter++}
+            />);
+        else
+            mealEntries.push(<MealEntry
+                signalSelect={true}
+                selectedChanged={this.onSelectedMealChanged}
+                removeMeal={this.onRemoveMeal}
+                key={mealCounter++}
+            />);
 
-        dayEntry.meals.push({
+        dayEntry.meals.push({       //TODO: Must make Custamizable
             key: mealCounter - 1,
             mealname: "New Meal",
             portion: 1,
@@ -174,17 +210,28 @@ class DailyMeals extends React.Component {
         else if (selectedSFoodItem === null)
             alert("Must select a Food Item !");
         else {
+            const amountInput = document.querySelector(".amountSize");
             const newFoodEntry = selectedSFoodItem.state.foodItem;
-            newFoodEntry.amount = document.querySelector(".amountSize").value;
-            if (!newFoodEntry.amount)
+
+            if (amountInput.value === "")
                 newFoodEntry.amount = newFoodEntry.sizeinfo === null ? 1 : 100;
+            else if (isNaN(amountInput.value)) {
+                alert("Must Enter Valid Number for Amount!");
+                amountInput.value = "";
+                return;
+            }
+            else
+                newFoodEntry.amount = amountInput.value;
+
             newFoodEntry.measure = newFoodEntry.sizeinfo === null ? "Pieces" : "Grams";
-            this.state.selectedMeal.addNewFoodEntry(ev, newFoodEntry);
+            selectedMeal.addNewFoodEntry(ev, newFoodEntry);
 
             for (let m of dayEntry.meals)
                 if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
                     || selectedMeal._reactInternalFiber.key == m.key)
                     m.foodentries.push(newFoodEntry);
+
+            amountInput.value = "";
             this.setState({
                 dayEntry: dayEntry
             });
@@ -244,7 +291,7 @@ class DailyMeals extends React.Component {
                     <div className="amountInput boxShow">
                         <label className="textHigh">Amount: </label>
                         <input className="amountSize" type="text" placeholder="100" />
-                        <select>
+                        <select disabled={true}>
                             <option>Grams</option>
                             <option>Pieces</option>
                         </select>

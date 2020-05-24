@@ -38,6 +38,11 @@ class FoodItem extends React.Component {
             </div>
         );
     };
+
+    componentDidMount = () => {
+        if (this.props.signalSelect)
+            this.props.selectedChanged(null, this);
+    };
 }
 
 export default FoodItem;

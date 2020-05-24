@@ -18,14 +18,19 @@ class MealEntry extends React.Component {
             foodCounter: 0,
             selectedFoodEntry: null,//TODO:LATER FOR REPLACE
             isHighlighted: false,
-            isMin: false
+            isMin: false,
+            fat: 0,
+            carbs: 0,
+            protein: 0
         };
 
         if (props.mealEntry)
-            for (let f of props.mealEntry.foodentries)
+            for (let f of props.mealEntry.foodentries) {
                 this.state.foodEntries.push(<FoodEntry
                     foodEntry={f}
                     key={this.state.foodCounter++} />);
+                this.addNewFoodEntryMacros(f);
+            }
     }
 
     addNewFoodEntry = (ev, newFoodEntry) => {
@@ -33,9 +38,14 @@ class MealEntry extends React.Component {
         let { foodCounter } = this.state;
 
         foodEntries.push(<FoodEntry foodEntry={newFoodEntry} key={foodCounter++} />);
+        this.addNewFoodEntryMacros(newFoodEntry);
+
         this.setState({
             foodEntries: foodEntries,
-            foodCounter: foodCounter
+            foodCounter: foodCounter,
+            fat: this.state.fat,
+            carbs: this.state.carbs,
+            protein: this.state.protein
         });
     };
 
@@ -50,23 +60,17 @@ class MealEntry extends React.Component {
         ev.stopPropagation();
     };
 
-    getMacroResults = () => {
-        const { mealEntry } = this.state;
+    addNewFoodEntryMacros = (fe) => {
+        const { fat, carbs, protein } = this.state;
+        const aux = fe.sizeinfo === null ? 1 : 100;
 
-        let fat=0, carbs=0, protein = 0;
-        let aux;
-        for (let f of mealEntry.foodentries) {
-            aux = f.sizeinfo === null ? 1 : 100;
-            fat += (f.fat * f.amount / aux);
-            carbs += (f.carbs * f.amount / aux);
-            protein += (f.protein * f.amount / aux);
-        }
-
-        return `${fat.toFixed(1)}//${carbs.toFixed(1)}//${protein.toFixed(1)}`;
+        this.state.fat = fat + (fe.fat * fe.amount / aux);
+        this.state.carbs = carbs + (fe.carbs * fe.amount / aux);
+        this.state.protein = protein + (fe.protein * fe.amount / aux);
     }
 
     render = () => {
-        const { mealEntry, isHighlighted, isMin, foodEntries } = this.state;
+        const { mealEntry, isHighlighted, isMin, foodEntries, fat, carbs, protein } = this.state;
         const { mealname } = mealEntry;
 
         return (
@@ -85,10 +89,15 @@ class MealEntry extends React.Component {
                 </div>
                 <div className="mealTotal">
                     <span>Total:</span>
-                    <span>{this.getMacroResults()}</span>
+                    <span>{`${fat.toFixed(1)}//${carbs.toFixed(1)}//${protein.toFixed(1)}`}</span>
                 </div>
             </div>
         );
+    };
+
+    componentDidMount = () => {
+        if (this.props.signalSelect)
+            this.props.selectedChanged(null, this);
     };
 }
 
