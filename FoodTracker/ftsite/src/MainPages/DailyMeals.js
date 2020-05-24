@@ -40,7 +40,6 @@ class DailyMeals extends React.Component {
         const dayPutReq = dayEntry;
         dayPutReq.userid = userId;
         dayPutReq.date = selectedDay;
-        console.log(dayPutReq);
 
         let res = await fetch(getServerURL() + "/dailymeals", {
             method: "put",
@@ -50,6 +49,7 @@ class DailyMeals extends React.Component {
             body: JSON.stringify(dayPutReq)
         });
         res = await res.json();
+        alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
         console.log(res);
     };
 
