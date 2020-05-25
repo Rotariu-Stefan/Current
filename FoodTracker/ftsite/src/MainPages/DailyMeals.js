@@ -12,6 +12,10 @@ const getServerURL = () => {
     return svData.serverLink;
 }
 
+const dateToStr = (dateObj) => {
+    return `${dateObj.getFullYear()}-${dateObj.getMonth() + 1 > 10 ? (dateObj.getMonth() + 1).toString() : "0" + (dateObj.getMonth() + 1).toString()}-${dateObj.getDate() > 10 ? dateObj.getDate().toString() : "0" + dateObj.getDate().toString()}`;
+};
+
 class DailyMeals extends React.Component {
     constructor(props) {
         super(props);
@@ -22,6 +26,7 @@ class DailyMeals extends React.Component {
             mealEntries: [],
             mealCounter: 0,
             sFoodItems: [],
+            sAmount: 50,
             selectedMeal: null,
             selectedFood: null
         };
@@ -110,7 +115,7 @@ class DailyMeals extends React.Component {
             }
         });
         res = await res.json();
-        
+
         this.setState({
             sFoodItems: [],
             selectedFood: null
@@ -237,6 +242,12 @@ class DailyMeals extends React.Component {
     onSelectedFoodChanged = async (ev, sender) => {
         const { selectedFood } = this.state;
 
+        await setTimeout(() => { }, 0);
+
+        this.setState({
+            selectedFood: null
+        });
+
         if (sender !== selectedFood) {
             if (selectedFood)
                 selectedFood.toggleSelected();
@@ -248,7 +259,7 @@ class DailyMeals extends React.Component {
     };
 
     render = () => {
-        const { mealEntries, selectedFood } = this.state;
+        const { mealEntries, selectedFood, sAmount } = this.state;
 
         return (
             <main className="mainDailyMeals boxShow">
@@ -295,35 +306,10 @@ class DailyMeals extends React.Component {
                     <div className="buffer"></div>{/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/}
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
-                        {selectedFood ? (() => {
-                            console.log(selectedFood.state.foodItem.foodname);
-                            return <FoodEntry foodEntry=
-                                {{
-                                    entryid: 0,
-                                    foodid: 0,
-                                    foodname: selectedFood.state.foodItem.foodname,
-                                    brand: selectedFood.state.foodItem.brand,
-                                    fat: 0, carbs: 0, protein: 0,
-                                    sizeinfo: null, userid: 0, pic: null, price: 0,
-                                    isdish: false,
-                                    noteid: null,
-                                    amount: 11,
-                                    measure: "Pieces"
-                                }} />
-                        })()
-                            : <FoodItem foodItem=
-                                {{
-                                    entryid: 0,
-                                    foodid: 0,
-                                    foodname: "NO",
-                                    brand: "POTATO",
-                                    fat: 0, carbs: 0, protein: 0,
-                                    sizeinfo: null, userid: 0, pic: null, price: 0,
-                                    isdish: false,
-                                    noteid: null,
-                                    amount: 11,
-                                    measure: "Pieces"
-                                }} />}
+                        {selectedFood ?
+                            <FoodEntry foodItem={selectedFood.state.foodItem}
+                                amount={sAmount} measure={"Grams"} key="0"/> :
+                            <FoodEntry />}
                         <button onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
                     </div>
                 </div>
@@ -369,9 +355,5 @@ class DailyMeals extends React.Component {
         document.querySelector("#selectedDay").value = this.state.selectedDay;
     };
 }
-
-const dateToStr = (dateObj) => {
-    return `${dateObj.getFullYear()}-${dateObj.getMonth() + 1 > 10 ? (dateObj.getMonth() + 1).toString() : "0" + (dateObj.getMonth() + 1).toString()}-${dateObj.getDate() > 10 ? dateObj.getDate().toString() : "0" + dateObj.getDate().toString()}`;
-};
 
 export default DailyMeals;
