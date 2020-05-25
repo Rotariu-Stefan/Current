@@ -36,6 +36,10 @@ class FoodEntry extends React.Component {
     }
 
     render = () => {
+        console.log("FE RENDER START -- FENTRY", this.state.foodEntry ?
+            (this.state.foodEntry.foodname + this.state.foodEntry.brand)
+            : null)
+
         const { foodEntry } = this.state;
         const { foodname, brand, amount, fat, carbs, protein, sizeinfo } = foodEntry;
 

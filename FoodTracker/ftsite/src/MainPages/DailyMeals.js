@@ -21,7 +21,7 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date()), //TODO: Eliminate and just user doc control?
+            selectedDay: dateToStr(new Date("2011-01-01")), //TODO: Eliminate and just user doc control?
             dayEntry: {},
             mealEntries: [],
             mealCounter: 0,
@@ -240,13 +240,22 @@ class DailyMeals extends React.Component {
     };
 
     onSelectedFoodChanged = async (ev, sender) => {
+        console.log("DM ONSELECT START -- SELFOOD:", this.state.selectedFood ?
+            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
+            : null)
         const { selectedFood } = this.state;
 
         await setTimeout(() => { }, 0);
+        console.log("DM ONSELECT AF TIMEOUT -- SELFOOD:", this.state.selectedFood ?
+            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
+            : null)
 
         this.setState({
             selectedFood: null
         });
+        console.log("DM ONSELECT AF SETSTATE-NULL -- SELFOOD:", this.state.selectedFood ?
+            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
+            : null)
 
         if (sender !== selectedFood) {
             if (selectedFood)
@@ -256,9 +265,15 @@ class DailyMeals extends React.Component {
                 selectedFood: sender,
             });
         }
+        console.log("DM ONSELECT AF SETSTATE-SENDER -- SELFOOD:", this.state.selectedFood ?
+            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
+            : null)
     };
 
     render = () => {
+        console.log("DM RENDER START -- SELFOOD:", this.state.selectedFood ?
+            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
+            :null)
         const { mealEntries, selectedFood, sAmount } = this.state;
 
         return (
@@ -306,10 +321,11 @@ class DailyMeals extends React.Component {
                     <div className="buffer"></div>{/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/}
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
-                        {selectedFood ?
-                            <FoodEntry foodItem={selectedFood.state.foodItem}
-                                amount={sAmount} measure={"Grams"} key="0"/> :
-                            <FoodEntry />}
+                        {this.state.selectedFood ?
+                            <FoodEntry foodItem={this.state.selectedFood.state.foodItem}
+                                amount={sAmount} measure={"Grams"}
+                                key={0} /> :
+                            <FoodEntry key={"WTF"} />}
                         <button onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
                     </div>
                 </div>
@@ -341,9 +357,6 @@ class DailyMeals extends React.Component {
                         <div className="buffer"></div>
                         <div className="foodEntries boxShow">
                             <label className="textHigh lineDown">Composition:</label>
-                            <FoodEntry amount="2" name_brand="avocado" macros="1/1/1" macrores="2/2/2" />
-                            <FoodEntry amount="2" name_brand="avocado" macros="1/1/1" macrores="2/2/2" />
-                            <FoodEntry />
                         </div>
                     </div>
                 </div>
