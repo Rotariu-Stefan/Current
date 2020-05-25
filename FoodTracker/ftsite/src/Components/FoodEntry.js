@@ -17,9 +17,22 @@ class FoodEntry extends React.Component {
             measure: "Pieces"
         };
 
+        //const bla = {
+        //    entryid: 0,
+        //    foodid: 0,
+        //    foodname: "NEW",
+        //    brand: "SHIT",
+        //    fat: 0, carbs: 0, protein: 0,
+        //    sizeinfo: null, userid: 0, pic: null, price: 0,
+        //    isdish: false,
+        //    noteid: null,
+        //    amount: 11,
+        //    measure: "Pieces"
+        //};
+
         this.state = {
             foodEntry: props.foodEntry ? props.foodEntry : this.defaultFoodEntry
-        };
+        }
     }
 
     render = () => {

@@ -122,7 +122,6 @@ server.get(["/dailymeals/foodsearch", "/yourfoods/foodsearch"], async (req, res)
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%');"
                 , [search]);
         } else {
-            console.log("HERE!!", userid);
             qselFI = await client.query("SELECT *" +
                 " FROM fooditems" +
                 " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
@@ -272,7 +271,7 @@ server.put("/dailymeals", async (req, res) => {
         console.log("-----------ftserver Received @dailymeals --- PUT Req:", req.body);
         const { date, userid, noteid, note, meals } = req.body;
 
-        const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1;", [date]);
+        const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1 AND userid=$2;", [date, userid]);
 
         const returnData = { date, userid };
         if (noteid === undefined) {

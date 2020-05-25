@@ -19,12 +19,11 @@ class DailyMeals extends React.Component {
         this.state = {
             selectedDay: dateToStr(new Date()), //TODO: Eliminate and just user doc control?
             dayEntry: {},
-            sFoodItems: [],
             mealEntries: [],
             mealCounter: 0,
+            sFoodItems: [],
             selectedMeal: null,
-            selectedSFoodItem: null,
-            selectedFoodEntry: React.createRef()
+            selectedFood: null
         };
 
         //; (async () => {
@@ -111,22 +110,22 @@ class DailyMeals extends React.Component {
             }
         });
         res = await res.json();
-
+        
         this.setState({
             sFoodItems: [],
-            selectedSFoodItem: null
+            selectedFood: null
         });
         let first = true;
         for (let f of res)
             if (!first)
                 this.state.sFoodItems.push(<FoodItem
-                    selectedChanged={this.onSelectedSFoodItemChanged}
+                    selectedChanged={this.onSelectedFoodChanged}
                     foodItem={f}
                     key={f.foodid} />);
             else {
                 this.state.sFoodItems.push(<FoodItem
                     signalSelect={true}
-                    selectedChanged={this.onSelectedSFoodItemChanged}
+                    selectedChanged={this.onSelectedFoodChanged}
                     foodItem={f}
                     key={f.foodid} />);
                 first = false;
@@ -203,19 +202,17 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewFoodEntry = (ev) => {
-        const { selectedMeal, selectedSFoodItem, dayEntry } = this.state;
+        const { selectedMeal, selectedFood, dayEntry } = this.state;
 
         if (selectedMeal === null)
             alert("Must select a Meal !");
-        else if (selectedSFoodItem === null)
+        else if (selectedFood === null)
             alert("Must select a Food Item !");
         else {
             const amountInput = document.querySelector(".amountSize");
-            const newFoodEntry = selectedSFoodItem.state.foodItem;
+            const newFoodEntry = selectedFood.state.foodItem;
 
-            if (amountInput.value === "")
-                newFoodEntry.amount = newFoodEntry.sizeinfo === null ? 1 : 100;
-            else if (isNaN(amountInput.value)) {
+            if (isNaN(amountInput.value)) {
                 alert("Must Enter Valid Number for Amount!");
                 amountInput.value = "";
                 return;
@@ -231,28 +228,27 @@ class DailyMeals extends React.Component {
                     || selectedMeal._reactInternalFiber.key == m.key)
                     m.foodentries.push(newFoodEntry);
 
-            amountInput.value = "";
             this.setState({
                 dayEntry: dayEntry
             });
         }
     };
 
-    onSelectedSFoodItemChanged = (ev, sender) => {
-        const { selectedSFoodItem } = this.state;
+    onSelectedFoodChanged = async (ev, sender) => {
+        const { selectedFood } = this.state;
 
-        if (sender !== selectedSFoodItem) {
-            if (selectedSFoodItem)
-                selectedSFoodItem.toggleSelected();
+        if (sender !== selectedFood) {
+            if (selectedFood)
+                selectedFood.toggleSelected();
             sender.toggleSelected();
             this.setState({
-                selectedSFoodItem: sender
+                selectedFood: sender,
             });
         }
     };
 
     render = () => {
-        const { mealEntries } = this.state;
+        const { mealEntries, selectedFood } = this.state;
 
         return (
             <main className="mainDailyMeals boxShow">
@@ -296,10 +292,38 @@ class DailyMeals extends React.Component {
                             <option>Pieces</option>
                         </select>
                     </div>
-                    <div className="buffer"></div>
+                    <div className="buffer"></div>{/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/}
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
-                        {<FoodEntry />}
+                        {selectedFood ? (() => {
+                            console.log(selectedFood.state.foodItem.foodname);
+                            return <FoodEntry foodEntry=
+                                {{
+                                    entryid: 0,
+                                    foodid: 0,
+                                    foodname: selectedFood.state.foodItem.foodname,
+                                    brand: selectedFood.state.foodItem.brand,
+                                    fat: 0, carbs: 0, protein: 0,
+                                    sizeinfo: null, userid: 0, pic: null, price: 0,
+                                    isdish: false,
+                                    noteid: null,
+                                    amount: 11,
+                                    measure: "Pieces"
+                                }} />
+                        })()
+                            : <FoodItem foodItem=
+                                {{
+                                    entryid: 0,
+                                    foodid: 0,
+                                    foodname: "NO",
+                                    brand: "POTATO",
+                                    fat: 0, carbs: 0, protein: 0,
+                                    sizeinfo: null, userid: 0, pic: null, price: 0,
+                                    isdish: false,
+                                    noteid: null,
+                                    amount: 11,
+                                    measure: "Pieces"
+                                }} />}
                         <button onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
                     </div>
                 </div>
