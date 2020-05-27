@@ -21,19 +21,20 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date()), //TODO: Eliminate and just user doc control?
+            selectedDay: dateToStr(new Date()),
             dayEntry: {},
             mealEntries: [],
+            selectedMeal: null,
             mealCounter: 0,
             sFoodItems: [],
+            selectedFood: null,
             sFoodCounter: 0,
             amount: "",
-            selectedMeal: null,
-            selectedFood: null
+            measure: "---"
         };
 
         //; (async () => {
-        this.loadDailyMeals(dateToStr(new Date()));
+        this.loadDailyMeals(this.state.selectedDay);
         this.loadSFoodItems("", false);
         //})();
     }
@@ -116,6 +117,8 @@ class DailyMeals extends React.Component {
             }
 
         this.setState({
+            selectedFood: first ? null : this.state.selectedFood,
+            measure: first ? "---" : this.state.measure,
             sFoodItems: sFoodItems,
             sFoodCounter: sFoodCounter
         });
@@ -252,7 +255,8 @@ class DailyMeals extends React.Component {
 
             this.setState({
                 selectedFood: sender,
-                amount: ""
+                amount: "",
+                measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams"
             });
         }
     };
@@ -281,8 +285,7 @@ class DailyMeals extends React.Component {
     }
 
     render = () => {
-        console.log("RENDER TEST:", this.state.selectedDay);
-        const { selectedDay, mealEntries, selectedFood, amount } = this.state;
+        const { selectedDay, mealEntries, selectedFood, amount, measure } = this.state;
 
         return (
             <main className="mainDailyMeals boxShow">
@@ -309,36 +312,28 @@ class DailyMeals extends React.Component {
                 <div id="searchArea" className="subblock boxShow">
                     <div className="searchInput boxShow">
                         <label className="textHigh">Search Food: </label>
-                        <input onChange={(ev) => this.loadSFoodItems(document.querySelector("#search").value,
+                        <input onChange={(ev) => this.loadSFoodItems(
+                            document.querySelector("#search").value,
                             ev.currentTarget.checked)}
                             id="isAll" type="checkbox" /> ALL Food
-                        <input onChange={(ev) => this.loadSFoodItems(ev.currentTarget.value,
+                        <input onChange={(ev) => this.loadSFoodItems(
+                            ev.currentTarget.value,
                             document.querySelector("#isAll").checked)}
-                            id="search"
-                            type="text"
+                            id="search" type="text"
                             placeholder="search terms" />
                     </div>
                     <div className="searchResults boxShow">
                         {this.state.sFoodItems}
                     </div>
-                    <div className="amountInput boxShow">{/*<<<<<<<<<<<<<<<<<<<AMOUNT*/}
+                    <div className="amountInput boxShow">
                         <label className="textHigh">Amount: </label>
                         <input id="amountSize" type="text" value={amount}
                             onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
-                            placeholder={selectedFood
-                                ? (selectedFood.state.foodItem.sizeinfo === null ? 1 : 100)
-                                : 0} />
-                        <select id="measureSelect" value={selectedFood
-                            ? selectedFood.state.foodItem.sizeinfo === null ? "Pieces" : "Grams"
-                            : "---"}
-                            readOnly={true}>
-                            <option className={selectedFood
-                                ? selectedFood.state.foodItem.sizeinfo === null ? "hidden" : ""
-                                : "hidden"}>
+                            placeholder={selectedFood ? (measure === "Pieces" ? 1 : 100) : 0} />
+                        <select id="measureSelect" value={measure} onChange={() => { }}>
+                            <option className={selectedFood ? measure === "Grams" ? "" : "hidden" : "hidden"}>
                                 Grams</option>
-                            <option className={selectedFood
-                                ? selectedFood.state.foodItem.sizeinfo === 0 ? "hidden" : ""
-                                : "hidden"}>
+                            <option className={selectedFood ? measure === "Pieces" ? "" : "hidden" : "hidden"}>
                                 Pieces</option>
                             <option className="hidden">---</option>
                         </select>
@@ -382,10 +377,6 @@ class DailyMeals extends React.Component {
                 </div>
             </main>
         );
-    };
-
-    componentDidMount = () => {
-        document.querySelector("#selectedDay").value = this.state.selectedDay;
     };
 }
 

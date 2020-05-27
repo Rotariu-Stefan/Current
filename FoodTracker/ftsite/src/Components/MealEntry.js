@@ -16,7 +16,6 @@ class MealEntry extends React.Component {
             mealEntry: props.mealEntry ? props.mealEntry : this.defaultMealEntry,
             foodEntries: [],
             foodCounter: 0,
-            selectedFoodEntry: null,//TODO:LATER FOR REPLACE
             isHighlighted: false,
             isMin: false,
             fat: 0,
@@ -28,8 +27,9 @@ class MealEntry extends React.Component {
             for (let f of props.mealEntry.foodentries) {
                 this.state.foodEntries.push(<FoodEntry
                     foodEntry={f}
-                    key={this.state.foodCounter++} />);
-                this.addNewFoodEntryMacros(f);
+                    addToMeal={this.addNewFoodEntryMacros}
+                    key={this.state.foodCounter} />);
+                this.state.foodCounter++;
             }
     }
 
@@ -37,8 +37,7 @@ class MealEntry extends React.Component {
         const { foodEntries } = this.state;
         let { foodCounter } = this.state;
 
-        foodEntries.push(<FoodEntry foodEntry={newFoodEntry} key={foodCounter++} />);
-        this.addNewFoodEntryMacros(newFoodEntry);
+        foodEntries.push(<FoodEntry foodEntry={newFoodEntry} addToMeal={this.addNewFoodEntryMacros} key={foodCounter++} />);
 
         this.setState({
             foodEntries: foodEntries,
@@ -60,14 +59,13 @@ class MealEntry extends React.Component {
         ev.stopPropagation();
     };
 
-    addNewFoodEntryMacros = (fe) => {
-        const { fat, carbs, protein } = this.state;
-        const aux = fe.sizeinfo === null ? 1 : 100;
+    addNewFoodEntryMacros = (newfat, newcarbs, newprotein) => {
+        const { portion } = this.state.mealEntry;
 
-        this.state.fat = fat + (fe.fat * fe.amount / aux);
-        this.state.carbs = carbs + (fe.carbs * fe.amount / aux);
-        this.state.protein = protein + (fe.protein * fe.amount / aux);
-    }
+        this.state.fat += newfat * portion;
+        this.state.carbs += newcarbs * portion;
+        this.state.protein += newprotein * portion;
+    };
 
     render = () => {
         const { mealEntry, isHighlighted, isMin, foodEntries, fat, carbs, protein } = this.state;
@@ -98,6 +96,8 @@ class MealEntry extends React.Component {
     componentDidMount = () => {
         if (this.props.signalSelect)
             this.props.selectedChanged(null, this);
+        else
+            this.setState({});
     };
 }
 

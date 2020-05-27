@@ -29,16 +29,25 @@ class FoodEntry extends React.Component {
             foodEntry = this.defaultFoodEntry;
 
         this.state = {
-            fatRes: (foodEntry.fat * foodEntry.amount / (foodEntry.sizeinfo === null ? 1 : 100)).toFixed(1),
-            carbsRes: (foodEntry.carbs * foodEntry.amount / (foodEntry.sizeinfo === null ? 1 : 100)).toFixed(1),
-            proteinRes: (foodEntry.protein * foodEntry.amount / (foodEntry.sizeinfo === null ? 1 : 100)).toFixed(1),
-            foodEntry:foodEntry
+            foodEntry: foodEntry
         };
+
+        this.state.fatRes=this.getMacroRes("fat");
+        this.state.carbsRes =this.getMacroRes("carbs");
+        this.state.proteinRes =this.getMacroRes("protein");
+
+        if (this.props.addToMeal)
+            this.props.addToMeal(this.state.fatRes, this.state.carbsRes, this.state.proteinRes);
     }
 
-    render = () => {        
+    getMacroRes = (mstr) => {
+        const { amount, measure } = this.state.foodEntry;
+        return (this.state.foodEntry[mstr] * amount / (measure === "Pieces" ? 1 : 100)).toFixed(1);
+    };
+
+    render = () => {
         const { foodEntry, fatRes, carbsRes, proteinRes } = this.state;
-        const { foodname, brand, amount, fat, carbs, protein} = foodEntry;
+        const { foodname, brand, amount, fat, carbs, protein } = foodEntry;
 
         return (
             <div className="foodEntry lineDown">
