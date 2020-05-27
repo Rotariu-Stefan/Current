@@ -51,9 +51,9 @@
     overflow: auto;
 }
 
-.dayAreaButtons{
-    display:flex;
-    justify-content:space-around; 
+.dayAreaButtons {
+    display: flex;
+    justify-content: space-around;
 }
 
 .mealArea {
@@ -85,13 +85,13 @@
         background-color: saddlebrown;
     }
 
-.name_brand {
+.name_brand, .amount, .macro {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-    .name_brand:hover {
+    .name_brand:hover, .amount:hover, .macro:hover {
         white-space: normal;
         word-break: break-word;
     }
@@ -127,14 +127,14 @@
         float: left;
     }
 
-#searchArea .search {
+#searchArea #search {
     height: 2rem;
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
 }
 
-#searchArea .amountSize {
+#searchArea #amountSize {
     height: 2rem;
     width: 30%;
     padding: 0 0.2rem;
@@ -163,12 +163,13 @@
 .feSelected {
     color: coral;
     background-color: saddlebrown;
-    border:1px solid coral;
+    border: 1px solid coral;
 }
 
-.buffer {
-    height: 2.2rem;
-}
+    .feSelected * {
+        white-space: normal;
+        word-break: break-word;
+    }
 
 .searchEntry {
     text-align: center;

@@ -13,7 +13,7 @@ const getServerURL = () => {
 }
 
 const dateToStr = (dateObj) => {
-    return `${dateObj.getFullYear()}-${dateObj.getMonth() + 1 > 10 ? (dateObj.getMonth() + 1).toString() : "0" + (dateObj.getMonth() + 1).toString()}-${dateObj.getDate() > 10 ? dateObj.getDate().toString() : "0" + dateObj.getDate().toString()}`;
+    return `${dateObj.getFullYear()}-${dateObj.getMonth() + 1 > 9 ? (dateObj.getMonth() + 1).toString() : "0" + (dateObj.getMonth() + 1).toString()}-${dateObj.getDate() > 9 ? dateObj.getDate().toString() : "0" + dateObj.getDate().toString()}`;
 };
 
 class DailyMeals extends React.Component {
@@ -21,23 +21,107 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date("2011-01-01")), //TODO: Eliminate and just user doc control?
+            selectedDay: dateToStr(new Date()), //TODO: Eliminate and just user doc control?
             dayEntry: {},
             mealEntries: [],
             mealCounter: 0,
             sFoodItems: [],
-            sAmount: 50,
+            sFoodCounter: 0,
+            amount: "",
             selectedMeal: null,
             selectedFood: null
         };
 
         //; (async () => {
-        this.getDailyMeals();
-        this.getSFoodItems();
+        this.loadDailyMeals(dateToStr(new Date()));
+        this.loadSFoodItems("", false);
         //})();
     }
 
-    onCommit = async () => {    //2021-03-12
+    loadDailyMeals = async (day) => {
+        let { mealEntries, mealCounter } = this.state;
+        //If app.currentUser is Guest pretend it's SV
+        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
+
+        let res = await fetch(getServerURL() + "/dailymeals", {
+            method: "get",
+            headers: {
+                "content-type": "application/json",
+                "reqdate": day,
+                "userid": userId,
+            }
+        });
+        res = await res.json();
+
+        mealEntries = [];
+        let first = true;
+        for (let m of res.meals)
+            if (!first)
+                mealEntries.push(<MealEntry
+                    selectedChanged={this.onSelectedMealChanged}
+                    removeMeal={this.onRemoveMeal}
+                    mealEntry={m}
+                    key={mealCounter++} />);
+            else {
+                mealEntries.push(<MealEntry
+                    signalSelect={true}
+                    selectedChanged={this.onSelectedMealChanged}
+                    removeMeal={this.onRemoveMeal}
+                    mealEntry={m}
+                    key={mealCounter++} />);
+                first = false;
+            }
+
+        this.setState({
+            selectedDay: day,
+            dayEntry: res,
+            mealEntries: mealEntries,
+            mealCounter: mealCounter
+        });
+    }
+
+    loadSFoodItems = async (searchTerms, isAll) => {
+        let { sFoodItems, sFoodCounter } = this.state;
+        //If app.currentUser is Guest pretend it's SV
+        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
+
+        let res;
+        res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
+            method: "get",
+            headers: {
+                "content-type": "application/json",
+                "userid": userId,
+                "search": searchTerms,
+                "isall": isAll
+            }
+        });
+        res = await res.json();
+
+
+        sFoodItems = [];
+        let first = true;
+        for (let f of res)
+            if (!first)
+                sFoodItems.push(<FoodItem
+                    selectedChanged={this.onSelectedFoodChanged}
+                    foodItem={f}
+                    key={sFoodCounter++} />);
+            else {
+                sFoodItems.push(<FoodItem
+                    signalSelect={true}
+                    selectedChanged={this.onSelectedFoodChanged}
+                    foodItem={f}
+                    key={sFoodCounter++} />);
+                first = false;
+            }
+
+        this.setState({
+            sFoodItems: sFoodItems,
+            sFoodCounter: sFoodCounter
+        });
+    };
+
+    onCommit = async (ev) => {
         const { dayEntry, selectedDay } = this.state;
         const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
 
@@ -55,90 +139,6 @@ class DailyMeals extends React.Component {
         res = await res.json();
         alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
         console.log(res);
-    };
-
-    getDailyMeals = async () => {
-        let { mealCounter, selectedDay } = this.state;
-        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
-
-        let res = await fetch(getServerURL() + "/dailymeals", {
-            method: "get",
-            headers: {
-                "content-type": "application/json",
-                "reqdate": document.querySelector("#selectedDay") ? document.querySelector("#selectedDay").value : selectedDay,
-                "userid": userId,
-            }
-        });
-        res = await res.json();
-
-        this.setState({
-            mealEntries: [],
-            selectedMeal: null
-        });
-        let first = true;
-        for (let m of res.meals)
-            if (!first)
-                this.state.mealEntries.push(<MealEntry
-                    selectedChanged={this.onSelectedMealChanged}
-                    removeMeal={this.onRemoveMeal}
-                    mealEntry={m}
-                    key={mealCounter++} />);
-            else {
-                this.state.mealEntries.push(<MealEntry
-                    signalSelect={true}
-                    selectedChanged={this.onSelectedMealChanged}
-                    removeMeal={this.onRemoveMeal}
-                    mealEntry={m}
-                    key={mealCounter++} />);
-                first = false;
-            }
-
-        this.setState({
-            selectedDay: document.querySelector("#selectedDay").value,
-            dayEntry: res,
-            mealCounter: mealCounter
-        });
-    }
-
-    getSFoodItems = async () => {
-        //If app.currentUser is Guest pretend it's SV
-        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
-
-        let res;
-        res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
-            method: "get",
-            headers: {
-                "content-type": "application/json",
-                "userid": userId,
-                "search": document.querySelector(".search") ? document.querySelector(".search").value : "",
-                "isall": document.querySelector("#isAll") ? document.querySelector("#isAll").checked : false
-            }
-        });
-        res = await res.json();
-
-        this.setState({
-            sFoodItems: [],
-            selectedFood: null
-        });
-        let first = true;
-        for (let f of res)
-            if (!first)
-                this.state.sFoodItems.push(<FoodItem
-                    selectedChanged={this.onSelectedFoodChanged}
-                    foodItem={f}
-                    key={f.foodid} />);
-            else {
-                this.state.sFoodItems.push(<FoodItem
-                    signalSelect={true}
-                    selectedChanged={this.onSelectedFoodChanged}
-                    foodItem={f}
-                    key={f.foodid} />);
-                first = false;
-            }
-
-        this.setState({
-            sFoodItems: this.state.sFoodItems
-        });
     };
 
     onAddNewMeal = (ev) => {    //TODO
@@ -200,6 +200,7 @@ class DailyMeals extends React.Component {
             if (selectedMeal)
                 selectedMeal.toggleHighlight();
             sender.toggleHighlight();
+
             this.setState({
                 selectedMeal: sender
             });
@@ -207,74 +208,81 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewFoodEntry = (ev) => {
-        const { selectedMeal, selectedFood, dayEntry } = this.state;
+        const { selectedMeal, selectedFood, dayEntry, amount } = this.state;
 
         if (selectedMeal === null)
             alert("Must select a Meal !");
         else if (selectedFood === null)
             alert("Must select a Food Item !");
         else {
-            const amountInput = document.querySelector(".amountSize");
-            const newFoodEntry = selectedFood.state.foodItem;
+            const amountInput = document.querySelector("#amountSize");
 
-            if (isNaN(amountInput.value)) {
+            if (isNaN(amount)) {
                 alert("Must Enter Valid Number for Amount!");
-                amountInput.value = "";
+                this.setState({
+                    amount: ""
+                });
                 return;
             }
-            else
-                newFoodEntry.amount = amountInput.value;
+            else {
+                const newFoodEntry = selectedFood.state.foodItem;
+                newFoodEntry.amount = amount ? amount : amountInput.placeholder;
+                newFoodEntry.measure = newFoodEntry.sizeinfo === null ? "Pieces" : "Grams";
 
-            newFoodEntry.measure = newFoodEntry.sizeinfo === null ? "Pieces" : "Grams";
-            selectedMeal.addNewFoodEntry(ev, newFoodEntry);
+                selectedMeal.addNewFoodEntry(ev, newFoodEntry);
+                for (let m of dayEntry.meals)
+                    if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
+                        || selectedMeal._reactInternalFiber.key == m.key)
+                        m.foodentries.push(newFoodEntry);
 
-            for (let m of dayEntry.meals)
-                if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                    || selectedMeal._reactInternalFiber.key == m.key)
-                    m.foodentries.push(newFoodEntry);
-
-            this.setState({
-                dayEntry: dayEntry
-            });
+                this.setState({
+                    dayEntry: dayEntry
+                });
+            }
         }
     };
 
-    onSelectedFoodChanged = async (ev, sender) => {
-        console.log("DM ONSELECT START -- SELFOOD:", this.state.selectedFood ?
-            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
-            : null)
+    onSelectedFoodChanged = (ev, sender) => {
         const { selectedFood } = this.state;
-
-        await setTimeout(() => { }, 0);
-        console.log("DM ONSELECT AF TIMEOUT -- SELFOOD:", this.state.selectedFood ?
-            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
-            : null)
-
-        this.setState({
-            selectedFood: null
-        });
-        console.log("DM ONSELECT AF SETSTATE-NULL -- SELFOOD:", this.state.selectedFood ?
-            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
-            : null)
 
         if (sender !== selectedFood) {
             if (selectedFood)
                 selectedFood.toggleSelected();
             sender.toggleSelected();
+
             this.setState({
                 selectedFood: sender,
+                amount: ""
             });
         }
-        console.log("DM ONSELECT AF SETSTATE-SENDER -- SELFOOD:", this.state.selectedFood ?
-            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
-            : null)
     };
 
+    currentEntry = () => {
+        const { selectedFood, amount } = this.state;
+
+        if (selectedFood) {
+            const measure = document.querySelector("#measureSelect").value;
+            return <FoodEntry foodItem={selectedFood.state.foodItem}
+                amount={amount ? amount : (selectedFood.state.foodItem.sizeinfo === null ? 1 : 100)}
+                measure={measure}
+                key={selectedFood.state.foodItem.foodid.toString() + amount + measure} />
+        }
+        else
+            return <FoodEntry key={null} />
+    }
+
+    onDayButtons = (ev, nrDays) => {
+        const { selectedDay } = this.state;
+
+        let d = new Date(selectedDay);
+        d.setDate(d.getDate() + nrDays);
+
+        this.loadDailyMeals(dateToStr(d));
+    }
+
     render = () => {
-        console.log("DM RENDER START -- SELFOOD:", this.state.selectedFood ?
-            (this.state.selectedFood.state.foodItem.foodname + this.state.selectedFood.state.foodItem.brand)
-            :null)
-        const { mealEntries, selectedFood, sAmount } = this.state;
+        console.log("RENDER TEST:", this.state.selectedDay);
+        const { selectedDay, mealEntries, selectedFood, amount } = this.state;
 
         return (
             <main className="mainDailyMeals boxShow">
@@ -282,9 +290,9 @@ class DailyMeals extends React.Component {
                     <div className="dayHeader">
                         <div className="datepick boxShow">
                             <label className="textHigh">Day: </label>
-                            <button className="ftButton">{"<"}</button>
-                            <input onChange={this.getDailyMeals} id="selectedDay" type="date" />
-                            <button className="ftButton">{">"}</button>
+                            <button onClick={(ev) => this.onDayButtons(ev, -1)} className="ftButton" > {"<"}</button>
+                            <input onChange={(ev) => this.loadDailyMeals(ev.currentTarget.value)} id="selectedDay" type="date" value={selectedDay} />
+                            <button onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
                         <hr />
                         <Note />
@@ -301,31 +309,43 @@ class DailyMeals extends React.Component {
                 <div id="searchArea" className="subblock boxShow">
                     <div className="searchInput boxShow">
                         <label className="textHigh">Search Food: </label>
-                        <input onChange={this.getSFoodItems} id="isAll" type="checkbox" /> ALL Food
-                        <input className="search"
-                            onChange={this.getSFoodItems}
+                        <input onChange={(ev) => this.loadSFoodItems(document.querySelector("#search").value,
+                            ev.currentTarget.checked)}
+                            id="isAll" type="checkbox" /> ALL Food
+                        <input onChange={(ev) => this.loadSFoodItems(ev.currentTarget.value,
+                            document.querySelector("#isAll").checked)}
+                            id="search"
                             type="text"
                             placeholder="search terms" />
                     </div>
                     <div className="searchResults boxShow">
                         {this.state.sFoodItems}
                     </div>
-                    <div className="amountInput boxShow">
+                    <div className="amountInput boxShow">{/*<<<<<<<<<<<<<<<<<<<AMOUNT*/}
                         <label className="textHigh">Amount: </label>
-                        <input className="amountSize" type="text" placeholder="100" />
-                        <select disabled={true}>
-                            <option>Grams</option>
-                            <option>Pieces</option>
+                        <input id="amountSize" type="text" value={amount}
+                            onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
+                            placeholder={selectedFood
+                                ? (selectedFood.state.foodItem.sizeinfo === null ? 1 : 100)
+                                : 0} />
+                        <select id="measureSelect" value={selectedFood
+                            ? selectedFood.state.foodItem.sizeinfo === null ? "Pieces" : "Grams"
+                            : "---"}
+                            readOnly={true}>
+                            <option className={selectedFood
+                                ? selectedFood.state.foodItem.sizeinfo === null ? "hidden" : ""
+                                : "hidden"}>
+                                Grams</option>
+                            <option className={selectedFood
+                                ? selectedFood.state.foodItem.sizeinfo === 0 ? "hidden" : ""
+                                : "hidden"}>
+                                Pieces</option>
+                            <option className="hidden">---</option>
                         </select>
                     </div>
-                    <div className="buffer"></div>{/*AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA*/}
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
-                        {this.state.selectedFood ?
-                            <FoodEntry foodItem={this.state.selectedFood.state.foodItem}
-                                amount={sAmount} measure={"Grams"}
-                                key={0} /> :
-                            <FoodEntry key={"WTF"} />}
+                        {this.currentEntry()}
                         <button onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
                     </div>
                 </div>

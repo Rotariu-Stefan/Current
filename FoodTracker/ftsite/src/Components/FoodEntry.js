@@ -17,40 +17,35 @@ class FoodEntry extends React.Component {
             measure: "Pieces"
         };
 
+        let foodEntry;
         if (props.foodEntry)
-            this.state = {
-                foodEntry: props.foodEntry
-            };
+            foodEntry = props.foodEntry;
         else if (props.foodItem) {
-            const fe = props.foodItem;
-            fe.amount = props.amount;
-            fe.measure = props.measure;
-            this.state = {
-                foodEntry: fe
-            };
+            foodEntry = props.foodItem;
+            foodEntry.amount = props.amount;
+            foodEntry.measure = props.measure;
         }
         else
-            this.state = {
-                foodEntry: this.defaultFoodEntry
-            };
+            foodEntry = this.defaultFoodEntry;
+
+        this.state = {
+            fatRes: (foodEntry.fat * foodEntry.amount / (foodEntry.sizeinfo === null ? 1 : 100)).toFixed(1),
+            carbsRes: (foodEntry.carbs * foodEntry.amount / (foodEntry.sizeinfo === null ? 1 : 100)).toFixed(1),
+            proteinRes: (foodEntry.protein * foodEntry.amount / (foodEntry.sizeinfo === null ? 1 : 100)).toFixed(1),
+            foodEntry:foodEntry
+        };
     }
 
-    render = () => {
-        console.log("FE RENDER START -- FENTRY", this.state.foodEntry ?
-            (this.state.foodEntry.foodname + this.state.foodEntry.brand)
-            : null)
-
-        const { foodEntry } = this.state;
-        const { foodname, brand, amount, fat, carbs, protein, sizeinfo } = foodEntry;
+    render = () => {        
+        const { foodEntry, fatRes, carbsRes, proteinRes } = this.state;
+        const { foodname, brand, amount, fat, carbs, protein} = foodEntry;
 
         return (
             <div className="foodEntry lineDown">
                 <span className="amount">{amount}</span>
                 <span className="name_brand">{`${foodname} ${brand ? "@" + brand : ""}`}</span>
                 <span className="macro">{`${fat}/${carbs}/${protein}`}</span>
-                <span className="macroRes">{`${(fat * amount / (sizeinfo === null ? 1 : 100)).toFixed(1)}
-                        /${(carbs * amount / (sizeinfo === null ? 1 : 100)).toFixed(1)}
-                        /${(protein * amount / (sizeinfo === null ? 1 : 100)).toFixed(1)}`}
+                <span className="macroRes">{`${fatRes}/${carbsRes}/${proteinRes}`}
                 </span>
             </div>
         );
