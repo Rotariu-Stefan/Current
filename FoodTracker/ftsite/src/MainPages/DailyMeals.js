@@ -22,7 +22,7 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date()),
+            selectedDay: "2020-11-11",//dateToStr(new Date()),
             dayEntry: {},
             mealEntries: [],
             selectedMeal: null,
@@ -196,7 +196,7 @@ class DailyMeals extends React.Component {
             });
         ev.stopPropagation();
     };
-
+    
     onSelectedMealChanged = (ev, sender) => {
         const { selectedMeal } = this.state;
 
@@ -243,6 +243,7 @@ class DailyMeals extends React.Component {
                     dayEntry: dayEntry
                 });
             }
+            document.querySelector("#search").select();
         }
     };
 
@@ -253,6 +254,8 @@ class DailyMeals extends React.Component {
             if (selectedFood)
                 selectedFood.toggleSelected();
             sender.toggleSelected();
+            if (document.activeElement !== document.querySelector("#search"))
+                document.querySelector("#search").select();
 
             this.setState({
                 selectedFood: sender,
@@ -285,6 +288,76 @@ class DailyMeals extends React.Component {
         this.loadDailyMeals(dateToStr(d));
     }
 
+    onSearchKey = (ev) => {
+        const { selectedFood, sFoodItems } = this.state;
+
+        switch (ev.key) {
+            case "Enter":
+                this.onAddNewFoodEntry();
+                ev.preventDefault();
+                break;
+            case "Tab":
+                document.querySelector("#amountSize").select();
+                ev.preventDefault();
+                break;
+            case "Escape":
+                document.querySelector("#search").value = "";
+                ev.preventDefault();
+                break;
+            case "ArrowUp":
+                if (selectedFood) {
+                    for (let i = 0; i < sFoodItems.length; i++)
+                        if (sFoodItems[i].key === selectedFood._reactInternalFiber.key)
+                            if (i === 0)
+                                break;
+                            else
+                                document.querySelectorAll(".foodItem")[i - 1].click();
+                }
+                ev.preventDefault();
+                break;
+            case "ArrowDown":
+                if (selectedFood) {
+                    for (let i = 0; i < sFoodItems.length; i++)
+                        if (sFoodItems[i].key === selectedFood._reactInternalFiber.key)
+                            if (i === sFoodItems.length - 1)
+                                break;
+                            else
+                                document.querySelectorAll(".foodItem")[i + 1].click();
+                }
+                ev.preventDefault();
+                break;
+            default:
+                break;
+        }
+    };
+
+    onAmountKey = (ev) => {
+        switch (ev.key) {
+            case "Enter":
+                this.onAddNewFoodEntry();
+                ev.preventDefault();
+                break;
+            case "Tab":
+                document.querySelector("#search").select();
+                ev.preventDefault();
+                break;
+            case "Escape":
+                document.querySelector("#amountSize").value = "";
+                ev.preventDefault();
+                break;
+            case "ArrowUp":     //TODO:Change Measure??
+                console.log(ev.key);
+                ev.preventDefault();
+                break;
+            case "ArrowDown":   //TODO:Change Measure??
+                console.log(ev.key);
+                ev.preventDefault();
+                break;
+            default:
+                break;
+        }
+    };//TODO?
+
     render = () => {
         const { selectedDay, mealEntries, selectedFood, amount, measure } = this.state;
 
@@ -316,10 +389,12 @@ class DailyMeals extends React.Component {
                         <input onChange={(ev) => this.loadSFoodItems(
                             document.querySelector("#search").value,
                             ev.currentTarget.checked)}
-                            id="isAll" type="checkbox" /> ALL Food
+                            id="isAll" type="checkbox" />
+                        ALL Food
                         <input onChange={(ev) => this.loadSFoodItems(
                             ev.currentTarget.value,
                             document.querySelector("#isAll").checked)}
+                            onKeyDown={this.onSearchKey}
                             id="search" type="text"
                             placeholder="search terms" />
                     </div>
@@ -330,6 +405,7 @@ class DailyMeals extends React.Component {
                         <label className="textHigh">Amount: </label>
                         <input id="amountSize" type="text" value={amount}
                             onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
+                            onKeyDown={this.onAmountKey}
                             placeholder={selectedFood ? (measure === "Pieces" ? 1 : 100) : 0} />
                         <select id="measureSelect" value={measure} onChange={() => { }}>
                             <option className={selectedFood ? measure === "Grams" ? "" : "hidden" : "hidden"}>
