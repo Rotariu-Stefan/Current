@@ -10,6 +10,7 @@ import svData from '../svData.json';
 
 const getServerURL = () => {
     return svData.serverLink;
+    //return "http://localhost:3001";
 }
 
 const dateToStr = (dateObj) => {
