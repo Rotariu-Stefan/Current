@@ -30,52 +30,52 @@ server.get("/", (req, res) => {
     }
 });
 
-server.get("/dailymeals_Deprecated", async (req, res) => {
-    try {
-        console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.headers);
-        const { userid, reqdate } = req.headers;
+//server.get("/dailymeals_Deprecated", async (req, res) => {
+//    try {
+//        console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.headers);
+//        const { userid, reqdate } = req.headers;
 
-        const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
-            " FROM meals" +
-            " WHERE userid= $1 AND timeeaten=$2;"
-            , [userid, reqdate]);
+//        const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
+//            " FROM meals" +
+//            " WHERE userid= $1 AND timeeaten=$2;"
+//            , [userid, reqdate]);
 
-        const day = {};
-        const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
-            " FROM notes n" +
-            " JOIN daynotes dn ON dn.noteid = n.noteid" +
-            " WHERE dn.daydate=$1;"
-            , [reqdate])
-        if (qselN.rowCount === 1)
-            day.note = qselN.rows[0];
-        else
-            day.noteid = null;
+//        const day = {};
+//        const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
+//            " FROM notes n" +
+//            " JOIN daynotes dn ON dn.noteid = n.noteid" +
+//            " WHERE dn.daydate=$1;"
+//            , [reqdate])
+//        if (qselN.rowCount === 1)
+//            day.note = qselN.rows[0];
+//        else
+//            day.noteid = null;
 
-        day.meals = qselM.rows;
-        for (meal of day.meals) {
-            if (meal.noteid) {
-                const qselNM = await client.query("SELECT noteid, title, score, notetext" +
-                    " FROM notes" +
-                    " WHERE noteid=$1;"
-                    , [meal.noteid])
-                meal.note = qselNM.rows[0];
-                delete meal.noteid;
-            }
+//        day.meals = qselM.rows;
+//        for (meal of day.meals) {
+//            if (meal.noteid) {
+//                const qselNM = await client.query("SELECT noteid, title, score, notetext" +
+//                    " FROM notes" +
+//                    " WHERE noteid=$1;"
+//                    , [meal.noteid])
+//                meal.note = qselNM.rows[0];
+//                delete meal.noteid;
+//            }
 
-            const qselFE = await client.query("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
-                " FROM fooditems f" +
-                " JOIN mealdata md ON f.foodid = md.foodid" +
-                " WHERE md.mealid=$1;"
-                , [meal.mealid]);
-            meal.foodentries = qselFE.rows;
-        }
-        res.json(day);
+//            const qselFE = await client.query("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
+//                " FROM fooditems f" +
+//                " JOIN mealdata md ON f.foodid = md.foodid" +
+//                " WHERE md.mealid=$1;"
+//                , [meal.mealid]);
+//            meal.foodentries = qselFE.rows;
+//        }
+//        res.json(day);
 
-    } catch (err) {
-        console.log("___________ERROR___________\n", err.message || err);
-        res.status(400).json("Error at Dailyday.meals!");
-    }
-});
+//    } catch (err) {
+//        console.log("___________ERROR___________\n", err.message || err);
+//        res.status(400).json("Error at Dailyday.meals!");
+//    }
+//});
 
 const runTransaction = async (req, res, type, page, TBody) => {
     console.log(`-----------ftserver Received @${page} --- ${type}\nReq:`
@@ -89,7 +89,7 @@ const runTransaction = async (req, res, type, page, TBody) => {
     try {
         await client.connect();
         await client.query("BEGIN");
-        
+
         await TBody(type === "GET" ? req.headers : req.body, res, client);
 
         await client.query("COMMIT");
@@ -98,7 +98,7 @@ const runTransaction = async (req, res, type, page, TBody) => {
         console.log("___________ERROR___________\n", err.message || err);
         res.status(400).json(`Error at ${page}!`);
     } finally {
-        client.end();
+        await client.end();
     }
 };
 
@@ -189,11 +189,11 @@ server.get("/dailymeals/foodsearch", (req, res) => runTransaction(req, res, "GET
     res.json(qselFI.rows);
 }));
 
-server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], (req, res) => runTransaction(req, res, "GET", "../foodsearch", async (reqData, res, client) => {
-    const { isdish, foodid, noteid } = reqData;
+server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], (req, res) => runTransaction(req, res, "GET", "../fooddetails", async (reqData, res, client) => {
+    const { foodid, isdish, noteid } = reqData;
 
     const details = { foodid };
-    if (noteid) {
+    if (noteid !== "null") {
         const qselN = await client.query("SELECT noteid, title, score, notetext" +
             " FROM notes" +
             " WHERE noteid=$1;"
@@ -201,7 +201,7 @@ server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], (req, res) => r
         details.note = qselN.rows[0];
     }
 
-    if (isdish) {
+    if (isdish === "true") {
         const qselFE = await client.query("SELECT dd.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, dd.amount, dd.measure" +
             " FROM fooditems f" +
             " JOIN dishdata dd ON f.foodid = dd.ingredientid" +
@@ -384,4 +384,15 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
 ; (async () => {
     //await showDB(process.argv[2]);
 
+    const client = new pg.Client({
+        connectionString: process.env.DATABASE_URL || process.argv[2],
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    //await client.connect();
+
+    //await client.query("update fooditems set pic='faina cocos.jpg' where foodname='faina cocos'");
+
+    //await client.end();
 })();

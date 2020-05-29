@@ -22,7 +22,7 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: "2020-11-11",//dateToStr(new Date()),
+            selectedDay: dateToStr(new Date()),
             dayEntry: {},
             mealEntries: [],
             selectedMeal: null,
@@ -30,8 +30,10 @@ class DailyMeals extends React.Component {
             sFoodItems: [],
             selectedFood: null,
             sFoodCounter: 0,
+            selectedFoodDetails: null,
             amount: "",
-            measure: "---"
+            measure: "---",
+            composition: []
         };
 
         //; (async () => {
@@ -196,7 +198,7 @@ class DailyMeals extends React.Component {
             });
         ev.stopPropagation();
     };
-    
+
     onSelectedMealChanged = (ev, sender) => {
         const { selectedMeal } = this.state;
 
@@ -247,8 +249,10 @@ class DailyMeals extends React.Component {
         }
     };
 
-    onSelectedFoodChanged = (ev, sender) => {
+    onSelectedFoodChanged = async (ev, sender) => {
         const { selectedFood } = this.state;
+        let { sFoodCounter, composition } = this.state;
+        const { foodid, isdish, noteid } = sender.state.foodItem;
 
         if (sender !== selectedFood) {
             if (selectedFood)
@@ -257,8 +261,30 @@ class DailyMeals extends React.Component {
             if (document.activeElement !== document.querySelector("#search"))
                 document.querySelector("#search").select();
 
+            let res = await fetch(getServerURL() + "/dailymeals/fooddetails", {
+                method: "get",
+                headers: {
+                    "content-type": "application/json",
+                    "foodid": foodid,
+                    "isdish": isdish,
+                    "noteid": noteid ? noteid : null
+                }
+            });
+            res = await res.json();            
+
+            composition = [];
+            if (res.foodentries) {     
+                for (let f of res.foodentries)
+                    composition.push(<FoodEntry
+                        foodEntry={f}
+                        key={sFoodCounter++} />);
+            }
+
             this.setState({
                 selectedFood: sender,
+                selectedFoodDetails: res,
+                sFoodCounter: sFoodCounter,
+                composition: composition,
                 amount: "",
                 measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams"
             });
@@ -359,7 +385,8 @@ class DailyMeals extends React.Component {
     };//TODO?
 
     render = () => {
-        const { selectedDay, mealEntries, selectedFood, amount, measure } = this.state;
+        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition } = this.state;
+        const { foodname, brand, fat, carbs, protein, price, pic } = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
 
         return (
             <main className="mainDailyMeals boxShow">
@@ -372,7 +399,7 @@ class DailyMeals extends React.Component {
                             <button onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
                         <hr />
-                        <Note />
+                        <Note note={dayEntry.note} />
                         <hr />
                     </div>
                     <div className="mealsArea">
@@ -423,32 +450,45 @@ class DailyMeals extends React.Component {
                 </div>
                 <div id="foodDetailsArea" className="subblock boxShow">
                     <div className="foodDetailsHeader">
-                        <div className="textHigh boxShow">cottage cheese @delaco</div>
+                        <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
                         <hr />
-                        <Note />
+                        <Note note={selectedFood ? selectedFoodDetails.note : null} />
                         <hr />
                     </div>
                     <div className="foodPic boxShow">
-                        <img src="FoodPics/cottage cheese @delaco.jpg" alt="[NO FOOD PIC]" />
+                        <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />
                     </div>
                     <div className="foodInfo">
                         <table>
                             <thead>
-                                <tr><th>Name</th><td colSpan="2">Cottage Cheese</td></tr>
-                                <tr><th>Brand</th><td colSpan="2">Delaco</td></tr>
-                                <tr><th>Macro</th><th>100g</th><th>1(175g)</th></tr>
+                                <tr><th>Name</th><td colSpan="2">{foodname}</td></tr>
+                                <tr><th>Brand</th><td colSpan="2">{brand ? brand : "--"}</td></tr>
+                                <tr><th>Macro</th><th>100g</th><th>1p</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>Fat</td><td>4.5g</td><td>7.9g</td></tr>
-                                <tr><td>Carbs</td><td>2g</td><td>3.5g</td></tr>
-                                <tr><td>Protein</td><td>12g</td><td>21g</td></tr>
-                                <tr><td>Calories</td><td>96.5Kc</td><td>169.1Kc</td></tr>
-                                <tr><td>Price</td><td>2.57Lei</td><td>4.5Lei</td></tr>
+                                <tr><td>Fat</td>
+                                    <td>{measure === "Grams" ? fat + "g" : "--"}</td>
+                                    <td>{measure === "Pieces" ? fat + "g" : "--"}</td></tr>
+                                <tr><td>Carbs</td>
+                                    <td>{measure === "Grams" ? carbs + "g" : "--"}</td>
+                                    <td>{measure === "Pieces" ? carbs + "g" : "--"}</td></tr>
+                                <tr><td>Protein</td>
+                                    <td>{measure === "Grams" ? protein + "g" : "--"}</td>
+                                    <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
+                                <tr><td>Calories</td>
+                                    <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                        + "Kc" : "--"}</td>
+                                    <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                        + "Kc" : "--"}</td></tr>
+                                <tr><td>Price</td>
+                                    <td>{measure === "Grams" ? price + "Lei" : "--"}</td>
+                                    <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
                             </tbody>
                         </table>
                         <div className="buffer"></div>
                         <div className="foodEntries boxShow">
                             <label className="textHigh lineDown">Composition:</label>
+                            {composition}
                         </div>
                     </div>
                 </div>

@@ -193,6 +193,10 @@
         border-collapse: collapse;
     }
 
+    #foodDetailsArea td {
+        width:33%;
+    }
+
 .foodDetailsHeader > :first-child {
     text-align: center;
 }

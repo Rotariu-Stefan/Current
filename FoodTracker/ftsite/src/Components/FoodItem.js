@@ -1,19 +1,20 @@
 import React from 'react';
 
 class FoodItem extends React.Component {
+    static defaultFoodItem = {
+        entryid: 0,
+        foodid: 0,
+        foodname: "Nothing",
+        brand: "Nowhere",
+        fat: 0, carbs: 0, protein: 0,
+        sizeinfo: null, userid: 0, pic: "empty.png", price: 0,
+        isdish: false,
+        noteid: null,
+        measure: "Pieces"
+    };
+
     constructor(props) {
         super(props);
-        this.defaultFoodItem = {
-            entryid: 0,
-            foodid: 0,
-            foodname: "Nothing",
-            brand: "Nowhere",
-            fat: 0, carbs: 0, protein: 0,
-            sizeinfo: null, userid: 0, pic: null, price: 0,
-            isdish: false,
-            noteid: null,
-            measure: "Pieces"
-        };
 
         this.state = {
             foodItem: (props.foodItem) ? props.foodItem : this.defaultFoodItem,

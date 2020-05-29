@@ -1,21 +1,21 @@
 import React from 'react';
 
 class FoodEntry extends React.Component {
+    static defaultFoodEntry = {
+        entryid: 0,
+        foodid: 0,
+        foodname: "Nothing",
+        brand: "Nobody",
+        fat: 0, carbs: 0, protein: 0,
+        sizeinfo: null, userid: 0, pic: null, price: 0,
+        isdish: false,
+        noteid: null,
+        amount: 1,
+        measure: "Pieces"
+    };
 
     constructor(props) {
         super(props);
-        this.defaultFoodEntry = {
-            entryid: 0,
-            foodid: 0,
-            foodname: "Nothing",
-            brand: "Nobody",
-            fat: 0, carbs: 0, protein: 0,
-            sizeinfo: null, userid: 0, pic: null, price: 0,
-            isdish: false,
-            noteid: null,
-            amount: 1,
-            measure: "Pieces"
-        };
 
         let foodEntry;
         if (props.foodEntry)
@@ -26,15 +26,15 @@ class FoodEntry extends React.Component {
             foodEntry.measure = props.measure;
         }
         else
-            foodEntry = this.defaultFoodEntry;
+            foodEntry = FoodEntry.defaultFoodEntry;
 
         this.state = {
             foodEntry: foodEntry
         };
 
-        this.state.fatRes=this.getMacroRes("fat");
-        this.state.carbsRes =this.getMacroRes("carbs");
-        this.state.proteinRes =this.getMacroRes("protein");
+        this.state.fatRes = this.getMacroRes("fat");
+        this.state.carbsRes = this.getMacroRes("carbs");
+        this.state.proteinRes = this.getMacroRes("protein");
 
         if (this.props.addToMeal)
             this.props.addToMeal(this.state.fatRes, this.state.carbsRes, this.state.proteinRes);

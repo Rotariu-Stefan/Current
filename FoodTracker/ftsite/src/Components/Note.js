@@ -1,19 +1,37 @@
 import React from "react";
 
-const Note = ({
-    grade = 0,
-    title = "Note Title",
-    text = "Note text lalalaal lalalalal alaalalal lllaal lalala asdasdsd asdda asdsadssads LA!"
-}) => {
-    return (
-        <div className="note boxShow">
-            <img src="SitePics/star.png" alt={"[STAR]" + grade} />
-            <div>
-                <span>{title}</span>
-                <span>{text}</span>
-            </div>
-        </div>
-    );
+class Note extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isEdit: false
+        };
+    }
+
+
+
+
+
+
+    render = () => {
+        if (this.props.note) {
+            const { score, title, text } = this.props.note;
+
+            return (
+                <div className="note boxShow">
+                    <img src="SitePics/starX.png" alt={"S=" + (score ? score : 0)} />
+                    <div>
+                        <span>{title ? title : "Untitled"}</span>
+                        <span>{text ? text : "[Empty]"}</span>
+                    </div>
+                </div>
+            );
+        }
+        else
+            return (
+                "No Note"//Add Note Button
+        );
+    }
 }
 
 export default Note;

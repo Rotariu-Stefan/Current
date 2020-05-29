@@ -3,17 +3,18 @@ import FoodEntry from './FoodEntry';
 import Note from './Note';
 
 class MealEntry extends React.Component {
+    static defaultMealEntry = {
+        mealname: "New Meal",
+        portion: 1,
+        noteid: null,
+        foodentries: []
+    };
+
     constructor(props) {
         super(props);
-        this.defaultMealEntry = {
-            mealname: "New Meal",
-            portion: 1,
-            noteid: null,
-            foodentries: []
-        }
 
         this.state = {
-            mealEntry: props.mealEntry ? props.mealEntry : this.defaultMealEntry,
+            mealEntry: props.mealEntry ? props.mealEntry : MealEntry.defaultMealEntry,
             foodEntries: [],
             foodCounter: 0,
             isHighlighted: false,
@@ -69,7 +70,7 @@ class MealEntry extends React.Component {
 
     render = () => {
         const { mealEntry, isHighlighted, isMin, foodEntries, fat, carbs, protein } = this.state;
-        const { mealname } = mealEntry;
+        const { mealname, note } = mealEntry;
 
         return (
             <div onClick={(ev) => this.props.selectedChanged(ev, this)}
@@ -80,7 +81,7 @@ class MealEntry extends React.Component {
                     <img onClick={this.toggleMinMax} src="PLACEHOLDER DROPDOWN" alt={isMin ? "+" : "-"} />
                 </div>
                 <hr />
-                <Note />
+                <Note note={note} />
                 <hr />
                 <div className={"foodEntries lineDown" + (isMin ? " hidden" : "")}>
                     {foodEntries}
