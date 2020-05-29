@@ -22,17 +22,23 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date()),
+            selectedDay: dateToStr(new Date("2020-05-04")),
             dayEntry: {},
+
             mealEntries: [],
             selectedMeal: null,
             mealCounter: 0,
-            sFoodItems: [],
+            mealareaIsLoading: true,
+
             selectedFood: null,
+            sFoodItems: [],
             sFoodCounter: 0,
-            selectedFoodDetails: null,
+            searchareaIsLoading: true,
+            searchCounter: 0,
             amount: "",
             measure: "---",
+
+            selectedFoodDetails: null,
             composition: []
         };
 
@@ -42,89 +48,107 @@ class DailyMeals extends React.Component {
         //})();
     }
 
-    loadDailyMeals = async (day) => {
-        let { mealEntries, mealCounter } = this.state;
-        //If app.currentUser is Guest pretend it's SV
-        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
-
-        let res = await fetch(getServerURL() + "/dailymeals", {
-            method: "get",
-            headers: {
-                "content-type": "application/json",
-                "reqdate": day,
-                "userid": userId,
-            }
-        });
-        res = await res.json();
-
-        mealEntries = [];
-        let first = true;
-        for (let m of res.meals)
-            if (!first)
-                mealEntries.push(<MealEntry
-                    selectedChanged={this.onSelectedMealChanged}
-                    removeMeal={this.onRemoveMeal}
-                    mealEntry={m}
-                    key={mealCounter++} />);
-            else {
-                mealEntries.push(<MealEntry
-                    signalSelect={true}
-                    selectedChanged={this.onSelectedMealChanged}
-                    removeMeal={this.onRemoveMeal}
-                    mealEntry={m}
-                    key={mealCounter++} />);
-                first = false;
-            }
-
+    loadDailyMeals = (day) => {
         this.setState({
-            selectedDay: day,
-            dayEntry: res,
-            mealEntries: mealEntries,
-            mealCounter: mealCounter
+            mealEntries: [],
+            mealareaIsLoading: true
         });
+
+        ; (async () => {
+            let { mealCounter } = this.state;
+            //If app.currentUser is Guest pretend it's SV
+            const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
+
+            let res = await fetch(getServerURL() + "/dailymeals", {
+                method: "get",
+                headers: {
+                    "content-type": "application/json",
+                    "reqdate": day,
+                    "userid": userId,
+                }
+            });
+            res = await res.json();
+
+            const mealEntries = [];
+            let first = true;
+            for (let m of res.meals)
+                if (!first)
+                    mealEntries.push(<MealEntry
+                        selectedChanged={this.onSelectedMealChanged}
+                        removeMeal={this.onRemoveMeal}
+                        mealEntry={m}
+                        key={mealCounter++} />);
+                else {
+                    mealEntries.push(<MealEntry
+                        signalSelect={true}
+                        selectedChanged={this.onSelectedMealChanged}
+                        removeMeal={this.onRemoveMeal}
+                        mealEntry={m}
+                        key={mealCounter++} />);
+                    first = false;
+                }
+
+            this.setState({
+                selectedDay: day,
+                dayEntry: res,
+                mealEntries: mealEntries,
+                mealCounter: mealCounter,
+                mealareaIsLoading: false,
+            });
+        })();
     }
 
-    loadSFoodItems = async (searchTerms, isAll) => {
-        let { sFoodItems, sFoodCounter } = this.state;
-        //If app.currentUser is Guest pretend it's SV
-        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
-
-        let res;
-        res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
-            method: "get",
-            headers: {
-                "content-type": "application/json",
-                "userid": userId,
-                "search": searchTerms,
-                "isall": isAll
-            }
-        });
-        res = await res.json();
-
-
-        sFoodItems = [];
-        let first = true;
-        for (let f of res)
-            if (!first)
-                sFoodItems.push(<FoodItem
-                    selectedChanged={this.onSelectedFoodChanged}
-                    foodItem={f}
-                    key={sFoodCounter++} />);
-            else {
-                sFoodItems.push(<FoodItem
-                    signalSelect={true}
-                    selectedChanged={this.onSelectedFoodChanged}
-                    foodItem={f}
-                    key={sFoodCounter++} />);
-                first = false;
-            }
-
+    loadSFoodItems = (searchTerms, isAll) => {
         this.setState({
-            selectedFood: first ? null : this.state.selectedFood,
-            measure: first ? "---" : this.state.measure,
-            sFoodItems: sFoodItems,
-            sFoodCounter: sFoodCounter
+            sFoodItems: [],
+            searchareaIsLoading: true,
+            searchCounter: this.state.searchCounter + 1
         });
+
+        ; (async (searchCounter) => {
+            let { sFoodCounter } = this.state;
+            //If app.currentUser is Guest pretend it's SV
+            const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
+
+            let res;
+            res = await fetch(getServerURL() + "/dailymeals/foodsearch", {
+                method: "get",
+                headers: {
+                    "content-type": "application/json",
+                    "userid": userId,
+                    "search": searchTerms,
+                    "isall": isAll
+                }
+            });
+            res = await res.json();
+
+            if (searchCounter >= this.state.searchCounter) {
+                const sFoodItems = [];
+                let first = true;
+                for (let f of res)
+                    if (!first)
+                        sFoodItems.push(<FoodItem
+                            selectedChanged={this.onSelectedFoodChanged}
+                            foodItem={f}
+                            key={sFoodCounter++} />);
+                    else {
+                        sFoodItems.push(<FoodItem
+                            signalSelect={true}
+                            selectedChanged={this.onSelectedFoodChanged}
+                            foodItem={f}
+                            key={sFoodCounter++} />);
+                        first = false;
+                    }
+
+                this.setState({
+                    selectedFood: first ? null : this.state.selectedFood,
+                    measure: first ? "---" : this.state.measure,
+                    sFoodItems: sFoodItems,
+                    sFoodCounter: sFoodCounter,
+                    searchareaIsLoading: false
+                });
+            }
+        })(this.state.searchCounter + 1);
     };
 
     onCommit = async (ev) => {
@@ -249,10 +273,8 @@ class DailyMeals extends React.Component {
         }
     };
 
-    onSelectedFoodChanged = async (ev, sender) => {
+    onSelectedFoodChanged = (ev, sender) => {
         const { selectedFood } = this.state;
-        let { sFoodCounter, composition } = this.state;
-        const { foodid, isdish, noteid } = sender.state.foodItem;
 
         if (sender !== selectedFood) {
             if (selectedFood)
@@ -261,33 +283,41 @@ class DailyMeals extends React.Component {
             if (document.activeElement !== document.querySelector("#search"))
                 document.querySelector("#search").select();
 
-            let res = await fetch(getServerURL() + "/dailymeals/fooddetails", {
-                method: "get",
-                headers: {
-                    "content-type": "application/json",
-                    "foodid": foodid,
-                    "isdish": isdish,
-                    "noteid": noteid ? noteid : null
-                }
-            });
-            res = await res.json();            
-
-            composition = [];
-            if (res.foodentries) {     
-                for (let f of res.foodentries)
-                    composition.push(<FoodEntry
-                        foodEntry={f}
-                        key={sFoodCounter++} />);
-            }
-
             this.setState({
                 selectedFood: sender,
-                selectedFoodDetails: res,
-                sFoodCounter: sFoodCounter,
-                composition: composition,
                 amount: "",
-                measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams"
+                measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams",
+                selectedFoodDetails: null
             });
+
+            ; (async () => {
+                let { sFoodCounter, composition } = this.state;
+                const { foodid, isdish, noteid } = sender.state.foodItem;
+                let res = await fetch(getServerURL() + "/dailymeals/fooddetails", {
+                    method: "get",
+                    headers: {
+                        "content-type": "application/json",
+                        "foodid": foodid,
+                        "isdish": isdish,
+                        "noteid": noteid ? noteid : null
+                    }
+                });
+                res = await res.json();
+
+                composition = [];
+                if (res.foodentries) {
+                    for (let f of res.foodentries)
+                        composition.push(<FoodEntry
+                            foodEntry={f}
+                            key={sFoodCounter++} />);
+                }
+
+                this.setState({
+                    selectedFoodDetails: res,
+                    sFoodCounter: sFoodCounter,
+                    composition: composition
+                });
+            })();
         }
     };
 
@@ -385,7 +415,7 @@ class DailyMeals extends React.Component {
     };//TODO?
 
     render = () => {
-        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition } = this.state;
+        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems } = this.state;
         const { foodname, brand, fat, carbs, protein, price, pic } = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
 
         return (
@@ -394,22 +424,24 @@ class DailyMeals extends React.Component {
                     <div className="dayHeader">
                         <div className="datepick boxShow">
                             <label className="textHigh">Day: </label>
-                            <button onClick={(ev) => this.onDayButtons(ev, -1)} className="ftButton" > {"<"}</button>
-                            <input onChange={(ev) => this.loadDailyMeals(ev.currentTarget.value)} id="selectedDay" type="date" value={selectedDay} />
-                            <button onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
+                            <button disabled={mealareaIsLoading} onClick={(ev) => this.onDayButtons(ev, -1)} className="ftButton" > {"<"}</button>
+                            <input disabled={mealareaIsLoading} onChange={(ev) => this.loadDailyMeals(ev.currentTarget.value)} id="selectedDay" type="date" value={selectedDay} />
+                            <button disabled={mealareaIsLoading} onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
                         <hr />
                         <Note note={dayEntry.note} />
                         <hr />
                     </div>
                     <div className="mealsArea">
-                        {mealEntries}
+                        {mealareaIsLoading ? "LOADING..." : mealEntries}
                     </div>
                     <div className="dayAreaButtons">
-                        <button onClick={this.onCommit} className="ftButton">COMMIT DAY!</button>
-                        <button onClick={this.onAddNewMeal} className="newMeal ftButton">NEW MEAL</button>
+                        <button disabled={mealareaIsLoading} onClick={this.onCommit} className="ftButton">COMMIT DAY!</button>
+                        <button disabled={mealareaIsLoading} onClick={this.onAddNewMeal} className="newMeal ftButton">NEW MEAL</button>
                     </div>
                 </div>
+
+
                 <div id="searchArea" className="subblock boxShow">
                     <div className="searchInput boxShow">
                         <label className="textHigh">Search Food: </label>
@@ -426,15 +458,15 @@ class DailyMeals extends React.Component {
                             placeholder="search terms" />
                     </div>
                     <div className="searchResults boxShow">
-                        {this.state.sFoodItems}
+                        {searchareaIsLoading ? "LOADING..." : sFoodItems}
                     </div>
                     <div className="amountInput boxShow">
                         <label className="textHigh">Amount: </label>
-                        <input id="amountSize" type="text" value={amount}
+                        <input disabled={searchareaIsLoading} id="amountSize" type="text" value={amount}
                             onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
                             onKeyDown={this.onAmountKey}
                             placeholder={selectedFood ? (measure === "Pieces" ? 1 : 100) : 0} />
-                        <select id="measureSelect" value={measure} onChange={() => { }}>
+                        <select disabled={searchareaIsLoading} id="measureSelect" value={measure} onChange={() => { }}>
                             <option className={selectedFood ? measure === "Grams" ? "" : "hidden" : "hidden"}>
                                 Grams</option>
                             <option className={selectedFood ? measure === "Pieces" ? "" : "hidden" : "hidden"}>
@@ -445,53 +477,60 @@ class DailyMeals extends React.Component {
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
                         {this.currentEntry()}
-                        <button onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
+                        <button disabled={searchareaIsLoading} onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
                     </div>
                 </div>
-                <div id="foodDetailsArea" className="subblock boxShow">
-                    <div className="foodDetailsHeader">
-                        <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
-                        <hr />
-                        <Note note={selectedFood ? selectedFoodDetails.note : null} />
-                        <hr />
-                    </div>
-                    <div className="foodPic boxShow">
-                        <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />
-                    </div>
-                    <div className="foodInfo">
-                        <table>
-                            <thead>
-                                <tr><th>Name</th><td colSpan="2">{foodname}</td></tr>
-                                <tr><th>Brand</th><td colSpan="2">{brand ? brand : "--"}</td></tr>
-                                <tr><th>Macro</th><th>100g</th><th>1p</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Fat</td>
-                                    <td>{measure === "Grams" ? fat + "g" : "--"}</td>
-                                    <td>{measure === "Pieces" ? fat + "g" : "--"}</td></tr>
-                                <tr><td>Carbs</td>
-                                    <td>{measure === "Grams" ? carbs + "g" : "--"}</td>
-                                    <td>{measure === "Pieces" ? carbs + "g" : "--"}</td></tr>
-                                <tr><td>Protein</td>
-                                    <td>{measure === "Grams" ? protein + "g" : "--"}</td>
-                                    <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
-                                <tr><td>Calories</td>
-                                    <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
-                                        + "Kc" : "--"}</td>
-                                    <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
-                                        + "Kc" : "--"}</td></tr>
-                                <tr><td>Price</td>
-                                    <td>{measure === "Grams" ? price + "Lei" : "--"}</td>
-                                    <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
-                            </tbody>
-                        </table>
-                        <div className="buffer"></div>
-                        <div className="foodEntries boxShow">
-                            <label className="textHigh lineDown">Composition:</label>
-                            {composition}
+
+                {selectedFoodDetails ? (
+                    <div id="foodDetailsArea" className="subblock boxShow">
+                        <div className="foodDetailsHeader">
+                            <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
+                            <hr />
+                            <Note note={selectedFoodDetails ? selectedFoodDetails.note : null} />
+                            <hr />
+                        </div>
+                        <div className="foodPic boxShow">
+                            <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />
+                        </div>
+                        <div className="foodInfo">
+                            <table>
+                                <thead>
+                                    <tr><th>Name</th><td colSpan="2">{foodname}</td></tr>
+                                    <tr><th>Brand</th><td colSpan="2">{brand ? brand : "--"}</td></tr>
+                                    <tr><th>Macro</th><th>100g</th><th>1p</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Fat</td>
+                                        <td>{measure === "Grams" ? fat + "g" : "--"}</td>
+                                        <td>{measure === "Pieces" ? fat + "g" : "--"}</td></tr>
+                                    <tr><td>Carbs</td>
+                                        <td>{measure === "Grams" ? carbs + "g" : "--"}</td>
+                                        <td>{measure === "Pieces" ? carbs + "g" : "--"}</td></tr>
+                                    <tr><td>Protein</td>
+                                        <td>{measure === "Grams" ? protein + "g" : "--"}</td>
+                                        <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
+                                    <tr><td>Calories</td>
+                                        <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                            + "Kc" : "--"}</td>
+                                        <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                            + "Kc" : "--"}</td></tr>
+                                    <tr><td>Price</td>
+                                        <td>{measure === "Grams" ? price + "Lei" : "--"}</td>
+                                        <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
+                                </tbody>
+                            </table>
+                            <div className="buffer"></div>
+                            <div className="foodEntries boxShow">
+                                <label className="textHigh lineDown">Composition:</label>
+                                {composition}
+                            </div>
                         </div>
                     </div>
-                </div>
+                ) : (
+                        <div id="foodDetailsArea" className="subblock boxShow">
+                            LOADING...
+                        </div>
+                    )}
             </main>
         );
     };

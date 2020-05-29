@@ -31,6 +31,9 @@
 
 /*#region DayArea Block*/
 #dayArea {
+    margin: 0;
+    padding: 0;
+    border-style: none;
     display: flex;
     flex-direction: column;
 }
@@ -194,7 +197,7 @@
     }
 
     #foodDetailsArea td {
-        width:33%;
+        width: 33%;
     }
 
 .foodDetailsHeader > :first-child {

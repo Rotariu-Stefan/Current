@@ -15,14 +15,14 @@ class Note extends React.Component {
 
     render = () => {
         if (this.props.note) {
-            const { score, title, text } = this.props.note;
+            const { score, title, notetext } = this.props.note;
 
             return (
                 <div className="note boxShow">
                     <img src="SitePics/starX.png" alt={"S=" + (score ? score : 0)} />
                     <div>
                         <span>{title ? title : "Untitled"}</span>
-                        <span>{text ? text : "[Empty]"}</span>
+                        <span>{notetext ? notetext : "[Empty]"}</span>
                     </div>
                 </div>
             );
