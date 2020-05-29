@@ -22,7 +22,7 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date("2020-05-04")),
+            selectedDay: dateToStr(new Date()),
             dayEntry: {},
 
             mealEntries: [],
@@ -151,24 +151,34 @@ class DailyMeals extends React.Component {
         })(this.state.searchCounter + 1);
     };
 
-    onCommit = async (ev) => {
-        const { dayEntry, selectedDay } = this.state;
-        const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
-
-        const dayPutReq = dayEntry;
-        dayPutReq.userid = userId;
-        dayPutReq.date = selectedDay;
-
-        let res = await fetch(getServerURL() + "/dailymeals", {
-            method: "put",
-            headers: {
-                "content-type": "application/json",
-            },
-            body: JSON.stringify(dayPutReq)
+    onCommit = (ev) => {
+        this.setState({
+            mealareaIsLoading: true
         });
-        res = await res.json();
-        alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
-        console.log(res);
+
+        ; (async (searchCounter) => {
+            const { dayEntry, selectedDay } = this.state;
+            const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
+
+            const dayPutReq = dayEntry;
+            dayPutReq.userid = userId;
+            dayPutReq.date = selectedDay;
+
+            let res = await fetch(getServerURL() + "/dailymeals", {
+                method: "put",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify(dayPutReq)
+            });
+            res = await res.json();
+
+            this.setState({
+                mealareaIsLoading: false
+            });
+            alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
+            console.log(res);
+        })();
     };
 
     onAddNewMeal = (ev) => {    //TODO
