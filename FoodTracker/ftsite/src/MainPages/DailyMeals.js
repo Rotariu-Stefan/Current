@@ -248,15 +248,13 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewFoodEntry = (ev) => {
-        const { selectedMeal, selectedFood, dayEntry, amount } = this.state;
+        const { selectedMeal, selectedFood, dayEntry, amount, measure } = this.state;
 
         if (selectedMeal === null)
             alert("Must select a Meal !");
         else if (selectedFood === null)
             alert("Must select a Food Item !");
         else {
-            const amountInput = document.querySelector("#amountSize");
-
             if (isNaN(amount)) {
                 alert("Must Enter Valid Number for Amount!");
                 this.setState({
@@ -266,8 +264,8 @@ class DailyMeals extends React.Component {
             }
             else {
                 const newFoodEntry = selectedFood.state.foodItem;
-                newFoodEntry.amount = amount ? amount : amountInput.placeholder;
-                newFoodEntry.measure = newFoodEntry.sizeinfo === null ? "Pieces" : "Grams";
+                newFoodEntry.amount = amount ? amount : document.querySelector("#amountSize").placeholder;
+                newFoodEntry.measure = measure;
 
                 selectedMeal.addNewFoodEntry(ev, newFoodEntry);
                 for (let m of dayEntry.meals)
@@ -332,12 +330,12 @@ class DailyMeals extends React.Component {
     };
 
     currentEntry = () => {
-        const { selectedFood, amount } = this.state;
+        const { selectedFood, amount, measure } = this.state;
 
         if (selectedFood) {
-            const measure = document.querySelector("#measureSelect").value;
             return <FoodEntry foodItem={selectedFood.state.foodItem}
-                amount={amount ? amount : (selectedFood.state.foodItem.sizeinfo === null ? 1 : 100)}
+                amount={amount ? amount : (selectedFood ? (measure === "Pieces" ? 1
+                    : selectedFood.state.foodItem.sizeinfo === 0 ? 100 : selectedFood.state.foodItem.sizeinfo) : 0)}
                 measure={measure}
                 key={selectedFood.state.foodItem.foodid.toString() + amount + measure} />
         }
@@ -475,73 +473,75 @@ class DailyMeals extends React.Component {
                         <input disabled={searchareaIsLoading} id="amountSize" type="text" value={amount}
                             onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
                             onKeyDown={this.onAmountKey}
-                            placeholder={selectedFood ? (measure === "Pieces" ? 1 : 100) : 0} />
-                        <select disabled={searchareaIsLoading} id="measureSelect" value={measure} onChange={() => { }}>
-                            <option className={selectedFood ? measure === "Grams" ? "" : "hidden" : "hidden"}>
-                                Grams</option>
-                            <option className={selectedFood ? measure === "Pieces" ? "" : "hidden" : "hidden"}>
-                                Pieces</option>
-                            <option className="hidden">---</option>
+                            placeholder={selectedFood ? (measure === "Pieces" ? 1
+                                : selectedFood.state.foodItem.sizeinfo === 0 ? 100 : selectedFood.state.foodItem.sizeinfo) : 0} />
+                        <select onChange={(ev) => this.setState({ measure: ev.currentTarget.value })} disabled={searchareaIsLoading} id="measureSelect" value={measure} >
+                            <option className={selectedFood ? (selectedFood.state.foodItem.sizeinfo === null ? "hidden" : "") : "hidden"}>
+                            Grams</option>
+                        <option className={selectedFood ? (selectedFood.state.foodItem.sizeinfo === 0 ? "hidden" : "") : "hidden"}>
+                            Pieces</option>
+                        <option className="hidden">---</option>
                         </select>
-                    </div>
-                    <div className="searchEntry boxShow">
-                        <label className="textHigh lineDown">Current Entry:</label>
-                        {this.currentEntry()}
-                        <button disabled={searchareaIsLoading} onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
-                    </div>
+                </div>
+                <div className="searchEntry boxShow">
+                    <label className="textHigh lineDown">Current Entry:</label>
+                    {this.currentEntry()}
+                    <button disabled={searchareaIsLoading} onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
+                </div>
                 </div>
 
                 {selectedFoodDetails ? (
-                    <div id="foodDetailsArea" className="subblock boxShow">
-                        <div className="foodDetailsHeader">
-                            <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
-                            <hr />
-                            <Note note={selectedFoodDetails ? selectedFoodDetails.note : null} />
-                            <hr />
-                        </div>
-                        <div className="foodPic boxShow">
-                            <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />
-                        </div>
-                        <div className="foodInfo">
-                            <table>
-                                <thead>
-                                    <tr><th>Name</th><td colSpan="2">{foodname}</td></tr>
-                                    <tr><th>Brand</th><td colSpan="2">{brand ? brand : "--"}</td></tr>
-                                    <tr><th>Macro</th><th>100g</th><th>1p</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Fat</td>
-                                        <td>{measure === "Grams" ? fat + "g" : "--"}</td>
-                                        <td>{measure === "Pieces" ? fat + "g" : "--"}</td></tr>
-                                    <tr><td>Carbs</td>
-                                        <td>{measure === "Grams" ? carbs + "g" : "--"}</td>
-                                        <td>{measure === "Pieces" ? carbs + "g" : "--"}</td></tr>
-                                    <tr><td>Protein</td>
-                                        <td>{measure === "Grams" ? protein + "g" : "--"}</td>
-                                        <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
-                                    <tr><td>Calories</td>
-                                        <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
-                                            + "Kc" : "--"}</td>
-                                        <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
-                                            + "Kc" : "--"}</td></tr>
-                                    <tr><td>Price</td>
-                                        <td>{measure === "Grams" ? price + "Lei" : "--"}</td>
-                                        <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
-                                </tbody>
-                            </table>
-                            <div className="buffer"></div>
-                            <div className="foodEntries boxShow">
-                                <label className="textHigh lineDown">Composition:</label>
-                                {composition}
-                            </div>
-                        </div>
+            <div id="foodDetailsArea" className="subblock boxShow">
+                <div className="foodDetailsHeader">
+                    <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
+                    <hr />
+                    <Note note={selectedFoodDetails ? selectedFoodDetails.note : null} />
+                    <hr />
+                </div>
+                <div className="foodPic boxShow">
+                    <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />
+                </div>
+                <div className="foodInfo">
+                    <table>
+                        <thead>
+                            <tr><th>Name</th><td colSpan="2">{foodname}</td></tr>
+                            <tr><th>Brand</th><td colSpan="2">{brand ? brand : "--"}</td></tr>
+                            <tr><th>Macro</th><th>100g</th><th>1p</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Fat</td>
+                                <td>{measure === "Grams" ? fat + "g" : "--"}</td>
+                                <td>{measure === "Pieces" ? fat + "g" : "--"}</td></tr>
+                            <tr><td>Carbs</td>
+                                <td>{measure === "Grams" ? carbs + "g" : "--"}</td>
+                                <td>{measure === "Pieces" ? carbs + "g" : "--"}</td></tr>
+                            <tr><td>Protein</td>
+                                <td>{measure === "Grams" ? protein + "g" : "--"}</td>
+                                <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
+                            <tr><td>Calories</td>
+                                <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                    + "Kc" : "--"}</td>
+                                <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                    + "Kc" : "--"}</td></tr>
+                            <tr><td>Price</td>
+                                <td>{measure === "Grams" ? price + "Lei" : "--"}</td>
+                                <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
+                        </tbody>
+                    </table>
+                    <div className="buffer"></div>
+                    <div className="foodEntries boxShow">
+                        <label className="textHigh lineDown">Composition:</label>
+                        {composition}
                     </div>
-                ) : (
-                        <div id="foodDetailsArea" className="subblock boxShow">
-                            LOADING...
+                </div>
+            </div>
+        ) : (
+                <div id="foodDetailsArea" className="subblock boxShow">
+                    LOADING...
                         </div>
-                    )}
-            </main>
+            )
+        }
+            </main >
         );
     };
 }

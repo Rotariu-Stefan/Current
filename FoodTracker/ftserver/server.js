@@ -390,9 +390,9 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
             rejectUnauthorized: false
         }
     });
-    //await client.connect();
+    await client.connect();
 
-    //await client.query("update fooditems set pic='faina cocos.jpg' where foodname='faina cocos'");
+    await client.query("update fooditems set sizeinfo=200 where foodid=110");
 
-    //await client.end();
+    await client.end();
 })();

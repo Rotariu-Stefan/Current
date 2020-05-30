@@ -41,8 +41,15 @@ class FoodEntry extends React.Component {
     }
 
     getMacroRes = (mstr) => {
-        const { amount, measure } = this.state.foodEntry;
-        return (this.state.foodEntry[mstr] * amount / (measure === "Pieces" ? 1 : 100)).toFixed(1);
+        const { amount, measure, sizeinfo } = this.state.foodEntry;
+        if (measure === "Pieces")
+            if (sizeinfo === null)
+                return (this.state.foodEntry[mstr] * amount).toFixed(1);
+            else {
+                return (this.state.foodEntry[mstr] * amount * sizeinfo / 100).toFixed(1);
+            }
+        else if (measure === "Grams")
+            return (this.state.foodEntry[mstr] * amount / 100).toFixed(1);
     };
 
     render = () => {
