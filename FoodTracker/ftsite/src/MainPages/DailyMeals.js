@@ -151,10 +151,6 @@ class DailyMeals extends React.Component {
     };
 
     onCommit = (ev) => {
-        this.setState({
-            mealareaIsLoading: true
-        });
-
         ; (async (searchCounter) => {
             const { dayEntry, selectedDay } = this.state;
             const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
@@ -172,9 +168,6 @@ class DailyMeals extends React.Component {
             });
             res = await res.json();
 
-            setTimeout(() => this.setState({
-                mealareaIsLoading: false
-            }), 2000);
             alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
             console.log(res);
         })();
