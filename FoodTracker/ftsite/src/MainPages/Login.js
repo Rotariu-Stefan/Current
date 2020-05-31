@@ -1,14 +1,8 @@
 import React from 'react';
 import "../Css/RegLog.css";
 import { app } from '../App';
-import svData from '../svData.json';
 
 //import { NavLink } from 'react-router-dom';
-
-const getServerURL = () => {
-    return svData.serverLink;
-    //return "http://localhost:3001";
-}
 
 class Login extends React.Component {
     constructor(props) {
@@ -26,7 +20,7 @@ class Login extends React.Component {
             const usernameText = inputs[0].value;
             const passText = inputs[1].value;
 
-            let res = await fetch(getServerURL() + "/login", {
+            let res = await fetch(app.getServerURL()() + "/login", {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json"

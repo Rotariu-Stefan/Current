@@ -3,6 +3,7 @@ import Header from './Sections/Header';
 import Nav from './Sections/Nav';
 import Main from './Sections/Main';
 import Footer from './Sections/Footer';
+import svData from './svData.json';
 
 const refs = {
     main: React.createRef(),
@@ -34,6 +35,11 @@ class App extends React.Component {
             currentUser: this.defaultUser
         };
         app = this;
+    }
+
+    getServerURL = () => {
+        return svData.serverLink;
+        //return "http://localhost:3001";
     }
 
     updateUser = (res) => {

@@ -4,32 +4,6 @@ const pg = require('pg');
 const cors = require('cors');
 const { initDB, loadFromFile, showDB, qrun } = require('./dbtop');
 
-const server = express();
-server.listen(process.env.PORT || 3001, () => {
-    console.log("Running on port:", process.env.PORT || 3001);
-});
-
-let reqTotal = 0;
-server.use((req, res, next) => {
-    console.log("Total Requests:", ++reqTotal);
-    next();
-});
-server.use(bodyParser.urlencoded({ extended: false }));
-server.use(bodyParser.json());
-server.use(cors());
-
-server.get("/", (req, res) => {
-    try {
-        console.log("-----------ftserver Received @/ --- GET Req:", req.headers);
-
-        res.json("Welcome to the party! A Hero is kU!");
-
-    } catch (err) {
-        console.log("___________ERROR___________\n", err.message || err);
-        res.status(400).json("Error at Root!");
-    }
-});
-
 //server.get("/dailymeals_Deprecated", async (req, res) => {
 //    try {
 //        console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.headers);
@@ -76,6 +50,32 @@ server.get("/", (req, res) => {
 //        res.status(400).json("Error at Dailyday.meals!");
 //    }
 //});
+
+const server = express();
+server.listen(process.env.PORT || 3001, () => {
+    console.log("Running on port:", process.env.PORT || 3001);
+});
+
+let reqTotal = 0;
+server.use((req, res, next) => {
+    console.log("Total Requests:", ++reqTotal);
+    next();
+});
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.use(cors());
+
+server.get("/", (req, res) => {
+    try {
+        console.log("-----------ftserver Received @/ --- GET Req:", req.headers);
+
+        res.json("Welcome to the party! A Hero is kU!");
+
+    } catch (err) {
+        console.log("___________ERROR___________\n", err.message || err);
+        res.status(400).json("Error at Root!");
+    }
+});
 
 const runTransaction = async (req, res, type, page, TBody) => {
     console.log(`-----------ftserver Received @${page} --- ${type}\nReq:`
@@ -169,9 +169,9 @@ server.get("/dailymeals/foodsearch", (req, res) => runTransaction(req, res, "GET
     } else {
         qselFI = await client.query("SELECT *" +
             " FROM fooditems" +
-            " WHERE LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($1::varchar), '%')" +
-            " AND userid=$2;"
-            , [search, userid]);
+            " WHERE userid=$1" +
+            " AND LOWER(CONCAT(foodname, ' ', brand)) LIKE CONCAT('%', LOWER($2::varchar), '%');"
+            , [userid, search]);
     }
 
     for (fooditem of qselFI.rows) {
@@ -187,6 +187,18 @@ server.get("/dailymeals/foodsearch", (req, res) => runTransaction(req, res, "GET
     }
 
     res.json(qselFI.rows);
+}));
+
+server.get("/dailymeals/notesearch", (req, res) => runTransaction(req, res, "GET", "/dailymeals/notesearch", async (reqData, res, client) => {
+    const { userid, search } = reqData;
+
+    qselN = await client.query("SELECT *" +
+        " FROM notes" +
+        " WHERE userid=$1" +
+        " AND LOWER(CONCAT(title, ' ', notetext)) LIKE CONCAT('%', LOWER($2::varchar), '%');"
+        , [userid, search]);
+
+    res.json(qselN.rows);
 }));
 
 server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], (req, res) => runTransaction(req, res, "GET", "../fooddetails", async (reqData, res, client) => {
@@ -390,9 +402,9 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
             rejectUnauthorized: false
         }
     });
-    await client.connect();
+    //await client.connect();
 
-    await client.query("update fooditems set sizeinfo=200 where foodid=110");
+    ////await client.query("update fooditems set sizeinfo=200 where foodid=110");
 
-    await client.end();
+    //await client.end();
 })();

@@ -226,7 +226,7 @@
 /*#endregion FoodDetailsArea Block*/
 
 /*#region Note*/
-.note {
+/*.note {
     display: flex;
     align-items: center;
 }
@@ -245,5 +245,5 @@
 
     .note span:last-child {
         font-size: 0.8rem;
-    }
+    }*/
 /*#endregion Note*/
