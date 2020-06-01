@@ -226,24 +226,5 @@
 /*#endregion FoodDetailsArea Block*/
 
 /*#region Note*/
-/*.note {
-    display: flex;
-    align-items: center;
-}
 
-    .note img {
-        width: 2rem;
-        height: 2rem;
-        padding-right: 0.2rem;
-    }
-
-    .note span:first-child {
-        padding-right: 0.2rem;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-    .note span:last-child {
-        font-size: 0.8rem;
-    }*/
 /*#endregion Note*/

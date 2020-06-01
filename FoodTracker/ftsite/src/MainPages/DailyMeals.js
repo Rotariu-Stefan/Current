@@ -16,7 +16,7 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date("2020-05-16")),
+            selectedDay: dateToStr(new Date()),
             dayEntry: {},
 
             mealEntries: [],
@@ -36,10 +36,8 @@ class DailyMeals extends React.Component {
             composition: []
         };
 
-        //; (async () => {
         this.loadDailyMeals(this.state.selectedDay);
         this.loadSFoodItems("", false);
-        //})();
     }
 
     loadDailyMeals = (day) => {
@@ -101,7 +99,6 @@ class DailyMeals extends React.Component {
         const xx = this.state.searchCounter + 1;
 
         setTimeout(async (searchCounter = xx) => {
-            console.log("F:", searchCounter, "T:", this.state.searchCounter);
             if (searchCounter < this.state.searchCounter)
                 return;
 
@@ -147,7 +144,7 @@ class DailyMeals extends React.Component {
                 sFoodCounter: sFoodCounter,
                 searchareaIsLoading: false
             });
-        }, 250);
+        }, 150);
     };
 
     onCommit = (ev) => {
@@ -167,6 +164,8 @@ class DailyMeals extends React.Component {
                 body: JSON.stringify(dayPutReq)
             });
             res = await res.json();
+
+            this.loadDailyMeals(this.state.selectedDay);
 
             alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
             console.log(res);
@@ -321,6 +320,15 @@ class DailyMeals extends React.Component {
         }
     };
 
+    onUpdateAttach = (newNote) => {
+        const { dayEntry } = this.state;
+
+        dayEntry.note = newNote;
+        this.setState({
+            dayEntry: dayEntry
+        });
+    };
+
     currentEntry = () => {
         const { selectedFood, amount, measure } = this.state;
 
@@ -429,7 +437,8 @@ class DailyMeals extends React.Component {
                             <button disabled={mealareaIsLoading} onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
                         <hr />
-                        <Note note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "0")} />
+                        <Note note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "0")}
+                            updateAttach={this.onUpdateAttach}/>
                         <hr />
                     </div>
                     <div className="mealsArea">
@@ -512,9 +521,11 @@ class DailyMeals extends React.Component {
                                         <td>{measure === "Grams" ? protein + "g" : "--"}</td>
                                         <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
                                     <tr><td>Calories</td>
-                                        <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                        <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4)
+                                            .toFixed(1)
                                             + "Kc" : "--"}</td>
-                                        <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4).toFixed(1)
+                                        <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4)
+                                            .toFixed(1)
                                             + "Kc" : "--"}</td></tr>
                                     <tr><td>Price</td>
                                         <td>{measure === "Grams" ? price + "Lei" : "--"}</td>

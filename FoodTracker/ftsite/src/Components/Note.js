@@ -9,31 +9,37 @@ class Note extends React.Component {
         this.state = {
             note: props.note,
 
-            isExist: props.note ? true : false,
             isEdit: false,
-            isNewAdd: false,
+            isEditValues: false,
 
+            selectedNoteView: null,
             noteViews: [],
             noteViewsIsLoading: true,
             noteViewCounter: 0,
-            searchCounter: 0
+            searchCounter: 0,
+
+            newScore: 0,
+            newTitle: "",
+            newText: ""
         };
         this.options = [];
         for (let i = -5; i <= 5; i++)
             this.options.push(<option>{i}</option>);
     }
 
-    onEditTypeChange = (ev) => {
-        this.setState({
-            isNewAdd: ev.currentTarget.value === "new"
-        })
-    };
-
-    onAddNote = () => {
-        this.setState({
-            isEdit: true
-        });
-        this.loadNoteViews("");
+    onEditAddNote = (isValues) => {
+        if (isValues)
+            this.setState({
+                isEdit: true,
+                isEditValues: true
+            });
+        else {
+            this.setState({
+                isEdit: true,
+                isEditValues: false
+            });
+            this.loadNoteViews("");
+        }
     };
 
     loadNoteViews = (searchTerms) => {
@@ -44,7 +50,7 @@ class Note extends React.Component {
         });
         const sc = this.state.searchCounter + 1;
 
-        setTimeout(() => this.searchNoteViews(searchTerms, sc), 250);
+        setTimeout(() => this.searchNoteViews(searchTerms, sc), 150);
     };
 
     searchNoteViews = async (searchTerms, searchCounter) => {
@@ -64,67 +70,116 @@ class Note extends React.Component {
             }
         });
         res = await res.json();
-        if (searchCounter < this.state.searchCounter)       //TODO: Figure out if Necessarry !!
+        if (searchCounter < this.state.searchCounter)
             return;
 
         const noteViews = [];
+        let first = true;
         for (let n of res)
-            noteViews.push(<NoteView note={n} key={noteViewCounter++} />);
+            if (!first)
+                noteViews.push(<NoteView note={n} selectedChanged={this.onSelectedNoteViewChanged} key={noteViewCounter++} />);
+            else {
+                noteViews.push(<NoteView note={n} signalSelect={true} selectedChanged={this.onSelectedNoteViewChanged} key={noteViewCounter++} />);
+                first = false;
+            }
 
         this.setState({
             noteViews: noteViews,
             noteViewCounter: noteViewCounter,
             noteViewsIsLoading: false
         });
-    };  //TODO
+    };
+
+    onSelectedNoteViewChanged = (ev, sender) => {
+        const { selectedNoteView } = this.state;
+
+        if (sender !== selectedNoteView) {
+            if (selectedNoteView)
+                selectedNoteView.toggleSelected();
+            sender.toggleSelected();
+
+            this.setState({
+                selectedNoteView: sender,
+            });
+        }
+    }
+
+    setNote = () => {
+        const { isEditValues, newScore, newTitle, newText } = this.state;
+
+        if (isEditValues) {
+            this.props.updateAttach({
+                score: newScore,
+                title: newTitle,
+                notetext: newText
+            });
+            this.setState({
+                note: {
+                    score: newScore,
+                    title: newTitle,
+                    notetext: newText
+                },
+                isEdit: false
+            });
+        }
+        else {
+            this.props.updateAttach(this.state.selectedNoteView.state.note);
+            this.setState({
+                note: this.state.selectedNoteView.state.note,
+                isEdit: false
+            });            
+        }
+
+
+    }
 
     render = () => {
-        const { isExist, isEdit, isNewAdd, note, noteViews, noteViewsIsLoading } = this.state;
+        const { isEdit, isEditValues, note, noteViews, noteViewsIsLoading } = this.state;
 
         if (isEdit) {
             return (
                 <div className="note boxShow">
-                    <input onChange={this.onEditTypeChange} type="radio" name="editType"
-                        value="select" checked={!isNewAdd} />Select
-                    <input onChange={this.onEditTypeChange} type="radio" name="editType" value="new" />New
+                    <input onChange={(ev) => this.onEditAddNote(false)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="select" checked={!isEditValues} />Select
+                    <input onChange={(ev) => this.onEditAddNote(true)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="values" checked={isEditValues} />Values
                     <button onClick={() => { this.setState({ isEdit: false }) }}>Cancel</button>
-                    {isNewAdd
+                    {isEditValues
                         ? <div>
-                            Score:<select>
+                            Score:<select onChange={(ev) => this.setState({
+                                newScore: ev.currentTarget.value
+                            })} defaultValue={0}>
                                 {this.options}
                             </select>
-                            <br />Title:<input type="text" />
-                            <br />Text:<input type="text" />
-                            <br /><button>Add New Note</button>
+                            <br />Title:<input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" />
+                            <br />Text:<input onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} type="text" />
+                            <br /><button onClick={this.setNote}>Add New Note</button>
                         </div>
                         : < div >
                             Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" />
                             <br />Results:<div>
                                 {noteViewsIsLoading ? "LOADING..." : noteViews}
                             </div>
-                            <button>Select Note</button>
+                            <button onClick={this.setNote}>Select Note</button>
                         </div>}
                 </div>
             );
         }
         else
-            if (isExist) {
+            if (note) {
                 const { score, title, notetext } = note;
 
                 return (
                     <div className="note boxShow">
                         <img src="SitePics/starX.png" alt={"S=" + (score)} />
-                        <div>
-                            <span>{title}</span>
-                            <span>{"--" + (notetext ? notetext : "<Empty>")}</span>
-                        </div>
+                        <span>{title}</span>
+                        <span>{"--" + (notetext ? notetext : "<Empty>")}</span>
+                        <button onClick={() => this.onEditAddNote(true)}>New Note</button>
                     </div>
                 );
             }
             else
                 return (
                     <div className="note boxShow">
-                        No Note<button onClick={this.onAddNote} >Add Note</button>
+                        No Note<button onClick={this.onEditAddNote} >Add Note</button>
                     </div >
                 );
     };

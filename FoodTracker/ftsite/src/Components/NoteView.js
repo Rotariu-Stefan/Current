@@ -16,20 +16,21 @@ class NoteView extends React.Component {
 
     render = () => {
         const { isSelected, note } = this.state;
-        const { score, title, notetext } = note ? note : {
-            score: 0,
-            title: "PTitle",
-            notetext: "PText lalallaalaal"
-        };
+        const { score, title, notetext } = note;
 
         return (
-            <div className={"note boxShow" + (isSelected ? " feSelected" : "")}>
+            <div onClick={(ev)=>this.props.selectedChanged(ev,this)} className={"note boxShow" + (isSelected ? " feSelected" : "")}>
                 <img src="SitePics/starX.png" alt={"S=" + (score)} />
                 <span>{title}</span>
                 <span>{"--" + (notetext ? notetext : "<Empty>")}</span>
             </div>
         );
 
+    };
+
+    componentDidMount = () => {
+        if (this.props.signalSelect)
+            this.props.selectedChanged(null, this);
     };
 }
 

@@ -119,11 +119,6 @@ server.post("/login", (req, res) => runTransaction(req, res, "POST", "/login", a
 server.get("/dailymeals", (req, res) => runTransaction(req, res, "GET", "/dailymeals", async (reqData, res, client) => {
     const { userid, reqdate } = reqData;
 
-    const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
-        " FROM meals" +
-        " WHERE userid= $1 AND timeeaten=$2;"
-        , [userid, reqdate]);
-
     const day = {};
     const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
         " FROM notes n" +
@@ -133,8 +128,12 @@ server.get("/dailymeals", (req, res) => runTransaction(req, res, "GET", "/dailym
     if (qselN.rowCount === 1)
         day.note = qselN.rows[0];
     else
-        day.noteid = null;
+        day.note = null;
 
+    const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
+        " FROM meals" +
+        " WHERE userid= $1 AND timeeaten=$2;"
+        , [userid, reqdate]);
     day.meals = qselM.rows;
     for (meal of day.meals) {
         if (meal.noteid) {
@@ -145,6 +144,8 @@ server.get("/dailymeals", (req, res) => runTransaction(req, res, "GET", "/dailym
             meal.note = qselNM.rows[0];
             delete meal.noteid;
         }
+        else
+            meal.note = null;
 
         const qselFE = await client.query("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
             " FROM fooditems f" +
@@ -192,7 +193,7 @@ server.get("/dailymeals/foodsearch", (req, res) => runTransaction(req, res, "GET
 server.get("/dailymeals/notesearch", (req, res) => runTransaction(req, res, "GET", "/dailymeals/notesearch", async (reqData, res, client) => {
     const { userid, search } = reqData;
 
-    qselN = await client.query("SELECT *" +
+    qselN = await client.query("SELECT noteid, score, title, notetext" +
         " FROM notes" +
         " WHERE userid=$1" +
         " AND LOWER(CONCAT(title, ' ', notetext)) LIKE CONCAT('%', LOWER($2::varchar), '%');"
@@ -292,33 +293,40 @@ server.put("/yourfoods", (req, res) => runTransaction(req, res, "PUT", "/yourfoo
 }));
 
 server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailymeals", async (reqData, res, client) => {
-    const { date, userid, noteid, note, meals } = reqData;
+    const { date, userid, note, meals } = reqData;
 
     const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1 AND userid=$2;", [date, userid]);
+    const qdelDN = await client.query("DELETE FROM daynotes WHERE daydate=$1;", [date]);
 
+    //IF "noteid" is Undefined then a New Note (with data from "note") needs to be created, then referred to day
+    //IF "noteid" is Null then there is no Note to add (and no "note" data)
+    //IF "noteid" is Number then an Already Existing Note(with the respective Id) needs to be referred to day
     const returnData = { date, userid };
-    if (noteid === undefined) {
-        const { title, score, notetext } = note;
-        const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
-            " VALUES($1, $2, $3, $4)" +
-            " RETURNING noteid;"
-            , [userid, title, score, notetext]);
-        returnData.noteid = qinsN.rows[0].noteid;
-    }
-    else
-        returnData.noteid = noteid;
-    if (returnData.noteid)
+    if (note) {
+        if (!note.noteid) {
+            const { title, score, notetext } = note;
+            const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
+                " VALUES($1, $2, $3, $4)" +
+                " RETURNING noteid;"
+                , [userid, title, score, notetext]);
+            returnData.noteid = qinsN.rows[0].noteid;
+        }
+        else
+            returnData.noteid = note.noteid;
         await client.query("INSERT INTO daynotes (daydate, noteid)" +
             " VALUES($1, $2);"
             , [date, returnData.noteid]);
+    }
+    else
+        returnData.noteid = null;
 
     returnData.meals = [];
     for (meal of meals) {
 
-        const { mealname, portion, foodentries } = meal;
+        const { mealname, portion, foodentries, mnote } = meal;
         const returnMeal = { mealid: undefined };
 
-        if (meal.noteid === undefined) {
+        if (mnote && !mnote.noteid) {
             const { title, score, notetext } = meal.note;
             const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
                 " VALUES($1, $2, $3, $4)" +
@@ -327,7 +335,7 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
             returnMeal.noteid = qinsN.rows[0].noteid;
         }
         else
-            returnMeal.noteid = meal.noteid;
+            returnMeal.noteid = null;
 
         const qinsM = await client.query("INSERT INTO meals (mealname, timeeaten, portion, userid, noteid)" +
             " VALUES($1, $2, $3, $4, $5)" +

@@ -38,8 +38,8 @@ class App extends React.Component {
     }
 
     getServerURL = () => {
-        return svData.serverLink;
-        //return "http://localhost:3001";
+        //return svData.serverLink;
+        return "http://localhost:3001";
     }
 
     updateUser = (res) => {

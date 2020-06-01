@@ -43,9 +43,6 @@ class MealEntry extends React.Component {
         this.setState({
             foodEntries: foodEntries,
             foodCounter: foodCounter,
-            fat: this.state.fat,
-            carbs: this.state.carbs,
-            protein: this.state.protein
         });
     };
 
@@ -60,12 +57,23 @@ class MealEntry extends React.Component {
         ev.stopPropagation();
     };
 
+    onUpdateAttach = (newNote) => {
+        const { mealEntry } = this.state;
+
+        mealEntry.note = newNote;
+        this.setState({
+            dayEntry: mealEntry
+        });
+    };
+
     addNewFoodEntryMacros = (newfat, newcarbs, newprotein) => {
         const { portion } = this.state.mealEntry;
 
-        this.state.fat += newfat * portion;
-        this.state.carbs += newcarbs * portion;
-        this.state.protein += newprotein * portion;
+        this.setState({
+            fat: this.state.fat + newfat * portion,
+            carbs: this.state.carbs + newcarbs * portion,
+            protein: this.state.protein + newprotein * portion
+        });
     };
 
     render = () => {
@@ -81,7 +89,7 @@ class MealEntry extends React.Component {
                     <img onClick={this.toggleMinMax} src="PLACEHOLDER DROPDOWN" alt={isMin ? "+" : "-"} />
                 </div>
                 <hr />
-                <Note note={note} />
+                <Note updateAttach={this.onUpdateAttach} note={note} />
                 <hr />
                 <div className={"foodEntries lineDown" + (isMin ? " hidden" : "")}>
                     {foodEntries}
