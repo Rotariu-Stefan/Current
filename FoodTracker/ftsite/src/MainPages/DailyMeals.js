@@ -69,6 +69,7 @@ class DailyMeals extends React.Component {
                         selectedChanged={this.onSelectedMealChanged}
                         removeMeal={this.onRemoveMeal}
                         mealEntry={m}
+                        updateDay={this.updateSelectedMealNote}
                         key={mealCounter++} />);
                 else {
                     mealEntries.push(<MealEntry
@@ -76,6 +77,7 @@ class DailyMeals extends React.Component {
                         selectedChanged={this.onSelectedMealChanged}
                         removeMeal={this.onRemoveMeal}
                         mealEntry={m}
+                        updateDay={this.updateSelectedMealNote}
                         key={mealCounter++} />);
                     first = false;
                 }
@@ -209,7 +211,7 @@ class DailyMeals extends React.Component {
         const { selectedMeal, mealEntries, dayEntry } = this.state;
 
         dayEntry.meals = dayEntry.meals.filter((m) => !((m.mealid && m.mealid === sender.state.mealEntry.mealid)
-            || m.key == sender._reactInternalFiber.key));
+            || (m.key && m.key.toString() === sender._reactInternalFiber.key)));
 
         this.setState({
             mealEntries: mealEntries.filter((meal) => meal.key !== sender._reactInternalFiber.key),
@@ -238,6 +240,30 @@ class DailyMeals extends React.Component {
         }
     };
 
+    onRemoveNote = () => {
+        const { dayEntry } = this.state;
+
+        dayEntry.note = null;
+        this.setState({
+            dayEntry: dayEntry
+        });
+    };
+
+    updateSelectedMealNote = () => {
+        const { dayEntry, selectedMeal } = this.state;
+
+        for (let m of dayEntry.meals)
+            if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
+                || selectedMeal._reactInternalFiber.key === m.key.toString()) {
+                m.note = selectedMeal.state.mealEntry.note;
+                break;
+            }
+
+        this.setState({
+            dayEntry: dayEntry
+        });
+    };
+
     onAddNewFoodEntry = (ev) => {
         const { selectedMeal, selectedFood, dayEntry, amount, measure } = this.state;
 
@@ -261,8 +287,10 @@ class DailyMeals extends React.Component {
                 selectedMeal.addNewFoodEntry(ev, newFoodEntry);
                 for (let m of dayEntry.meals)
                     if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                        || selectedMeal._reactInternalFiber.key == m.key)
+                        || (m.key && selectedMeal._reactInternalFiber.key === m.key.toString())) {
                         m.foodentries.push(newFoodEntry);
+                        break;
+                    }
 
                 this.setState({
                     dayEntry: dayEntry
@@ -396,6 +424,9 @@ class DailyMeals extends React.Component {
     };
 
     onAmountKey = (ev) => {
+
+        console.log("DAY:", this.state.dayEntry);
+
         switch (ev.key) {
             case "Enter":
                 this.onAddNewFoodEntry();
@@ -437,8 +468,8 @@ class DailyMeals extends React.Component {
                             <button disabled={mealareaIsLoading} onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
                         <hr />
-                        <Note note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "0")}
-                            updateAttach={this.onUpdateAttach}/>
+                        {mealareaIsLoading ? "LOADING..."
+                            : <Note removeNote={this.onRemoveNote} note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "0")} updateAttach={this.onUpdateAttach} />}
                         <hr />
                     </div>
                     <div className="mealsArea">
@@ -496,7 +527,7 @@ class DailyMeals extends React.Component {
                         <div className="foodDetailsHeader">
                             <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
                             <hr />
-                            <Note note={selectedFoodDetails ? selectedFoodDetails.note : null}
+                            <Note removeNote={() => { }} note={selectedFoodDetails ? selectedFoodDetails.note : null}
                                 key={"F" + (selectedFoodDetails.note ? selectedFoodDetails.note.noteid : "0")} />
                             <hr />
                         </div>

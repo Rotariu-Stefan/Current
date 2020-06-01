@@ -127,7 +127,7 @@ class Note extends React.Component {
             this.setState({
                 note: this.state.selectedNoteView.state.note,
                 isEdit: false
-            });            
+            });
         }
 
 
@@ -138,7 +138,7 @@ class Note extends React.Component {
 
         if (isEdit) {
             return (
-                <div className="note boxShow">
+                <div className="noteEdit boxShow">
                     <input onChange={(ev) => this.onEditAddNote(false)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="select" checked={!isEditValues} />Select
                     <input onChange={(ev) => this.onEditAddNote(true)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="values" checked={isEditValues} />Values
                     <button onClick={() => { this.setState({ isEdit: false }) }}>Cancel</button>
@@ -150,15 +150,15 @@ class Note extends React.Component {
                                 {this.options}
                             </select>
                             <br />Title:<input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" />
-                            <br />Text:<input onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} type="text" />
-                            <br /><button onClick={this.setNote}>Add New Note</button>
+                            <br />Text:<textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} />
+                            <button onClick={this.setNote}>Add New Note</button>
                         </div>
                         : < div >
                             Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" />
-                            <br />Results:<div>
+                            <button onClick={this.setNote}>Select Note</button>
+                            <div>
                                 {noteViewsIsLoading ? "LOADING..." : noteViews}
                             </div>
-                            <button onClick={this.setNote}>Select Note</button>
                         </div>}
                 </div>
             );
@@ -169,10 +169,13 @@ class Note extends React.Component {
 
                 return (
                     <div className="note boxShow">
-                        <img src="SitePics/starX.png" alt={"S=" + (score)} />
-                        <span>{title}</span>
-                        <span>{"--" + (notetext ? notetext : "<Empty>")}</span>
-                        <button onClick={() => this.onEditAddNote(true)}>New Note</button>
+                        <img src="SitePics/starX.png" alt={"S=" + (score)} className="scoreImg" />
+                        <img onClick={() => this.onEditAddNote(true)} src="PLACEHOLDER EDIT"
+                            alt="New" className="managerImg" />
+                        <img onClick={this.props.removeNote} src="PLACEHOLDER CLOSE"
+                            alt="X" className="managerImg" />
+                        <span className="title">{title}</span>
+                        <span className="notetext">{"--" + (notetext ? notetext : "<Empty>")}</span>
                     </div>
                 );
             }

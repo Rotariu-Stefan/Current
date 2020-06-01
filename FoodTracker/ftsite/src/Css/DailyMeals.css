@@ -72,10 +72,15 @@
     font-weight: bold;
 }
 
-    .mealTitle img {
-        float: right;
-        padding: 0 0.5rem;
-        border: 1px solid black;
+.managerImg {
+    float: right;
+    padding: 0 0.5rem;
+    border: 1px solid black;
+}
+
+    .managerImg:hover {
+        color: coral;
+        background-color: saddlebrown;
     }
 
 .foodEntry {
@@ -226,5 +231,39 @@
 /*#endregion FoodDetailsArea Block*/
 
 /*#region Note*/
+.note, .noteEdit {
+    color: black;
+    background-color: rgba(143, 136, 80, 0.25);
+}
+
+.note .managerImg:hover, .noteView:hover, .nSelected {
+    color: yellow;
+    background-color: slategrey;
+}
+
+.scoreImg {
+    float: left;
+    padding: 0 0.5rem;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.notetext {
+    font-size: 0.8rem;
+}
+
+.noteEdit {
+    max-height: 10rem;
+    overflow: auto;
+}
+
+    .note button, .noteEdit button {
+        color: yellow;
+        background-color: slategrey;
+        float: right;
+    }
 
 /*#endregion Note*/

@@ -66,6 +66,16 @@ class MealEntry extends React.Component {
         });
     };
 
+    onRemoveNote = () => {
+        const { mealEntry } = this.state;
+
+        mealEntry.note = null;
+        this.setState({
+            mealEntry: mealEntry
+        });
+        this.props.updateDay();
+    };
+
     addNewFoodEntryMacros = (newfat, newcarbs, newprotein) => {
         const { portion } = this.state.mealEntry;
 
@@ -85,11 +95,14 @@ class MealEntry extends React.Component {
                 className={"mealArea boxShow" + (isHighlighted ? " highlight" : "")}>
                 <div className="mealTitle">
                     {mealname}
-                    <img onClick={(ev) => this.props.removeMeal(ev, this)} src="PLACEHOLDER DROPDOWN" alt="X" />
-                    <img onClick={this.toggleMinMax} src="PLACEHOLDER DROPDOWN" alt={isMin ? "+" : "-"} />
+                    <img onClick={(ev) => this.props.removeMeal(ev, this)} src="PLACEHOLDER CLOSE" alt="X"
+                        className="managerImg" />
+                    <img onClick={this.toggleMinMax} src="PLACEHOLDER MIN/MAX" alt={isMin ? "+" : "-"}
+                        className="managerImg" />
                 </div>
                 <hr />
-                <Note updateAttach={this.onUpdateAttach} note={note} />
+                <Note removeNote={this.onRemoveNote} updateAttach={this.onUpdateAttach} note={note}
+                    key={this._reactInternalFiber.key + "_note"} />
                 <hr />
                 <div className={"foodEntries lineDown" + (isMin ? " hidden" : "")}>
                     {foodEntries}

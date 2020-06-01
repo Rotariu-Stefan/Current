@@ -298,9 +298,6 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
     const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1 AND userid=$2;", [date, userid]);
     const qdelDN = await client.query("DELETE FROM daynotes WHERE daydate=$1;", [date]);
 
-    //IF "noteid" is Undefined then a New Note (with data from "note") needs to be created, then referred to day
-    //IF "noteid" is Null then there is no Note to add (and no "note" data)
-    //IF "noteid" is Number then an Already Existing Note(with the respective Id) needs to be referred to day
     const returnData = { date, userid };
     if (note) {
         if (!note.noteid) {
@@ -323,16 +320,21 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
     returnData.meals = [];
     for (meal of meals) {
 
-        const { mealname, portion, foodentries, mnote } = meal;
+        const { mealname, portion, foodentries, note } = meal;
         const returnMeal = { mealid: undefined };
 
-        if (mnote && !mnote.noteid) {
-            const { title, score, notetext } = meal.note;
-            const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
-                " VALUES($1, $2, $3, $4)" +
-                " RETURNING noteid;"
-                , [userid, title, score, notetext]);
-            returnMeal.noteid = qinsN.rows[0].noteid;
+        if (note) {
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", note);
+            if (!note.noteid) {
+                const { title, score, notetext } = note;
+                const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
+                    " VALUES($1, $2, $3, $4)" +
+                    " RETURNING noteid;"
+                    , [userid, title, score, notetext]);
+                returnMeal.noteid = qinsN.rows[0].noteid;
+            }
+            else
+                returnMeal.noteid = note.noteid;
         }
         else
             returnMeal.noteid = null;
