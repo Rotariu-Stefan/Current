@@ -424,9 +424,6 @@ class DailyMeals extends React.Component {
     };
 
     onAmountKey = (ev) => {
-
-        console.log("DAY:", this.state.dayEntry);
-
         switch (ev.key) {
             case "Enter":
                 this.onAddNewFoodEntry();
@@ -467,18 +464,13 @@ class DailyMeals extends React.Component {
                             <input disabled={mealareaIsLoading} onChange={(ev) => this.loadDailyMeals(ev.currentTarget.value)} id="selectedDay" type="date" value={selectedDay} />
                             <button disabled={mealareaIsLoading} onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
-                        <hr />
                         {mealareaIsLoading ? "LOADING..."
                             : <Note removeNote={this.onRemoveNote} note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "0")} updateAttach={this.onUpdateAttach} />}
-                        <hr />
                     </div>
                     <div className="mealsArea">
                         {mealareaIsLoading ? "LOADING..." : mealEntries}
                     </div>
-                    <div className="dayAreaButtons">
-                        <button disabled={mealareaIsLoading} onClick={this.onCommit} className="ftButton">COMMIT DAY!</button>
-                        <button disabled={mealareaIsLoading} onClick={this.onAddNewMeal} className="newMeal ftButton">NEW MEAL</button>
-                    </div>
+                    <button disabled={mealareaIsLoading} onClick={this.onCommit} className="ftButton">COMMIT DAY!</button>
                 </div>
 
 
@@ -518,7 +510,14 @@ class DailyMeals extends React.Component {
                     <div className="searchEntry boxShow">
                         <label className="textHigh lineDown">Current Entry:</label>
                         {this.currentEntry()}
-                        <button disabled={searchareaIsLoading} onClick={this.onAddNewFoodEntry} className="ftButton">ADD TO MEAL</button>
+                        <button disabled={searchareaIsLoading} onClick={this.onAddNewFoodEntry} className="ftButton">ADD FOOD ENTRY</button>
+                    </div>
+                    <div className="addMealArea">
+                        <label className="textHigh">Meal Name:</label>
+                        <input className="newMName" type="text" />
+                        <label className="textHigh">Portion:</label>
+                        <input className="newMPortion" type="text" />
+                        <button disabled={mealareaIsLoading} onClick={this.onAddNewMeal} className="newMeal ftButton">ADD NEW MEAL</button>
                     </div>
                 </div>
 
@@ -526,10 +525,8 @@ class DailyMeals extends React.Component {
                     <div id="foodDetailsArea" className="subblock boxShow">
                         <div className="foodDetailsHeader">
                             <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
-                            <hr />
                             <Note removeNote={() => { }} note={selectedFoodDetails ? selectedFoodDetails.note : null}
                                 key={"F" + (selectedFoodDetails.note ? selectedFoodDetails.note.noteid : "0")} />
-                            <hr />
                         </div>
                         <div className="foodPic boxShow">
                             <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />

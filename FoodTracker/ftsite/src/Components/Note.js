@@ -24,7 +24,7 @@ class Note extends React.Component {
         };
         this.options = [];
         for (let i = -5; i <= 5; i++)
-            this.options.push(<option>{i}</option>);
+            this.options.push(<option key={i}>{i}</option>);
     }
 
     onEditAddNote = (isValues) => {
@@ -110,13 +110,13 @@ class Note extends React.Component {
         if (isEditValues) {
             this.props.updateAttach({
                 score: newScore,
-                title: newTitle,
+                title: newTitle === "" ? "Untitled" : newTitle,
                 notetext: newText
             });
             this.setState({
                 note: {
                     score: newScore,
-                    title: newTitle,
+                    title: newTitle === "" ? "Untitled" : newTitle,
                     notetext: newText
                 },
                 isEdit: false
@@ -129,34 +129,41 @@ class Note extends React.Component {
                 isEdit: false
             });
         }
-
-
     }
 
     render = () => {
         const { isEdit, isEditValues, note, noteViews, noteViewsIsLoading } = this.state;
+        if (this.props.isMin)
+            return <hr />;
 
         if (isEdit) {
             return (
                 <div className="noteEdit boxShow">
-                    <input onChange={(ev) => this.onEditAddNote(false)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="select" checked={!isEditValues} />Select
+                    <div className="editChoices">
+                        <input onChange={(ev) => this.onEditAddNote(false)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="select" checked={!isEditValues} />Select
                     <input onChange={(ev) => this.onEditAddNote(true)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="values" checked={isEditValues} />Values
                     <button onClick={() => { this.setState({ isEdit: false }) }}>Cancel</button>
+                    </div>
                     {isEditValues
-                        ? <div>
-                            Score:<select onChange={(ev) => this.setState({
-                                newScore: ev.currentTarget.value
-                            })} defaultValue={0}>
-                                {this.options}
-                            </select>
-                            <br />Title:<input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" />
-                            <br />Text:<textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} />
-                            <button onClick={this.setNote}>Add New Note</button>
-                        </div>
-                        : < div >
-                            Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" />
-                            <button onClick={this.setNote}>Select Note</button>
+                        ? <div className="newNote">
+                            <span>Score:</span>
                             <div>
+                                <select onChange={(ev) => this.setState({
+                                    newScore: ev.currentTarget.value
+                                })} defaultValue={0}>
+                                    {this.options}
+                                </select>
+                                <button onClick={this.setNote}>Set New Note</button>
+                            </div>
+                            <span>Title:</span><input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" />
+                            <span>Text:</span><textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} />
+                        </div>
+                        : < div>
+                            <div className="noteSearch">
+                                Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" />
+                                <button onClick={this.setNote}>Select Note</button>
+                            </div>
+                            <div className="noteSearchArea">
                                 {noteViewsIsLoading ? "LOADING..." : noteViews}
                             </div>
                         </div>}
@@ -169,20 +176,20 @@ class Note extends React.Component {
 
                 return (
                     <div className="note boxShow">
-                        <img src="SitePics/starX.png" alt={"S=" + (score)} className="scoreImg" />
-                        <img onClick={() => this.onEditAddNote(true)} src="PLACEHOLDER EDIT"
-                            alt="New" className="managerImg" />
-                        <img onClick={this.props.removeNote} src="PLACEHOLDER CLOSE"
+                        <img src="SitePics/star.png" alt={"S=" + (score)} className="scoreImg" />
+                        <img onClick={this.props.removeNote} src="SitePics/icons8-close-window-16.png"
                             alt="X" className="managerImg" />
+                        <img onClick={() => this.onEditAddNote(true)} src="SitePics/icons8-edit-16.png"
+                            alt="New" className="managerImg" />
                         <span className="title">{title}</span>
-                        <span className="notetext">{"--" + (notetext ? notetext : "<Empty>")}</span>
+                        <span className="notetext">{notetext ? "--" + notetext : ""}</span>
                     </div>
                 );
             }
             else
                 return (
                     <div className="note boxShow">
-                        No Note<button onClick={this.onEditAddNote} >Add Note</button>
+                        No Note<img className="managerImg" src="SitePics/icons8-plus-16.png" alt="New" onClick={this.onEditAddNote} />
                     </div >
                 );
     };

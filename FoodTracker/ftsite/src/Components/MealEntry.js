@@ -6,7 +6,7 @@ class MealEntry extends React.Component {
     static defaultMealEntry = {
         mealname: "New Meal",
         portion: 1,
-        noteid: null,
+        note: null,
         foodentries: []
     };
 
@@ -14,7 +14,7 @@ class MealEntry extends React.Component {
         super(props);
 
         this.state = {
-            mealEntry: props.mealEntry ? props.mealEntry : MealEntry.defaultMealEntry,
+            mealEntry: props.mealEntry ? props.mealEntry : { ...MealEntry.defaultMealEntry },
             foodEntries: [],
             foodCounter: 0,
             isHighlighted: false,
@@ -28,7 +28,7 @@ class MealEntry extends React.Component {
             for (let f of props.mealEntry.foodentries) {
                 this.state.foodEntries.push(<FoodEntry
                     foodEntry={f}
-                    addToMeal={this.addNewFoodEntryMacros}
+                    addToMeal={this.addInitialFoodEntryMacros}
                     key={this.state.foodCounter} />);
                 this.state.foodCounter++;
             }
@@ -86,6 +86,14 @@ class MealEntry extends React.Component {
         });
     };
 
+    addInitialFoodEntryMacros = (newfat, newcarbs, newprotein) => {
+        const { portion } = this.state.mealEntry;
+
+        this.state.fat += newfat * portion;
+        this.state.carbs += newcarbs * portion;
+        this.state.protein += newprotein * portion;
+    }
+
     render = () => {
         const { mealEntry, isHighlighted, isMin, foodEntries, fat, carbs, protein } = this.state;
         const { mealname, note } = mealEntry;
@@ -95,15 +103,13 @@ class MealEntry extends React.Component {
                 className={"mealArea boxShow" + (isHighlighted ? " highlight" : "")}>
                 <div className="mealTitle">
                     {mealname}
-                    <img onClick={(ev) => this.props.removeMeal(ev, this)} src="PLACEHOLDER CLOSE" alt="X"
+                    <img onClick={(ev) => this.props.removeMeal(ev, this)} src="SitePics/icons8-cancel-20.png" alt="X"
                         className="managerImg" />
-                    <img onClick={this.toggleMinMax} src="PLACEHOLDER MIN/MAX" alt={isMin ? "+" : "-"}
+                    <img onClick={this.toggleMinMax} src={isMin ? "SitePics/icons8-plus-20.png" : "SitePics/icons8-minus-20.png"} alt={isMin ? "+" : "-"}
                         className="managerImg" />
                 </div>
-                <hr />
                 <Note removeNote={this.onRemoveNote} updateAttach={this.onUpdateAttach} note={note}
-                    key={this._reactInternalFiber.key + "_note"} />
-                <hr />
+                    key={this._reactInternalFiber.key + "_note"} isMin={isMin}/>
                 <div className={"foodEntries lineDown" + (isMin ? " hidden" : "")}>
                     {foodEntries}
                 </div>

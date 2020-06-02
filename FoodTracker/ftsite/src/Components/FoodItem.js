@@ -17,7 +17,7 @@ class FoodItem extends React.Component {
         super(props);
 
         this.state = {
-            foodItem: (props.foodItem) ? props.foodItem : this.defaultFoodItem,
+            foodItem: (props.foodItem) ? props.foodItem : { ...FoodItem.defaultFoodItem },
             isSelected: false
         };
     }

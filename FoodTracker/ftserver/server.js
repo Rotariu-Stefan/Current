@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const pg = require('pg');
 const cors = require('cors');
-const { initDB, loadFromFile, showDB, qrun } = require('./dbtop');
+const { initDB, loadFromFile, showDB } = require('./dbtop');
 
 //server.get("/dailymeals_Deprecated", async (req, res) => {
 //    try {
@@ -56,12 +56,12 @@ server.listen(process.env.PORT || 3001, () => {
     console.log("Running on port:", process.env.PORT || 3001);
 });
 
-let reqTotal = 0;
-server.use((req, res, next) => {
-    console.log("Total Requests:", ++reqTotal);
-    next();
-});
-server.use(bodyParser.urlencoded({ extended: false }));
+//let reqTotal = 0;
+//server.use((req, res, next) => {
+//    console.log("Total Requests:", ++reqTotal);
+//    next();
+//});
+//server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 server.use(cors());
 
@@ -78,8 +78,7 @@ server.get("/", (req, res) => {
 });
 
 const runTransaction = async (req, res, type, page, TBody) => {
-    console.log(`-----------ftserver Received @${page} --- ${type}\nReq:`
-        , type === "GET" ? req.headers : req.body);
+    console.log(`-----------ftserver Received @${page} --- ${type}`);
     const client = new pg.Client({
         connectionString: process.env.DATABASE_URL || process.argv[2],
         ssl: {
@@ -104,6 +103,7 @@ const runTransaction = async (req, res, type, page, TBody) => {
 
 server.post("/login", (req, res) => runTransaction(req, res, "POST", "/login", async (reqData, res, client) => {
     const { username, pass } = reqData;
+    console.log("ReqData:", username, pass);
 
     const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access" +
         " FROM users" +
@@ -118,6 +118,7 @@ server.post("/login", (req, res) => runTransaction(req, res, "POST", "/login", a
 
 server.get("/dailymeals", (req, res) => runTransaction(req, res, "GET", "/dailymeals", async (reqData, res, client) => {
     const { userid, reqdate } = reqData;
+    console.log("ReqData:", userid, reqdate);
 
     const day = {};
     const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
@@ -160,6 +161,7 @@ server.get("/dailymeals", (req, res) => runTransaction(req, res, "GET", "/dailym
 
 server.get("/dailymeals/foodsearch", (req, res) => runTransaction(req, res, "GET", "/dailymeals/foodsearch", async (reqData, res, client) => {
     const { userid, search, isall } = reqData;
+    console.log("ReqData:", userid, search, isall);
 
     let qselFI;
     if (isall === "true") {
@@ -192,6 +194,7 @@ server.get("/dailymeals/foodsearch", (req, res) => runTransaction(req, res, "GET
 
 server.get("/dailymeals/notesearch", (req, res) => runTransaction(req, res, "GET", "/dailymeals/notesearch", async (reqData, res, client) => {
     const { userid, search } = reqData;
+    console.log("ReqData:", userid, search);
 
     qselN = await client.query("SELECT noteid, score, title, notetext" +
         " FROM notes" +
@@ -204,6 +207,7 @@ server.get("/dailymeals/notesearch", (req, res) => runTransaction(req, res, "GET
 
 server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], (req, res) => runTransaction(req, res, "GET", "../fooddetails", async (reqData, res, client) => {
     const { foodid, isdish, noteid } = reqData;
+    console.log("ReqData:", foodid, isdish, noteid);
 
     const details = { foodid };
     if (noteid !== "null") {
@@ -228,6 +232,7 @@ server.get(["/dailymeals/fooddetails", "/yourfood/fooddetails"], (req, res) => r
 
 server.get("/yourfoods", (req, res) => runTransaction(req, res, "GET", "/yourfoods", async (reqData, res, client) => {
     const { userid } = reqData;
+    console.log("ReqData:", userid);
 
     const qselF = await client.query("SELECT *" +
         " FROM fooditems" +
@@ -239,6 +244,7 @@ server.get("/yourfoods", (req, res) => runTransaction(req, res, "GET", "/yourfoo
 
 server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register", async (reqData, res, client) => {
     const { username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass } = reqData;
+    console.log("ReqData:", reqData);
 
     const qselU = await client.query("SELECT userid" +
         "FROM users WHERE email=$1 OR username=$2;", [email, username]);
@@ -255,6 +261,7 @@ server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register
 
 server.put("/yourfoods", (req, res) => runTransaction(req, res, "PUT", "/yourfoods", async (reqData, res, client) => {
     const { foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, foodentries } = reqData;
+    console.log("ReqData:", reqData);
 
     const returnData = { foodid: undefined };
     if (noteid === undefined) {
@@ -294,6 +301,7 @@ server.put("/yourfoods", (req, res) => runTransaction(req, res, "PUT", "/yourfoo
 
 server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailymeals", async (reqData, res, client) => {
     const { date, userid, note, meals } = reqData;
+    console.log("ReqData:", reqData);
 
     const qdelM = await client.query("DELETE FROM meals WHERE timeeaten=$1 AND userid=$2;", [date, userid]);
     const qdelDN = await client.query("DELETE FROM daynotes WHERE daydate=$1;", [date]);
@@ -362,6 +370,7 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
 
 server.post("/profile", (req, res) => runTransaction(req, res, "POST", "/profile", async (reqData, res, client) => {
     const { userid, username, email, firstname, lastname, dob, sex, describe, pic } = reqData;
+    console.log("ReqData:", userid, reqdate);
 
     const qupd = await client.query("UPDATE users" +
         " SET username=$1, email=$2, firstname=$3, lastname=$4, dob=$5, sex=$6, describe=$7, pic=$8" +
@@ -373,6 +382,7 @@ server.post("/profile", (req, res) => runTransaction(req, res, "POST", "/profile
 
 server.post("/profile/changepass", (req, res) => runTransaction(req, res, "POST", "/profile/changepass", async (reqData, res, client) => {
     const { userid, oldpass, newpass } = reqData;
+    console.log("ReqData:", reqData);
 
     const qsel = await client.query("SELECT userid" +
         " FROM users" +
@@ -406,15 +416,15 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
 ; (async () => {
     //await showDB(process.argv[2]);
 
-    const client = new pg.Client({
-        connectionString: process.env.DATABASE_URL || process.argv[2],
-        ssl: {
-            rejectUnauthorized: false
-        }
-    });
+    //const client = new pg.Client({
+    //    connectionString: process.env.DATABASE_URL || process.argv[2],
+    //    ssl: {
+    //        rejectUnauthorized: false
+    //    }
+    //});
     //await client.connect();
 
-    ////await client.query("update fooditems set sizeinfo=200 where foodid=110");
+    //await client.query("...");
 
     //await client.end();
 })();

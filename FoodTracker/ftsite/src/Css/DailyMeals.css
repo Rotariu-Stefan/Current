@@ -54,13 +54,10 @@
     overflow: auto;
 }
 
-.dayAreaButtons {
-    display: flex;
-    justify-content: space-around;
-}
-
 .mealArea {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
 }
 
     .mealArea:hover {
@@ -74,8 +71,7 @@
 
 .managerImg {
     float: right;
-    padding: 0 0.5rem;
-    border: 1px solid black;
+    padding: 0 0.3rem;
 }
 
     .managerImg:hover {
@@ -184,8 +180,19 @@
     font-size: 1.1rem;
 }
 
+.addMealArea{
+    margin-top:0.7rem;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+}
+    .addMealArea input {
+        height: 1.5rem;
+        font-weight: bold;
+    }
+    .newMPortion{
+        width:20%;
+    }
 /*#endregion SearchArea Block*/
-
 /*#region FoodDetailsArea Block*/
 #foodDetailsArea {
     display: flex;
@@ -234,36 +241,64 @@
 .note, .noteEdit {
     color: black;
     background-color: rgba(143, 136, 80, 0.25);
+    border:1px dotted slategrey;
+    border-radius: 10px;
 }
 
-.note .managerImg:hover, .noteView:hover, .nSelected {
-    color: yellow;
-    background-color: slategrey;
-}
+    .note .managerImg:hover, .noteView:hover, .nSelected {
+        color: lightyellow;
+        background-color: slategrey;
+    }
 
-.scoreImg {
-    float: left;
-    padding: 0 0.5rem;
-}
+    .note .scoreImg {
+        float: left;
+        padding: 0 0.3rem;
+    }
 
-.title {
-    font-weight: bold;
-    font-size: 1rem;
-}
+    .note .title {
+        font-weight: bold;
+        font-size: 1rem;
+    }
 
-.notetext {
-    font-size: 0.8rem;
-}
+    .note .notetext {
+        font-size: 0.8rem;
+    }
 
 .noteEdit {
-    max-height: 10rem;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
 }
 
+    .noteEdit .editChoices input {
+        margin: 0 0.3rem;
+    }
+
     .note button, .noteEdit button {
-        color: yellow;
+        height: 1.3rem;
+        color: lightyellow;
         background-color: slategrey;
+        font-size: 0.8rem;
         float: right;
     }
 
+    .noteEdit .newNote {
+        display: grid;
+        grid-template-columns: auto 1fr;
+    }
+
+    .noteEdit .noteSearch {
+        height: 1.5rem;
+        display: flex;
+    }
+
+        .noteEdit .noteSearch input {
+            height: 1.3rem;
+            flex: auto;
+            font-size: 0.8rem;
+        }
+
+    .noteEdit .noteSearchArea {
+        max-height: 8rem;
+        overflow: auto;
+    }
 /*#endregion Note*/

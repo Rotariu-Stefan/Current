@@ -26,7 +26,7 @@ class FoodEntry extends React.Component {
             foodEntry.measure = props.measure;
         }
         else
-            foodEntry = FoodEntry.defaultFoodEntry;
+            foodEntry = { ...FoodEntry.defaultFoodEntry };
 
         this.state = {
             foodEntry: foodEntry
@@ -35,9 +35,6 @@ class FoodEntry extends React.Component {
         this.state.fatRes = this.getMacroRes("fat");
         this.state.carbsRes = this.getMacroRes("carbs");
         this.state.proteinRes = this.getMacroRes("protein");
-
-        if (this.props.addToMeal)
-            this.props.addToMeal(this.state.fatRes, this.state.carbsRes, this.state.proteinRes);
     }
 
     getMacroRes = (mstr) => {
@@ -66,6 +63,14 @@ class FoodEntry extends React.Component {
             </div>
         );
     };
+
+    componentDidMount = () => {
+        const { fatRes, carbsRes, proteinRes } = this.state;
+
+        if (this.props.addToMeal) {
+            this.props.addToMeal(fatRes, carbsRes, proteinRes);
+        }
+    }
 }
 
 export default FoodEntry;
