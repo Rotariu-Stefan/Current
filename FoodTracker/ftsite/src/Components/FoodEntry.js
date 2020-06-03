@@ -54,7 +54,7 @@ class FoodEntry extends React.Component {
         const { foodname, brand, amount, fat, carbs, protein } = foodEntry;
 
         return (
-            <div className="foodEntry lineDown">
+            <div className={"foodEntry " + this.props.className}>
                 <span className="amount">{amount}</span>
                 <span className="name_brand">{`${foodname} ${brand ? "@" + brand : ""}`}</span>
                 <span className="macro">{`${fat}/${carbs}/${protein}`}</span>

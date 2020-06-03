@@ -18,6 +18,9 @@ class DailyMeals extends React.Component {
         this.state = {
             selectedDay: dateToStr(new Date()),
             dayEntry: {},
+            dayFat: 0,
+            dayCarbs: 0,
+            dayProtein: 0,
 
             mealEntries: [],
             selectedMeal: null,
@@ -43,7 +46,11 @@ class DailyMeals extends React.Component {
     loadDailyMeals = (day) => {
         this.setState({
             mealEntries: [],
-            mealareaIsLoading: true
+            mealareaIsLoading: true,
+            selectedMeal:null,
+            dayFat: 0,
+            dayCarbs: 0,
+            dayProtein: 0
         });
 
         ; (async () => {
@@ -66,6 +73,7 @@ class DailyMeals extends React.Component {
             for (let m of res.meals)
                 if (!first)
                     mealEntries.push(<MealEntry
+                        addToDay={this.addNewFoodEntryMacros}
                         selectedChanged={this.onSelectedMealChanged}
                         removeMeal={this.onRemoveMeal}
                         mealEntry={m}
@@ -74,6 +82,7 @@ class DailyMeals extends React.Component {
                 else {
                     mealEntries.push(<MealEntry
                         signalSelect={true}
+                        addToDay={this.addNewFoodEntryMacros}
                         selectedChanged={this.onSelectedMealChanged}
                         removeMeal={this.onRemoveMeal}
                         mealEntry={m}
@@ -174,37 +183,52 @@ class DailyMeals extends React.Component {
         })();
     };
 
-    onAddNewMeal = (ev) => {    //TODO
+    onAddNewMeal = (ev) => {
         const { mealEntries, dayEntry, selectedMeal } = this.state;
         let { mealCounter } = this.state;
 
+        const newMPortion = document.querySelector(".newMPortion");
+        if (isNaN(newMPortion.value)) {
+            alert("Must Enter Valid Number for Portion!");
+            newMPortion.value = "";
+            return;
+        }
+        const newMName = document.querySelector(".newMName");
+        const newMeal = {
+            mealname: newMName.value === "" ? newMName.placeholder : newMName.value,
+            portion: newMPortion.value === "" ? newMPortion.placeholder : newMPortion.value,
+            noteid: null,
+            foodentries: []
+        };
         if (selectedMeal)
             mealEntries.push(<MealEntry
+                mealEntry={newMeal}
+                addToDay={this.addNewFoodEntryMacros}
                 selectedChanged={this.onSelectedMealChanged}
                 removeMeal={this.onRemoveMeal}
-                key={mealCounter++}
+                key={mealCounter}
             />);
         else
             mealEntries.push(<MealEntry
                 signalSelect={true}
+                mealEntry={newMeal}
+                addToDay={this.addNewFoodEntryMacros}
                 selectedChanged={this.onSelectedMealChanged}
                 removeMeal={this.onRemoveMeal}
-                key={mealCounter++}
+                key={mealCounter}
             />);
 
-        dayEntry.meals.push({       //TODO: Must make Custamizable
-            key: mealCounter - 1,
-            mealname: "New Meal",
-            portion: 1,
-            noteid: null,
-            foodentries: []
-        });
+        newMeal.key = mealCounter;
+        dayEntry.meals.push(newMeal);
 
+        newMName.value = "";
+        newMPortion.value = "";
         this.setState({
             mealEntries: mealEntries,
-            mealCounter: mealCounter,
+            mealCounter: mealCounter + 1,
             dayEntry: dayEntry
         });
+        document.querySelector("#search").select();
     };
 
     onRemoveMeal = (ev, sender) => {
@@ -238,6 +262,13 @@ class DailyMeals extends React.Component {
                 selectedMeal: sender
             });
         }
+    };
+
+    addNewFoodEntryMacros = (newfat, newcarb, newprotein) => {
+        this.state.dayFat += newfat;
+        this.state.dayCarbs += newcarb;
+        this.state.dayProtein += newprotein;
+        this.setState({});
     };
 
     onRemoveNote = () => {
@@ -451,7 +482,7 @@ class DailyMeals extends React.Component {
     };//TODO?
 
     render = () => {
-        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems } = this.state;
+        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, mealCounter, dayFat, dayCarbs, dayProtein } = this.state;
         const { foodname, brand, fat, carbs, protein, price, pic } = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
 
         return (
@@ -469,6 +500,11 @@ class DailyMeals extends React.Component {
                     </div>
                     <div className="mealsArea">
                         {mealareaIsLoading ? "LOADING..." : mealEntries}
+                    </div>
+                    <hr />
+                    <div className="dayTotal">
+                        <span>Day Total:</span>
+                        <span>{`${dayFat.toFixed(1)}||${dayCarbs.toFixed(1)}||${dayProtein.toFixed(1)}`}</span>
                     </div>
                     <button disabled={mealareaIsLoading} onClick={this.onCommit} className="ftButton">COMMIT DAY!</button>
                 </div>
@@ -512,11 +548,14 @@ class DailyMeals extends React.Component {
                         {this.currentEntry()}
                         <button disabled={searchareaIsLoading} onClick={this.onAddNewFoodEntry} className="ftButton">ADD FOOD ENTRY</button>
                     </div>
+                    <hr />
                     <div className="addMealArea">
-                        <label className="textHigh">Meal Name:</label>
-                        <input className="newMName" type="text" />
-                        <label className="textHigh">Portion:</label>
-                        <input className="newMPortion" type="text" />
+                        <div>
+                            <label className="textHigh">Meal Name:</label>
+                            <input className="newMName" type="text" placeholder={"Meal" + (mealCounter + 1)} />
+                            <label className="textHigh">Portion:</label>
+                            <input className="newMPortion" type="text" placeholder="1" />
+                        </div>
                         <button disabled={mealareaIsLoading} onClick={this.onAddNewMeal} className="newMeal ftButton">ADD NEW MEAL</button>
                     </div>
                 </div>
@@ -560,9 +599,8 @@ class DailyMeals extends React.Component {
                                         <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
                                 </tbody>
                             </table>
-                            <div className="buffer"></div>
+                            <div className="comp textHigh">Composition:</div>
                             <div className="foodEntries boxShow">
-                                <label className="textHigh lineDown">Composition:</label>
                                 {composition}
                             </div>
                         </div>

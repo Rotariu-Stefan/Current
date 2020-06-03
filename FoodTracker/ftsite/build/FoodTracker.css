@@ -104,6 +104,7 @@ footer {
     #profileArea * {
         cursor: pointer;
     }
+
     #profileArea > :first-child {
         grid-column: span 2;
         text-align: center;
@@ -166,7 +167,7 @@ footer {
 }
 
 .highlight {
-    border: 3px double coral;
+    border: 3px double #b64545;
     border-radius: 10px;
 }
 
@@ -181,9 +182,14 @@ footer {
 .ftButton {
     padding: 0.3rem;
     margin: 0.1rem;
-    background-color: #BB6666;
+    background-color: #B66060;
     font-size: 1rem;
     font-weight: bold;
     border-color: black;
+    border-radius: 5px;
+}
+
+textarea {
+    resize: none;
 }
 /*#endregion Misc Classes*/

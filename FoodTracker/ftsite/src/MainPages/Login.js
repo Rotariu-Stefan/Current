@@ -20,7 +20,7 @@ class Login extends React.Component {
             const usernameText = inputs[0].value;
             const passText = inputs[1].value;
 
-            let res = await fetch(app.getServerURL()() + "/login", {
+            let res = await fetch(app.getServerURL() + "/login", {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json"

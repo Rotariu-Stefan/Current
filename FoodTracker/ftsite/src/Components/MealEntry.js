@@ -28,7 +28,8 @@ class MealEntry extends React.Component {
             for (let f of props.mealEntry.foodentries) {
                 this.state.foodEntries.push(<FoodEntry
                     foodEntry={f}
-                    addToMeal={this.addInitialFoodEntryMacros}
+                    className="lineDown"
+                    addToMeal={this.addNewFoodEntryMacros}
                     key={this.state.foodCounter} />);
                 this.state.foodCounter++;
             }
@@ -38,7 +39,7 @@ class MealEntry extends React.Component {
         const { foodEntries } = this.state;
         let { foodCounter } = this.state;
 
-        foodEntries.push(<FoodEntry foodEntry={newFoodEntry} addToMeal={this.addNewFoodEntryMacros} key={foodCounter++} />);
+        foodEntries.push(<FoodEntry foodEntry={newFoodEntry} addToMeal={this.addNewFoodEntryMacros} key={foodCounter++} className="lineDown" />);
 
         this.setState({
             foodEntries: foodEntries,
@@ -79,43 +80,36 @@ class MealEntry extends React.Component {
     addNewFoodEntryMacros = (newfat, newcarbs, newprotein) => {
         const { portion } = this.state.mealEntry;
 
-        this.setState({
-            fat: this.state.fat + newfat * portion,
-            carbs: this.state.carbs + newcarbs * portion,
-            protein: this.state.protein + newprotein * portion
-        });
-    };
-
-    addInitialFoodEntryMacros = (newfat, newcarbs, newprotein) => {
-        const { portion } = this.state.mealEntry;
-
         this.state.fat += newfat * portion;
         this.state.carbs += newcarbs * portion;
-        this.state.protein += newprotein * portion;
-    }
+        this.state.protein += newprotein * portion;     
+        this.setState({});
+
+        this.props.addToDay(newfat * portion, newcarbs * portion, newprotein * portion);
+    };
 
     render = () => {
         const { mealEntry, isHighlighted, isMin, foodEntries, fat, carbs, protein } = this.state;
-        const { mealname, note } = mealEntry;
+        const { mealname, note, portion } = mealEntry;
 
         return (
             <div onClick={(ev) => this.props.selectedChanged(ev, this)}
                 className={"mealArea boxShow" + (isHighlighted ? " highlight" : "")}>
                 <div className="mealTitle">
-                    {mealname}
+                    {`${mealname} (x${portion})`}
                     <img onClick={(ev) => this.props.removeMeal(ev, this)} src="SitePics/icons8-cancel-20.png" alt="X"
                         className="managerImg" />
                     <img onClick={this.toggleMinMax} src={isMin ? "SitePics/icons8-plus-20.png" : "SitePics/icons8-minus-20.png"} alt={isMin ? "+" : "-"}
                         className="managerImg" />
                 </div>
                 <Note removeNote={this.onRemoveNote} updateAttach={this.onUpdateAttach} note={note}
-                    key={this._reactInternalFiber.key + "_note"} isMin={isMin}/>
+                    key={this._reactInternalFiber.key + "_note"} isMin={isMin} />
                 <div className={"foodEntries lineDown" + (isMin ? " hidden" : "")}>
                     {foodEntries}
                 </div>
                 <div className="mealTotal">
-                    <span>Total:</span>
-                    <span>{`${fat.toFixed(1)}//${carbs.toFixed(1)}//${protein.toFixed(1)}`}</span>
+                    <span>Meal Total:</span>
+                    <span>{`${fat.toFixed(1)}|${carbs.toFixed(1)}|${protein.toFixed(1)}`}</span>
                 </div>
             </div>
         );

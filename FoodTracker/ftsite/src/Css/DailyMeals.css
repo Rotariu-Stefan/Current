@@ -25,15 +25,12 @@
 
 #dayArea, #searchArea, #foodDetailsArea {
     height: 40rem;
-    padding: 0.2rem;
+    padding: 0.1rem;
 }
 /*#endregion Main Outline*/
 
 /*#region DayArea Block*/
 #dayArea {
-    margin: 0;
-    padding: 0;
-    border-style: none;
     display: flex;
     flex-direction: column;
 }
@@ -50,6 +47,7 @@
     }
 
 .mealsArea {
+    margin: 0.3rem 0;
     flex: auto;
     overflow: auto;
 }
@@ -64,7 +62,7 @@
         background-color: rgba(255, 228, 196, 0.75);
     }
 
-.mealTitle, .mealTotal, .macroRes {
+.mealTitle, .mealTotal, .macroRes, .dayTotal {
     font-size: 1.1rem;
     font-weight: bold;
 }
@@ -105,11 +103,11 @@
     justify-self: center;
 }
 
-.mealTotal {
-    text-align: center;
+.mealTotal, .dayTotal {
+    text-align: right;
 }
 
-    .mealTotal span:first-child {
+    .mealTotal span:first-child, .dayTotal span:first-child {
         width: 0px;
         white-space: nowrap;
         float: left;
@@ -154,6 +152,10 @@
     background-color: rgba(255, 241, 224, 0.5);
 }
 
+#searchArea hr {
+    margin: 1rem 0;
+}
+
 .foodItem {
     display: grid;
     grid-template-columns: 1fr 6.5rem 2rem;
@@ -180,19 +182,39 @@
     font-size: 1.1rem;
 }
 
-.addMealArea{
-    margin-top:0.7rem;
-    display:grid;
-    grid-template-columns:1fr 1fr;
+.addMealArea div {
+    display: flex;
+    justify-content: center;
 }
+
+.addMealArea {
+    text-align: center;
+}
+
+    .addMealArea label {
+        flex-shrink: 0;
+    }
+
     .addMealArea input {
-        height: 1.5rem;
+        height: 2rem;
+    }
+
+    .addMealArea input {
+        height: 2rem;
+        padding: 0 0.2rem;
+        font-size: 1rem;
         font-weight: bold;
     }
-    .newMPortion{
-        width:20%;
-    }
+
+.newMName {
+    min-width: 20%;
+}
+
+.newMPortion {
+    width: 10%;
+}
 /*#endregion SearchArea Block*/
+
 /*#region FoodDetailsArea Block*/
 #foodDetailsArea {
     display: flex;
@@ -235,13 +257,17 @@
     flex: auto;
     overflow: auto;
 }
-/*#endregion FoodDetailsArea Block*/
 
+    .foodInfo .comp {
+        text-align: center;
+        text-decoration:underline;
+    }
+/*#endregion FoodDetailsArea Block*/
 /*#region Note*/
 .note, .noteEdit {
     color: black;
     background-color: rgba(143, 136, 80, 0.25);
-    border:1px dotted slategrey;
+    border: 1px dotted slategrey;
     border-radius: 10px;
 }
 
