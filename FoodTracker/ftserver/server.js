@@ -3,53 +3,7 @@ const bodyParser = require('body-parser');
 const pg = require('pg');
 const cors = require('cors');
 const { initDB, loadFromFile, showDB } = require('./dbtop');
-
-//server.get("/dailymeals_Deprecated", async (req, res) => {
-//    try {
-//        console.log("-----------ftserver Received @/dailymeals --- GET Req:", req.headers);
-//        const { userid, reqdate } = req.headers;
-
-//        const qselM = await client.query("SELECT mealid, mealname, portion, noteid" +
-//            " FROM meals" +
-//            " WHERE userid= $1 AND timeeaten=$2;"
-//            , [userid, reqdate]);
-
-//        const day = {};
-//        const qselN = await client.query("SELECT n.noteid, n.title, n.score, n.notetext" +
-//            " FROM notes n" +
-//            " JOIN daynotes dn ON dn.noteid = n.noteid" +
-//            " WHERE dn.daydate=$1;"
-//            , [reqdate])
-//        if (qselN.rowCount === 1)
-//            day.note = qselN.rows[0];
-//        else
-//            day.noteid = null;
-
-//        day.meals = qselM.rows;
-//        for (meal of day.meals) {
-//            if (meal.noteid) {
-//                const qselNM = await client.query("SELECT noteid, title, score, notetext" +
-//                    " FROM notes" +
-//                    " WHERE noteid=$1;"
-//                    , [meal.noteid])
-//                meal.note = qselNM.rows[0];
-//                delete meal.noteid;
-//            }
-
-//            const qselFE = await client.query("SELECT md.entryid, f.foodid, f.foodname, f.brand, f.fat, f.carbs, f.protein, f.sizeinfo, f.userid, f.pic, f.price, f.isdish, f.noteid, md.amount, md.measure" +
-//                " FROM fooditems f" +
-//                " JOIN mealdata md ON f.foodid = md.foodid" +
-//                " WHERE md.mealid=$1;"
-//                , [meal.mealid]);
-//            meal.foodentries = qselFE.rows;
-//        }
-//        res.json(day);
-
-//    } catch (err) {
-//        console.log("___________ERROR___________\n", err.message || err);
-//        res.status(400).json("Error at Dailyday.meals!");
-//    }
-//});
+const bcrypt = require('bcrypt-nodejs');
 
 const server = express();
 server.listen(process.env.PORT || 3001, () => {
@@ -105,15 +59,19 @@ server.post("/login", (req, res) => runTransaction(req, res, "POST", "/login", a
     const { username, pass } = reqData;
     console.log("ReqData:", username, pass);
 
-    const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access" +
+    const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass" +
         " FROM users" +
-        " WHERE (username=$1 OR email=$1) AND pass=$2;"
-        , [username, pass]);
-
-    if (qsel.rows.length === 1)
-        res.json(qsel.rows[0]);
+        " WHERE (username=$1 OR email=$1)"
+        , [username]);
+    if (qsel.rowCount === 1)
+        if (bcrypt.compareSync(pass, qsel.rows[0].pass)) {
+            delete qsel.rows[0].pass;
+            res.json(qsel.rows[0]);
+        }
+        else
+            res.json("Invalid Info at Login - Wrong username/password!");
     else
-        res.json("Invalid Info at Login - Wrong username/password!");
+        res.json("Invalid Info at Login -User/Email does not exist!");
 }));
 
 server.get("/dailymeals", (req, res) => runTransaction(req, res, "GET", "/dailymeals", async (reqData, res, client) => {
@@ -252,7 +210,8 @@ server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register
         const qinsU = await client.query("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
             " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
             " RETURNING userid;"
-            , [username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass]);
+            , [username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access
+                , bcrypt.hashSync(pass)]);
 
         res.json({ userid: qinsU.rows[0].userid });
     } else
@@ -260,20 +219,24 @@ server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register
 }));
 
 server.put("/yourfoods", (req, res) => runTransaction(req, res, "PUT", "/yourfoods", async (reqData, res, client) => {
-    const { foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, foodentries } = reqData;
+    const { userid, foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish, note, foodentries } = reqData;
     console.log("ReqData:", reqData);
 
     const returnData = { foodid: undefined };
-    if (noteid === undefined) {
-        const { title, score, notetext } = note;
-        const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
-            " VALUES($1, $2, $3, $4)" +
-            " RETURNING noteid;"
-            , [userid, title, score, notetext]);
-        returnData.noteid = qinsN.rows[0].noteid;
+    if (note) {
+        if (!note.noteid) {
+            const { title, score, notetext } = note;
+            const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
+                " VALUES($1, $2, $3, $4)" +
+                " RETURNING noteid;"
+                , [userid, title, score, notetext]);
+            returnData.noteid = qinsN.rows[0].noteid;
+        }
+        else
+            returnData.noteid = note.noteid;
     }
     else
-        returnData.noteid = noteid;
+        returnData.noteid = null;
 
     const qinsF = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
         " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
@@ -384,47 +347,108 @@ server.post("/profile/changepass", (req, res) => runTransaction(req, res, "POST"
     const { userid, oldpass, newpass } = reqData;
     console.log("ReqData:", reqData);
 
-    const qsel = await client.query("SELECT userid" +
+    const qsel = await client.query("SELECT pass" +
         " FROM users" +
-        " WHERE userid=$1 AND pass=$2;"
-        , [userid, oldpass])
-    if (qsel.rowCount === 1) {
-        const qupd = await client.query("UPDATE users" +
-            " SET pass=$1" +
-            " WHERE userid=$2;"
-            , [newpass, userid]);
-        res.json("User password changed!");
-    }
+        " WHERE userid=$1;"
+        , [userid])
+    if (qsel.rowCount === 1)
+        if (bcrypt.compareSync(oldpass, qsel.rows[0].pass)) {
+            const qupd = await client.query("UPDATE users" +
+                " SET pass=$1" +
+                " WHERE userid=$2;"
+                , [bcrypt.hashSync(newpass), userid]);
+            res.json("User password changed!");
+        }
+        else
+            res.json("Invalid Info at ChangePass - Failed to confirm credentials!");
     else
-        res.json("Invalid Info at ChangePass - Credentials don't Match!");
+        res.json("Invalid Info at ChangePass - Could not retreive user info!");
 }));
 
 server.post("/yourfoods", (req, res) => runTransaction(req, res, "POST", "/yourfoods", async (reqData, res, client) => {
-    const { foodid, foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid, note, composition } = reqData;
+    const { foodid, foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish, note, composition } = reqData;
+    console.log("ReqData:", reqData);
 
-    //TODO: UPDATE FOODITEM WITH foodid
+    const returnData = { foodid: foodid };
+    if (note) {
+        if (!note.noteid) {
+            const { title, score, notetext } = note;
+            const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
+                " VALUES($1, $2, $3, $4)" +
+                " RETURNING noteid;"
+                , [userid, title, score, notetext]);
+            returnData.noteid = qinsN.rows[0].noteid;
+        }
+        else
+            returnData.noteid = note.noteid;
+    }
+    else
+        returnData.noteid = null;
 
-}));//TODO
+    const qupdF = await client.query("UPDATE fooditems" +
+        " SET foodname=$1, brand=$2, fat=$3, carbs=$4, protein=$5, sizeinfo=$6," +
+        " pic=$7, price=$8, isdish=$9, noteid=$10" +
+        " WHERE foodid=$11;"
+        , [foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish, returnData.noteid, foodid]);
+
+    const qdelD = await client.query("DELETE FROM dishdata" +
+        " WHERE dishid=$1;"
+        , [foodid]);
+
+    if (isdish) {
+        returnData.entryids = [];
+        for (entry of foodentries) {
+            const { foodid, amount, measure } = entry;
+            const qinsDD = await client.query("INSERT INTO dishdata (dishid, ingredientid, amount, measure)" +
+                " VALUES($1, $2, $3, $4)" +
+                " RETURNING entryid;"
+                , [returnData.foodid, foodid, amount, measure]);
+            returnData.entryids.push(qinsDD.rows[0].entryid);
+        }
+    }
+    else
+        returnData.entryids = null;
+
+    res.json(returnData);
+
+}));
 
 server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/yourfoods", async (reqData, res, client) => {
     const { foodid } = reqData;
 
-    //TODO: DELETE FOODITEM WITH foodid
-
-}));//TODO
+    const qdelF = await client.query("DELETE FROM fooditem" +
+        " WHERE foodid=$1"
+        , [foodid]);
+    res.json("FoodItem Deleted!");
+}));
 
 ; (async () => {
     //await showDB(process.argv[2]);
-
-    //const client = new pg.Client({
-    //    connectionString: process.env.DATABASE_URL || process.argv[2],
-    //    ssl: {
-    //        rejectUnauthorized: false
-    //    }
+    //bcrypt.hash("mamapass", null, null, async function (err, hash) {
+    //    console.log(bcrypt.compareSync("mamapass", hash));
     //});
-    //await client.connect();
 
-    //await client.query("...");
 
-    //await client.end();
+    const client = new pg.Client({
+        connectionString: process.env.DATABASE_URL || process.argv[2],
+        ssl: {
+            rejectUnauthorized: false
+        }
+    });
+    await client.connect();
+
+    //let res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid TYPE INT;");
+    //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP NOT NULL;");
+    //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP DEFAULT;");
+    //let res = await client.query("ALTER TABLE mealdata DROP CONSTRAINT FK_MealData_Food");
+    //res = await client.query("ALTER TABLE mealdata ADD CONSTRAINT FK_MealData_Food FOREIGN KEY(FoodID) REFERENCES FoodItems(FoodID) ON DELETE SET NULL");
+
+    //const res = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
+    //    " VALUES('halva', 'suntat', 35, 47, 12, 0, 1, null, default, false, null)" +
+    //    " RETURNING foodid;");
+
+
+
+    //console.log(res.rows);
+    await client.end();
 })();

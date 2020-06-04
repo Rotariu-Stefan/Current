@@ -16,15 +16,15 @@ class DailyMeals extends React.Component {
         super(props);
 
         this.state = {
-            selectedDay: dateToStr(new Date()),
+            selectedDay: dateToStr(new Date('2020-06-05')),
             dayEntry: {},
             dayFat: 0,
             dayCarbs: 0,
             dayProtein: 0,
 
             mealEntries: [],
-            selectedMeal: null,
             mealCounter: 0,
+            selectedMeal: null,
             mealareaIsLoading: true,
 
             selectedFood: null,
@@ -46,8 +46,8 @@ class DailyMeals extends React.Component {
     loadDailyMeals = (day) => {
         this.setState({
             mealEntries: [],
+            selectedMeal: null,
             mealareaIsLoading: true,
-            selectedMeal:null,
             dayFat: 0,
             dayCarbs: 0,
             dayProtein: 0
@@ -161,6 +161,7 @@ class DailyMeals extends React.Component {
     onCommit = (ev) => {
         ; (async (searchCounter) => {
             const { dayEntry, selectedDay } = this.state;
+            //IF Guest assume SV
             const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
 
             const dayPutReq = dayEntry;
@@ -200,15 +201,7 @@ class DailyMeals extends React.Component {
             noteid: null,
             foodentries: []
         };
-        if (selectedMeal)
-            mealEntries.push(<MealEntry
-                mealEntry={newMeal}
-                addToDay={this.addNewFoodEntryMacros}
-                selectedChanged={this.onSelectedMealChanged}
-                removeMeal={this.onRemoveMeal}
-                key={mealCounter}
-            />);
-        else
+
             mealEntries.push(<MealEntry
                 signalSelect={true}
                 mealEntry={newMeal}
@@ -235,7 +228,7 @@ class DailyMeals extends React.Component {
         const { selectedMeal, mealEntries, dayEntry } = this.state;
 
         dayEntry.meals = dayEntry.meals.filter((m) => !((m.mealid && m.mealid === sender.state.mealEntry.mealid)
-            || (m.key && m.key.toString() === sender._reactInternalFiber.key)));
+            || (m.key !== undefined && m.key.toString() === sender._reactInternalFiber.key)));
 
         this.setState({
             mealEntries: mealEntries.filter((meal) => meal.key !== sender._reactInternalFiber.key),
@@ -285,7 +278,7 @@ class DailyMeals extends React.Component {
 
         for (let m of dayEntry.meals)
             if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                || selectedMeal._reactInternalFiber.key === m.key.toString()) {
+                || m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString()) {
                 m.note = selectedMeal.state.mealEntry.note;
                 break;
             }
@@ -318,7 +311,7 @@ class DailyMeals extends React.Component {
                 selectedMeal.addNewFoodEntry(ev, newFoodEntry);
                 for (let m of dayEntry.meals)
                     if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                        || (m.key && selectedMeal._reactInternalFiber.key === m.key.toString())) {
+                        || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
                         m.foodentries.push(newFoodEntry);
                         break;
                     }
@@ -482,7 +475,7 @@ class DailyMeals extends React.Component {
     };//TODO?
 
     render = () => {
-        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, mealCounter, dayFat, dayCarbs, dayProtein } = this.state;
+        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, dayFat, dayCarbs, dayProtein } = this.state;
         const { foodname, brand, fat, carbs, protein, price, pic } = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
 
         return (
@@ -552,7 +545,7 @@ class DailyMeals extends React.Component {
                     <div className="addMealArea">
                         <div>
                             <label className="textHigh">Meal Name:</label>
-                            <input className="newMName" type="text" placeholder={"Meal" + (mealCounter + 1)} />
+                            <input className="newMName" type="text" placeholder={"Meal" + (mealEntries.length+1)} />
                             <label className="textHigh">Portion:</label>
                             <input className="newMPortion" type="text" placeholder="1" />
                         </div>
@@ -599,7 +592,7 @@ class DailyMeals extends React.Component {
                                         <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
                                 </tbody>
                             </table>
-                            <div className="comp textHigh">Composition:</div>
+                            <div className="comp textHigh">{composition.length > 0 ? "Composition:" : ""}</div>
                             <div className="foodEntries boxShow">
                                 {composition}
                             </div>
