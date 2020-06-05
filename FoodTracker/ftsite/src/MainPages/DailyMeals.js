@@ -15,8 +15,9 @@ class DailyMeals extends React.Component {
     constructor(props) {
         super(props);
 
+        this.newFoodKey = "mustchange";
         this.state = {
-            selectedDay: dateToStr(new Date('2020-06-05')),
+            selectedDay: dateToStr(new Date()),
             dayEntry: {},
             dayFat: 0,
             dayCarbs: 0,
@@ -34,6 +35,19 @@ class DailyMeals extends React.Component {
             searchCounter: 0,
             amount: "",
             measure: "---",
+
+            newFoodForm: false,
+            newFoodItem: {
+                foodname: "",
+                brand: "",
+                fat: 0, carbs: 0, protein: 0,
+                price: 0,
+                sizeinfo: 100,
+                isdish: false,
+                pic: "empty.png",
+                userid: 0,
+                noteid: null,
+            },
 
             selectedFoodDetails: null,
             composition: []
@@ -185,7 +199,7 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewMeal = (ev) => {
-        const { mealEntries, dayEntry, selectedMeal } = this.state;
+        const { mealEntries, dayEntry, newFoodForm } = this.state;
         let { mealCounter } = this.state;
 
         const newMPortion = document.querySelector(".newMPortion");
@@ -202,14 +216,14 @@ class DailyMeals extends React.Component {
             foodentries: []
         };
 
-            mealEntries.push(<MealEntry
-                signalSelect={true}
-                mealEntry={newMeal}
-                addToDay={this.addNewFoodEntryMacros}
-                selectedChanged={this.onSelectedMealChanged}
-                removeMeal={this.onRemoveMeal}
-                key={mealCounter}
-            />);
+        mealEntries.push(<MealEntry
+            signalSelect={true}
+            mealEntry={newMeal}
+            addToDay={this.addNewFoodEntryMacros}
+            selectedChanged={this.onSelectedMealChanged}
+            removeMeal={this.onRemoveMeal}
+            key={mealCounter}
+        />);
 
         newMeal.key = mealCounter;
         dayEntry.meals.push(newMeal);
@@ -221,7 +235,8 @@ class DailyMeals extends React.Component {
             mealCounter: mealCounter + 1,
             dayEntry: dayEntry
         });
-        document.querySelector("#search").select();
+        if (!newFoodForm)
+            document.querySelector("#search").select();
     };
 
     onRemoveMeal = (ev, sender) => {
@@ -278,7 +293,7 @@ class DailyMeals extends React.Component {
 
         for (let m of dayEntry.meals)
             if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                || m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString()) {
+                || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
                 m.note = selectedMeal.state.mealEntry.note;
                 break;
             }
@@ -289,39 +304,63 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewFoodEntry = (ev) => {
-        const { selectedMeal, selectedFood, dayEntry, amount, measure } = this.state;
+        const { selectedMeal, selectedFood, dayEntry, amount, measure, newFoodForm, newFoodItem } = this.state;
 
-        if (selectedMeal === null)
+        if (selectedMeal === null) {
             alert("Must select a Meal !");
-        else if (selectedFood === null)
-            alert("Must select a Food Item !");
-        else {
-            if (isNaN(amount)) {
-                alert("Must Enter Valid Number for Amount!");
-                this.setState({
-                    amount: ""
-                });
+            return;
+        }
+        if (newFoodForm) {
+            if (newFoodItem.foodname === "") {
+                alert("New Food must have a Name !");
                 return;
             }
-            else {
-                const newFoodEntry = selectedFood.state.foodItem;
-                newFoodEntry.amount = amount ? amount : document.querySelector("#amountSize").placeholder;
-                newFoodEntry.measure = measure;
-
-                selectedMeal.addNewFoodEntry(ev, newFoodEntry);
-                for (let m of dayEntry.meals)
-                    if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                        || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
-                        m.foodentries.push(newFoodEntry);
-                        break;
-                    }
-
-                this.setState({
-                    dayEntry: dayEntry
-                });
+            const sum = Number(newFoodItem.fat) + Number(newFoodItem.carbs) + Number(newFoodItem.protein);
+            if (isNaN(sum) || (measure === "Grams" && (sum > 100 || sum <= 0))) {
+                alert("Macro value are wrong!");
+                return
             }
-            document.querySelector("#search").select();
         }
+        else if (selectedFood === null) {
+            alert("Must select a Food Item !");
+            return;
+        }
+        if (isNaN(amount)) {
+            alert("Must Enter Valid Number for Amount!");
+            this.setState({
+                amount: ""
+            });
+            return;
+        }
+
+        const newFoodEntry = newFoodForm ? newFoodItem : selectedFood.state.foodItem;
+        newFoodEntry.amount = amount ? amount : document.querySelector("#amountSize").placeholder;
+        newFoodEntry.measure = measure;
+
+        selectedMeal.addNewFoodEntry(ev, newFoodEntry);
+        for (let m of dayEntry.meals)
+            if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
+                || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
+                m.foodentries.push(newFoodEntry);
+                break;
+            }
+
+        this.setState({
+            dayEntry: dayEntry,
+            newFoodForm: false,
+            newFoodItem: {
+                foodname: "",
+                brand: "",
+                fat: 0, carbs: 0, protein: 0,
+                price: 0,
+                sizeinfo: 100,
+                isdish: false,
+                pic: "empty.png",
+                userid: 0,
+                noteid: null,
+            }
+        });
+        setTimeout(() => document.querySelector("#search").select(), 0);
     };
 
     onSelectedFoodChanged = (ev, sender) => {
@@ -382,18 +421,55 @@ class DailyMeals extends React.Component {
     };
 
     currentEntry = () => {
-        const { selectedFood, amount, measure } = this.state;
+        const { selectedFood, amount, measure, newFoodForm, newFoodItem } = this.state;
 
-        if (selectedFood) {
-            return <FoodEntry foodItem={selectedFood.state.foodItem}
-                amount={amount ? amount : (selectedFood ? (measure === "Pieces" ? 1
-                    : selectedFood.state.foodItem.sizeinfo === 0 ? 100 : selectedFood.state.foodItem.sizeinfo) : 0)}
+        if (newFoodForm) {
+            this.newFoodKey = this.newFoodKey === "mustchange" ? "willchange" : "mustchange";
+            return <FoodEntry foodItem={newFoodItem}
+                amount={amount}
                 measure={measure}
-                key={selectedFood.state.foodItem.foodid.toString() + amount + measure} />
+                key={this.newFoodKey} />
         }
         else
-            return <FoodEntry key={null} />
-    }
+            if (selectedFood) {
+                return <FoodEntry foodItem={selectedFood.state.foodItem}
+                    amount={amount ? amount : (selectedFood ? (measure === "Pieces" ? 1
+                        : selectedFood.state.foodItem.sizeinfo === 0 ? 100 : selectedFood.state.foodItem.sizeinfo) : 0)}
+                    measure={measure}
+                    key={selectedFood.state.foodItem.foodid.toString() + amount + measure} />
+            }
+            else
+                return <FoodEntry key={"F0"} />
+    };
+
+    changeNewFoodValue = (field, value) => {
+        const aux = this.state.newFoodItem;
+
+        if (field === "per") {
+            const psi = document.querySelector(".PSInput");
+            if (value === "1Piece") {
+                psi.disabled = true;
+                psi.value = "";
+                aux.sizeinfo = null;
+                this.state.amount = 1;
+            }
+            else {
+                document.querySelector(".PSInput").disabled = false;
+                psi.value = 100;
+                aux.sizeinfo = 100;
+                this.state.amount = 100;
+            }
+        }
+        else {
+            if (field === "sizeinfo")
+                value = value === "" ? null : value;
+            aux[field] = value;
+        }
+        this.setState({
+            newFoodItem: aux,
+            measure: aux.sizeinfo === null ? "Pieces" : "Grams",
+        });
+    };
 
     onDayButtons = (ev, nrDays) => {
         const { selectedDay } = this.state;
@@ -448,6 +524,8 @@ class DailyMeals extends React.Component {
     };
 
     onAmountKey = (ev) => {
+        console.log(this.state.dayEntry);
+
         switch (ev.key) {
             case "Enter":
                 this.onAddNewFoodEntry();
@@ -475,7 +553,7 @@ class DailyMeals extends React.Component {
     };//TODO?
 
     render = () => {
-        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, dayFat, dayCarbs, dayProtein } = this.state;
+        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, dayFat, dayCarbs, dayProtein, newFoodForm } = this.state;
         const { foodname, brand, fat, carbs, protein, price, pic } = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
 
         return (
@@ -489,7 +567,7 @@ class DailyMeals extends React.Component {
                             <button disabled={mealareaIsLoading} onClick={(ev) => this.onDayButtons(ev, 1)} className="ftButton">{">"}</button>
                         </div>
                         {mealareaIsLoading ? "LOADING..."
-                            : <Note removeNote={this.onRemoveNote} note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "0")} updateAttach={this.onUpdateAttach} />}
+                            : <Note removeNote={this.onRemoveNote} note={dayEntry.note} key={"D" + (dayEntry.note ? dayEntry.note.noteid : "D0")} updateAttach={this.onUpdateAttach} />}
                     </div>
                     <div className="mealsArea">
                         {mealareaIsLoading ? "LOADING..." : mealEntries}
@@ -503,26 +581,82 @@ class DailyMeals extends React.Component {
                 </div>
 
 
-                <div id="searchArea" className="subblock boxShow">
-                    <div className="searchInput boxShow">
-                        <label className="textHigh">Search Food: </label>
-                        <input onChange={(ev) => this.loadSFoodItems(
-                            document.querySelector("#search").value,
-                            ev.currentTarget.checked)}
-                            id="isAll" type="checkbox" />
-                        ALL Food
-                        <input onChange={(ev) => this.loadSFoodItems(
-                            ev.currentTarget.value,
-                            document.querySelector("#isAll").checked)}
-                            onKeyDown={this.onSearchKey}
-                            id="search" type="text"
-                            placeholder="search terms" />
-                    </div>
-                    <div className="searchResults boxShow">
-                        {searchareaIsLoading ? "LOADING..." : sFoodItems}
-                    </div>
-                    <div className="amountInput boxShow">
-                        <label className="textHigh">Amount: </label>
+                <div id="addFoodArea" className="subblock boxShow">
+                    {newFoodForm
+                        ? <div className="newFoodForm">
+                            <div className="newFoodHeader">
+                                <label className="textHigh">Create New Food:</label>
+                                <button onClick={() => this.setState({ newFoodForm: false })} className="ftButton">
+                                    +Select</button>
+                            </div>
+                            <span>Name:</span><input onChange={(ev) => this.changeNewFoodValue("foodname", ev.currentTarget.value)} placeholder="name" type="text" />
+                            <span>Brand:</span><input onChange={(ev) => this.changeNewFoodValue("brand", ev.currentTarget.value)} placeholder="brand" type="text" />
+                            <span>Macros:</span>
+                            <div>
+                                <input onChange={(ev) => this.changeNewFoodValue("fat", ev.currentTarget.value)} type="text" placeholder="0" /><span>Fat</span>
+                                <input onChange={(ev) => this.changeNewFoodValue("carbs", ev.currentTarget.value)} type="text" placeholder="0" /><span>Carbs</span>
+                                <input onChange={(ev) => this.changeNewFoodValue("protein", ev.currentTarget.value)} type="text" placeholder="0" /><span>Protein</span>
+                            </div>
+                            <span>Per:</span>
+                            <div><select onChange={(ev) => this.changeNewFoodValue("per", ev.currentTarget.value)} className="smallerInput">
+                                <option>100Grams</option>
+                                <option>1Piece</option>
+                            </select>
+
+
+
+
+
+
+
+
+
+                                <span>Piece Size:</span><input onChange={(ev) => this.changeNewFoodValue("sizeinfo", ev.currentTarget.value)} className="PSInput smallerInput" defaultValue="100" placeholder="null" type="text" />
+
+
+
+
+
+
+
+
+
+
+                            </div>
+                            <span>Price:</span>
+                            <div>
+                                <input onChange={(ev) => this.changeNewFoodValue("price", ev.currentTarget.value)} className="smallerInput" placeholder="0" type="text" />
+                                <div><span>Is Dish?</span><input onChange={(ev) => this.changeNewFoodValue("isdish", ev.currentTarget.checked)} type="checkbox" /></div>
+                            </div>
+                            <label className="afaInfo">To add certain details (dish, composition, photo, note)or further edit foods go to Your Foods section.</label>
+                        </div>
+
+                        : [<div className="searchForm boxShow" key="searchForm">
+                            <label className="textHigh">Search Food: </label>
+                            <input onChange={(ev) => this.loadSFoodItems(
+                                document.querySelector("#search").value,
+                                ev.currentTarget.checked)}
+                                id="isAll" type="checkbox" />
+                            ALL
+                        <button onClick={() => this.setState({
+                                newFoodForm: true,
+                                selectedFood: null,
+                                measure: "Grams",
+                                amount: 100
+                            })} className="ftButton">
+                                +New</button>
+                            <input onChange={(ev) => this.loadSFoodItems(
+                                ev.currentTarget.value,
+                                document.querySelector("#isAll").checked)}
+                                onKeyDown={this.onSearchKey}
+                                id="search" type="text"
+                                placeholder="search terms" />
+                        </div>,
+                        <div className="searchResults boxShow" key="searchResults">
+                            {searchareaIsLoading ? "LOADING..." : sFoodItems}
+                        </div>]}
+                    <div className="amountForm boxShow">
+                        <label className="textHigh">Amount: </label>{/*aaaaaaaaaaaaaaaaaa*/}
                         <input disabled={searchareaIsLoading} id="amountSize" type="text" value={amount}
                             onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
                             onKeyDown={this.onAmountKey}
@@ -545,7 +679,7 @@ class DailyMeals extends React.Component {
                     <div className="addMealArea">
                         <div>
                             <label className="textHigh">Meal Name:</label>
-                            <input className="newMName" type="text" placeholder={"Meal" + (mealEntries.length+1)} />
+                            <input className="newMName" type="text" placeholder={"Meal" + (mealEntries.length + 1)} />
                             <label className="textHigh">Portion:</label>
                             <input className="newMPortion" type="text" placeholder="1" />
                         </div>

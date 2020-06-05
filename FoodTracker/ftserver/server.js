@@ -295,7 +295,6 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
         const returnMeal = { mealid: undefined };
 
         if (note) {
-            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", note);
             if (!note.noteid) {
                 const { title, score, notetext } = note;
                 const qinsN = await client.query("INSERT INTO notes (userid, title, score, notetext)" +
@@ -317,7 +316,17 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
         returnMeal.mealid = qinsM.rows[0].mealid;
 
         returnMeal.entryids = [];
-        for (entry of foodentries) {
+        for (entry of foodentries) {//TODO! More Than Basic Food with No Note!
+            if (!entry.foodid) {
+                const { foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish } = entry;
+
+                const qinsF = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
+                    " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
+                    " RETURNING foodid;"
+                    , [foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, null]);
+                entry.foodid = qinsF.rows[0].foodid;
+            }
+
             const { foodid, amount, measure } = entry;
             const qinsMD = await client.query("INSERT INTO mealdata (mealid, foodid, amount, measure)" +
                 " VALUES($1, $2, $3, $4)" +

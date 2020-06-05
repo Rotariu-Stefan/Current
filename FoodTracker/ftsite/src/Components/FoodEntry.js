@@ -2,7 +2,7 @@ import React from 'react';
 
 class FoodEntry extends React.Component {
     static defaultFoodEntry = {
-        entryid: 0,
+        //entryid: 0,
         foodid: 0,
         foodname: "Nothing",
         brand: "Nobody",

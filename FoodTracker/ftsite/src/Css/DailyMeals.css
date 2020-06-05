@@ -18,12 +18,12 @@
         justify-items: center;
     }
 
-    #dayArea, #searchArea, #foodDetailsArea {
+    #dayArea, #addFoodArea, #foodDetailsArea {
         width: 35rem;
     }
 }
 
-#dayArea, #searchArea, #foodDetailsArea {
+#dayArea, #addFoodArea, #foodDetailsArea {
     height: 40rem;
     padding: 0.1rem;
 }
@@ -83,8 +83,7 @@
 }
 
     .foodEntry:hover {
-        color: coral;
-        background-color: saddlebrown;
+        color: orangered;
     }
 
 .name_brand, .amount, .macro {
@@ -114,29 +113,37 @@
     }
 /*#endregion DayArea Block*/
 
-/*#region SearchArea Block*/
-#searchArea {
+/*#region addFoodArea Block*/
+#addFoodArea {
     display: flex;
     flex-direction: column;
 }
 
-.searchInput, .amountInput {
+.searchForm {
+    font-weight: bold;
+}
+
+    .searchForm button {
+        float: right;
+    }
+
+.amountForm {
     padding: 0.2rem;
     text-align: right;
 }
 
-    .searchInput label, .amountInput label {
+    .amountForm label {
         float: left;
     }
 
-#searchArea #search {
+#addFoodArea #search {
     height: 2rem;
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
 }
 
-#searchArea #amountSize {
+#addFoodArea #amountSize {
     height: 2rem;
     width: 30%;
     padding: 0 0.2rem;
@@ -152,7 +159,7 @@
     background-color: rgba(255, 241, 224, 0.5);
 }
 
-#searchArea hr {
+#addFoodArea hr {
     margin: 1rem 0;
 }
 
@@ -162,8 +169,8 @@
 }
 
     .foodItem:hover {
-        color: coral;
-        background-color: saddlebrown;
+        color: orangered;
+        background-color: rgba(255, 228, 196, 0.75);
     }
 
 .feSelected {
@@ -182,21 +189,16 @@
     font-size: 1.1rem;
 }
 
-.addMealArea div {
-    display: flex;
-    justify-content: center;
-}
-
 .addMealArea {
     text-align: center;
 }
 
-    .addMealArea label {
-        flex-shrink: 0;
+    .addMealArea div {
+        display: flex;
     }
 
-    .addMealArea input {
-        height: 2rem;
+    .addMealArea label {
+        flex-shrink: 0;
     }
 
     .addMealArea input {
@@ -213,10 +215,50 @@
 .newMPortion {
     width: 10%;
 }
-/*#endregion SearchArea Block*/
 
-/*#region FoodDetailsArea Block*/
-#foodDetailsArea {
+.newFoodForm {
+    display: grid;
+    grid-template-columns: 20% minmax(10%, 1fr);
+    grid-row-gap: 1rem;
+}
+
+    .newFoodForm .newFoodHeader, .afaInfo {
+        grid-column: 1 / span 2;
+    }
+
+    .newFoodForm input, .newFoodForm select {
+        height: 1.7rem;
+        padding: 0 0.2rem;
+        margin: 0 0.1rem;
+        font-size: 1rem;
+        font-weight: bold;
+        min-width: 15%;
+    }
+
+    .newFoodForm div {
+        display: flex;
+        justify-content:space-between;
+    }
+
+    .newFoodForm select {
+        flex-shrink: 0;
+    }
+
+    .newFoodForm span {
+        flex-shrink: 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+.smallerInput {
+    width: 30%;
+}
+.afaInfo {
+    margin:2rem 0;
+    color:purple;
+}
+    /*#endregion addFoodArea Block*/
+    /*#region FoodDetailsArea Block*/
+    #foodDetailsArea {
     display: flex;
     flex-direction: column;
 }
@@ -260,9 +302,10 @@
 
     .foodInfo .comp {
         text-align: center;
-        text-decoration:underline;
+        text-decoration: underline;
     }
 /*#endregion FoodDetailsArea Block*/
+
 /*#region Note*/
 .note, .noteEdit {
     color: black;
@@ -305,6 +348,7 @@
         background-color: slategrey;
         font-size: 0.8rem;
         float: right;
+        border-radius: 5px;
     }
 
     .noteEdit .newNote {
@@ -323,7 +367,7 @@
             font-size: 0.8rem;
         }
 
-    .noteEdit .noteSearchArea {
+    .noteEdit .noteaddFoodArea {
         max-height: 8rem;
         overflow: auto;
     }

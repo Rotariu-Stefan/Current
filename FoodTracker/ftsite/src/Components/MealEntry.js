@@ -68,6 +68,7 @@ class MealEntry extends React.Component {
     };
 
     onRemoveNote = () => {
+        console.log("ASDAS");
         const { mealEntry } = this.state;
 
         mealEntry.note = null;
@@ -82,7 +83,7 @@ class MealEntry extends React.Component {
 
         this.state.fat += newfat * portion;
         this.state.carbs += newcarbs * portion;
-        this.state.protein += newprotein * portion;     
+        this.state.protein += newprotein * portion;
         this.setState({});
 
         this.props.addToDay(newfat * portion, newcarbs * portion, newprotein * portion);
@@ -103,7 +104,7 @@ class MealEntry extends React.Component {
                         className="managerImg" />
                 </div>
                 <Note removeNote={this.onRemoveNote} updateAttach={this.onUpdateAttach} note={note}
-                    key={this._reactInternalFiber.key + "_note"} isMin={isMin} />
+                    key={this._reactInternalFiber.key + (note ? "_note" : "0")} isMin={isMin} />
                 <div className={"foodEntries lineDown" + (isMin ? " hidden" : "")}>
                     {foodEntries}
                 </div>

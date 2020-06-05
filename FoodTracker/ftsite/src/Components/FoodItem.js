@@ -2,7 +2,7 @@ import React from 'react';
 
 class FoodItem extends React.Component {
     static defaultFoodItem = {
-        entryid: 0,
+        //entryid: 0,
         foodid: 0,
         foodname: "Nothing",
         brand: "Nowhere",
@@ -10,7 +10,7 @@ class FoodItem extends React.Component {
         sizeinfo: null, userid: 0, pic: "empty.png", price: 0,
         isdish: false,
         noteid: null,
-        measure: "Pieces"
+        //measure: "Pieces"
     };
 
     constructor(props) {
