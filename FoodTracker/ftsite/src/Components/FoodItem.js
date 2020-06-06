@@ -9,7 +9,7 @@ class FoodItem extends React.Component {
         fat: 0, carbs: 0, protein: 0,
         sizeinfo: null, userid: 0, pic: "empty.png", price: 0,
         isdish: false,
-        noteid: null,
+        note: null,
         //measure: "Pieces"
     };
 

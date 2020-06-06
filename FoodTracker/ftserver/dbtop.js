@@ -191,7 +191,7 @@ const loadFromFile = async (filename) => {
                         sizeinfo: Amount.includes("g") ? 0 : null,
                         userid: 1, pic: null, price: 11,
                         isdish: false,
-                        noteid: null,
+                        note: null,
                         foodentries: null
                     };
 

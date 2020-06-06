@@ -4,6 +4,7 @@ const pg = require('pg');
 const cors = require('cors');
 const { initDB, loadFromFile, showDB } = require('./dbtop');
 const bcrypt = require('bcrypt-nodejs');
+const fetch = require('node-fetch');
 
 const server = express();
 server.listen(process.env.PORT || 3001, () => {
@@ -316,15 +317,19 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
         returnMeal.mealid = qinsM.rows[0].mealid;
 
         returnMeal.entryids = [];
-        for (entry of foodentries) {//TODO! More Than Basic Food with No Note!
+        for (entry of foodentries) {
             if (!entry.foodid) {
-                const { foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish } = entry;
+                entry.userid = userid;
 
-                const qinsF = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
-                    " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
-                    " RETURNING foodid;"
-                    , [foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, null]);
-                entry.foodid = qinsF.rows[0].foodid;
+                let res = await fetch("https://tranquil-citadel-37714.herokuapp.com" + "/yourfoods", {
+                    method: "put",
+                    headers: {
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify(entry)
+                });
+                res = await res.json();
+                entry.foodid = res.foodid;
             }
 
             const { foodid, amount, measure } = entry;

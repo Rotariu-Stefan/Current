@@ -9,7 +9,7 @@ class FoodEntry extends React.Component {
         fat: 0, carbs: 0, protein: 0,
         sizeinfo: null, userid: 0, pic: null, price: 0,
         isdish: false,
-        noteid: null,
+        note: null,
         amount: 1,
         measure: "Pieces"
     };
