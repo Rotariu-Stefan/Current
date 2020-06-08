@@ -28,6 +28,7 @@ class MealEntry extends React.Component {
             for (let f of props.mealEntry.foodentries) {
                 this.state.foodEntries.push(<FoodEntry
                     foodEntry={f}
+                    removeFoodEntry={this.onRemoveFoodEntry}
                     className="lineDown"
                     addToMeal={this.addNewFoodEntryMacros}
                     key={this.state.foodCounter} />);
@@ -39,12 +40,35 @@ class MealEntry extends React.Component {
         const { foodEntries } = this.state;
         let { foodCounter } = this.state;
 
-        foodEntries.push(<FoodEntry foodEntry={newFoodEntry} addToMeal={this.addNewFoodEntryMacros} key={foodCounter++} className="lineDown" />);
+        foodEntries.push(<FoodEntry foodEntry={newFoodEntry} removeFoodEntry={this.onRemoveFoodEntry} addToMeal={this.addNewFoodEntryMacros} key={foodCounter++} className="lineDown" />);
 
         this.setState({
             foodEntries: foodEntries,
             foodCounter: foodCounter,
         });
+    };
+
+    onRemoveFoodEntry = (ev, sender) => {
+        const { foodEntries, mealEntry, fat, carbs, protein } = this.state;
+        const { portion } = mealEntry;
+
+        for (let i = 0; i < foodEntries.length; i++)
+            if (foodEntries[i].key == sender._reactInternalFiber.key) {
+                mealEntry.foodentries.splice(i, 1);
+                foodEntries.splice(i, 1)
+
+                this.setState({
+                    foodEntries: foodEntries,
+                    mealEntry: mealEntry,
+                    fat: fat - sender.state.fatRes * portion,
+                    carbs: carbs - sender.state.carbsRes * portion,
+                    protein: protein - sender.state.proteinRes * portion
+                });
+                this.props.addToDay(0 - sender.state.fatRes * portion, 0 - sender.state.carbsRes * portion
+                    , 0 - sender.state.proteinRes * portion);
+            }
+
+        this.props.updateDayMF(this);
     };
 
     toggleHighlight = () => this.setState({
@@ -63,12 +87,11 @@ class MealEntry extends React.Component {
 
         mealEntry.note = newNote;
         this.setState({
-            dayEntry: mealEntry
+            mealEntry: mealEntry
         });
     };
 
     onRemoveNote = () => {
-        console.log("ASDAS");
         const { mealEntry } = this.state;
 
         mealEntry.note = null;

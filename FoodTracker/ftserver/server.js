@@ -330,6 +330,8 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
                 });
                 res = await res.json();
                 entry.foodid = res.foodid;
+                if (!entry.foodid)
+                    throw new Error("Could not enter New Food Item!");
             }
 
             const { foodid, amount, measure } = entry;
@@ -451,7 +453,8 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
     });
     await client.connect();
 
-    //let res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid TYPE INT;");
+    //let res = await client.query(
+    //    "ALTER TABLE users ALTER COLUMN username TYPE varchar(50);");
     //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP NOT NULL;");
     //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP DEFAULT;");
     //let res = await client.query("ALTER TABLE mealdata DROP CONSTRAINT FK_MealData_Food");

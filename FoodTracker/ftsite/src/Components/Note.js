@@ -155,12 +155,12 @@ class Note extends React.Component {
                                 </select>
                                 <button onClick={this.setNote}>Set New Note</button>
                             </div>
-                            <span>Title:</span><input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" />
-                            <span>Text:</span><textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} />
+                            <span>Title:</span><input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" maxLength="50"/>
+                            <span>Text:</span><textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} maxLength="250"/>
                         </div>
                         : < div>
                             <div className="noteSearch">
-                                Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" />
+                                Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" maxLength="100" />
                                 <button onClick={this.setNote}>Select Note</button>
                             </div>
                             <div className="noteSearchArea">
@@ -189,7 +189,7 @@ class Note extends React.Component {
             else
                 return (
                     <div className="note boxShow">
-                        No Note<img className="managerImg" src="SitePics/icons8-plus-16.png" alt="New" onClick={this.onEditAddNote} />
+                        No Note<img className="managerImg" src="SitePics/icons8-plus-16.png" alt="N" onClick={this.onEditAddNote} />
                     </div >
                 );
     };

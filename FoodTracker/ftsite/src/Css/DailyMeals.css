@@ -99,7 +99,7 @@
 
 .macroRes {
     grid-column: span 3;
-    justify-self: center;
+    text-align: center;
 }
 
 .mealTotal, .dayTotal {
@@ -165,7 +165,7 @@
 
 .foodItem {
     display: grid;
-    grid-template-columns: 1fr 6.5rem 2rem;
+    grid-template-columns: 1fr 6.5rem 2.1rem;
 }
 
     .foodItem:hover {
@@ -237,7 +237,7 @@
 
     .newFoodForm div {
         display: flex;
-        justify-content:space-between;
+        justify-content: space-between;
     }
 
     .newFoodForm select {
@@ -249,16 +249,19 @@
         font-size: 1.2rem;
         font-weight: bold;
     }
+
 .smallerInput {
     width: 30%;
 }
+
 .afaInfo {
-    margin:2rem 0;
-    color:purple;
+    margin: 2rem 0;
+    color: purple;
 }
-    /*#endregion addFoodArea Block*/
-    /*#region FoodDetailsArea Block*/
-    #foodDetailsArea {
+/*#endregion addFoodArea Block*/
+
+/*#region FoodDetailsArea Block*/
+#foodDetailsArea {
     display: flex;
     flex-direction: column;
 }
