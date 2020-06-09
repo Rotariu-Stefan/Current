@@ -264,7 +264,7 @@ class DailyMeals extends React.Component {
     };
 
     onUpdateDay = (sender) => {
-        const { mealEntries, dayEntry } = this.state;
+        const { dayEntry } = this.state;
 
         for (let m of dayEntry.meals)
             if ((m.mealid && sender.state.mealEntry.mealid === m.mealid)
@@ -448,7 +448,8 @@ class DailyMeals extends React.Component {
             return <FoodEntry foodItem={newFoodItem}
                 amount={amount}
                 measure={measure}
-                key={this.newFoodKey} />
+                key={this.newFoodKey}
+                readOnly="true"/>
         }
         else
             if (selectedFood) {
@@ -456,10 +457,11 @@ class DailyMeals extends React.Component {
                     amount={amount ? amount : (selectedFood ? (measure === "Pieces" ? 1
                         : selectedFood.state.foodItem.sizeinfo === 0 ? 100 : selectedFood.state.foodItem.sizeinfo) : 0)}
                     measure={measure}
-                    key={selectedFood.state.foodItem.foodid.toString() + amount + measure} />
+                    key={selectedFood.state.foodItem.foodid.toString() + amount + measure}
+                    readOnly="true" />;
             }
             else
-                return <FoodEntry key={"F0"} />
+                return <FoodEntry key={"F0"} readOnly="true" />
     };
 
     changeNewFoodValue = (field, value) => {
@@ -652,7 +654,7 @@ class DailyMeals extends React.Component {
                                 document.querySelector("#isAll").checked)}
                                 onKeyDown={this.onSearchKey}
                                 id="search" type="text"
-                                placeholder="search terms" />
+                                placeholder="search text" />
                         </div>,
                         <div className="searchResults boxShow" key="searchResults">
                             {searchareaIsLoading ? "LOADING..." : sFoodItems}

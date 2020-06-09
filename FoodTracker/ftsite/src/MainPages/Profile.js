@@ -27,7 +27,7 @@ class Profile extends React.Component {
                         <span>Sex: {user.sex==="1"?"Male":"Female"}</span>
                         <div className="personal">
                             <div>
-                                <img src={`UserPics/${user.pic}`} alt="[NO PIC]" /><br />
+                                <img src={`UserPics/${user.pic ? user.pic :"profileEmpty.png"}`} alt="[NO PIC]" /><br />
                                 <button>Browse</button>
                             </div>
                             <div>

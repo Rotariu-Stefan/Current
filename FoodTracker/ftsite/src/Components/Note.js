@@ -154,12 +154,12 @@ class Note extends React.Component {
                                     {this.options}
                                 </select>
                                 <img src={`SitePics/star${newScore}.png`} alt={"S=" + (newScore)} className="scoreImg" />
-                                <button onClick={this.setNote}>Set New Note</button>
+                                <button onClick={this.setNote}>Apply New Note</button>
                             </div>
                             <span>Title:</span><input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" maxLength="50" />
                             <span>Text:</span><textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} maxLength="250" />
                         </div>
-                        : < div>
+                        : < div className="selectNote">
                             <div className="noteSearch">
                                 Search:<input onChange={(ev) => this.loadNoteViews(ev.currentTarget.value)} type="text" maxLength="100" />
                                 <button onClick={this.setNote}>Select Note</button>

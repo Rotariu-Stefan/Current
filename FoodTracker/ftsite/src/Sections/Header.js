@@ -68,7 +68,7 @@ class Header extends React.Component {
                     <span onClick={() => app.changeMainPage(isLogged ? "Profile" : "Register")}>
                         {username}
                         <br />
-                        <img src={`UserPics/${pic}`} alt="[NO PIC]" />
+                        <img src={`UserPics/${pic ? pic : "profileEmpty.png"}`} alt="[NO PIC]" />
                     </span>
                     <span onClick={() => app.changeMainPage(isLogged ? "Profile" : "Register")} className="navlink">
                         {isLogged ? "Profile" : "Register"}

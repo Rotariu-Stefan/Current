@@ -19,9 +19,9 @@ class NoteView extends React.Component {
         const { score, title, notetext } = note;
 
         return (
-            <div onClick={(ev)=>this.props.selectedChanged(ev,this)} className={"noteView boxShow" + (isSelected ? " nSelected" : "")}>
+            <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"noteView boxShow lineDown" + (isSelected ? " nSelected" : "")}>
                 <img src={`SitePics/star${score}.png`} alt={"S=" + (score)} className="scoreImg" />
-                <span>{title}</span>
+                <span className="title">{title}</span>
                 <span>{"--" + (notetext ? notetext : "<Empty>")}</span>
             </div>
         );

@@ -53,7 +53,7 @@ class MealEntry extends React.Component {
         const { portion } = mealEntry;
 
         for (let i = 0; i < foodEntries.length; i++)
-            if (foodEntries[i].key == sender._reactInternalFiber.key) {
+            if (foodEntries[i].key.toString() === sender._reactInternalFiber.key) {
                 mealEntry.foodentries.splice(i, 1);
                 foodEntries.splice(i, 1)
 

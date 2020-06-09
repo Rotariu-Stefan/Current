@@ -83,7 +83,7 @@
 }
 
     .foodEntry:hover {
-        color: orangered;
+        color: brown;
     }
 
 .name_brand, .amount, .macro {
@@ -169,14 +169,13 @@
 }
 
     .foodItem:hover {
-        color: orangered;
-        background-color: rgba(255, 228, 196, 0.75);
+        background-color: rgba(139, 69, 19, 0.75);
     }
 
 .feSelected {
-    color: coral;
-    background-color: saddlebrown;
-    border: 1px solid coral;
+    color: orange;
+    background-color: rgba(139, 69, 19, 0.75);
+    font-weight: bold;
 }
 
     .feSelected * {
@@ -317,24 +316,28 @@
     border-radius: 10px;
 }
 
-    .note .managerImg:hover, .noteView:hover, .nSelected {
-        color: lightyellow;
+    .note .managerImg:hover, .noteView:hover {
         background-color: slategrey;
     }
 
-    .note .scoreImg {
-        float: left;
-        padding: 0 0.3rem;
-    }
+.nSelected {
+    color: lightyellow;
+    background-color: slategrey;
+}
 
-    .note .title {
-        font-weight: bold;
-        font-size: 1rem;
-    }
+.note .scoreImg {
+    float: left;
+    padding: 0 0.3rem;
+}
 
-    .note .notetext {
-        font-size: 0.8rem;
-    }
+.note .title, .noteView .title {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.note .notetext {
+    font-size: 0.8rem;
+}
 
 .noteEdit {
     display: flex;
@@ -374,4 +377,9 @@
         max-height: 8rem;
         overflow: auto;
     }
+
+.noteSearchArea {
+    height: 10rem;
+    overflow: auto;
+}
 /*#endregion Note*/

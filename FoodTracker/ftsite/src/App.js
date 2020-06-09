@@ -66,7 +66,7 @@ class App extends React.Component {
             [
                 <Header ref={refs.header} key="H" />,
                 <Nav ref={refs.nav} key="N" />,
-                <Main ref={refs.main} page="DailyMeals" key="M" />,
+                <Main ref={refs.main} page="Register" key="M" />,
                 <Footer ref={refs.footer} key="F" />
             ]
         );

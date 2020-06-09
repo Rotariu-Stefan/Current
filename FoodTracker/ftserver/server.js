@@ -206,17 +206,22 @@ server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register
     console.log("ReqData:", reqData);
 
     const qselU = await client.query("SELECT userid" +
-        "FROM users WHERE email=$1 OR username=$2;", [email, username]);
-    if (qselU.rowCount === 0) {
+        " FROM users WHERE username=$1;", [username]);
+    const qselE = await client.query("SELECT userid" +
+        " FROM users WHERE email=$1;", [email]);
+    if (qselU.rowCount > 0)
+        res.json("Invalid info at Register - Username already exists!");
+    else if (qselE.rowCount > 0)
+        res.json("Invalid info at Register - Email already exists!");
+
+    else if (qselU.rowCount === 0) {
         const qinsU = await client.query("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
-            " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)" +
+            " VALUES($1, $2, $3, $4, $5, $6, $7, $8, 'Breakfast,Lunch,Dinner', 'User', $9)" +
             " RETURNING userid;"
-            , [username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access
-                , bcrypt.hashSync(pass)]);
+            , [username, email, firstname, lastname, dob, sex, describe, pic === "" ? null : pic, bcrypt.hashSync(pass)]);
 
         res.json({ userid: qinsU.rows[0].userid });
-    } else
-        res.json("Invalid info at Register - Username or Email entered is in use!");
+    }
 }));
 
 server.put("/yourfoods", (req, res) => runTransaction(req, res, "PUT", "/yourfoods", async (reqData, res, client) => {
