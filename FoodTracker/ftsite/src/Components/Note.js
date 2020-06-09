@@ -132,7 +132,7 @@ class Note extends React.Component {
     }
 
     render = () => {
-        const { isEdit, isEditValues, note, noteViews, noteViewsIsLoading } = this.state;
+        const { isEdit, isEditValues, note, noteViews, noteViewsIsLoading, newScore } = this.state;
         if (this.props.isMin)
             return <hr />;
 
@@ -141,8 +141,8 @@ class Note extends React.Component {
                 <div className="noteEdit boxShow">
                     <div className="editChoices">
                         <input onChange={(ev) => this.onEditAddNote(false)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="select" checked={!isEditValues} />Select
-                    <input onChange={(ev) => this.onEditAddNote(true)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="values" checked={isEditValues} />Values
-                    <button onClick={() => { this.setState({ isEdit: false }) }}>Cancel</button>
+                        <input onChange={(ev) => this.onEditAddNote(true)} type="radio" name={this._reactInternalFiber.key + "_radio"} value="values" checked={isEditValues} />Values
+                        <button onClick={() => { this.setState({ isEdit: false }) }}>Cancel</button>
                     </div>
                     {isEditValues
                         ? <div className="newNote">
@@ -153,10 +153,11 @@ class Note extends React.Component {
                                 })} defaultValue={0}>
                                     {this.options}
                                 </select>
+                                <img src={`SitePics/star${newScore}.png`} alt={"S=" + (newScore)} className="scoreImg" />
                                 <button onClick={this.setNote}>Set New Note</button>
                             </div>
-                            <span>Title:</span><input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" maxLength="50"/>
-                            <span>Text:</span><textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} maxLength="250"/>
+                            <span>Title:</span><input onChange={(ev) => this.setState({ newTitle: ev.currentTarget.value })} type="text" maxLength="50" />
+                            <span>Text:</span><textarea onChange={(ev) => this.setState({ newText: ev.currentTarget.value })} maxLength="250" />
                         </div>
                         : < div>
                             <div className="noteSearch">
@@ -176,7 +177,7 @@ class Note extends React.Component {
 
                 return (
                     <div className="note boxShow">
-                        <img src="SitePics/star.png" alt={"S=" + (score)} className="scoreImg" />
+                        <img src={`SitePics/star${score}.png`} alt={"S=" + (score)} className="scoreImg" />
                         <img onClick={this.props.removeNote} src="SitePics/icons8-close-window-16.png"
                             alt="X" className="managerImg" />
                         <img onClick={() => this.onEditAddNote(true)} src="SitePics/icons8-edit-16.png"
