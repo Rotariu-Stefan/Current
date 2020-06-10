@@ -7,17 +7,13 @@ import FoodItem from '../Components/FoodItem';
 import Note from '../Components/Note';
 import { app } from '../App';
 
-const dateToStr = (dateObj) => {
-    return `${dateObj.getFullYear()}-${dateObj.getMonth() + 1 > 9 ? (dateObj.getMonth() + 1).toString() : "0" + (dateObj.getMonth() + 1).toString()}-${dateObj.getDate() > 9 ? dateObj.getDate().toString() : "0" + dateObj.getDate().toString()}`;
-};
-
 class DailyMeals extends React.Component {
     constructor(props) {
         super(props);
 
         this.newFoodKey = "mustchange";
         this.state = {
-            selectedDay: dateToStr(new Date()),//'2020-11-11')),
+            selectedDay: app.dateToStr(new Date()),//'2020-11-11')),
             dayEntry: {},
             dayFat: 0,
             dayCarbs: 0,
@@ -499,7 +495,7 @@ class DailyMeals extends React.Component {
         let d = new Date(selectedDay);
         d.setDate(d.getDate() + nrDays);
 
-        this.loadDailyMeals(dateToStr(d));
+        this.loadDailyMeals(app.dateToStr(d));
     }
 
     onSearchKey = (ev) => {
@@ -546,8 +542,6 @@ class DailyMeals extends React.Component {
     };
 
     onAmountKey = (ev) => {
-        //console.log(this.state.dayEntry);
-
         switch (ev.key) {
             case "Enter":
                 this.onAddNewFoodEntry();

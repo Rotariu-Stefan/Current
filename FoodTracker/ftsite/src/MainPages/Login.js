@@ -9,48 +9,63 @@ class Login extends React.Component {
         super(props);
 
         this.state = {
-            warningMsg: null
+            warningMsg: null,
+            isLoading: false
         };
     }
 
     onLogin = async (ev) => {
-        try {
-            ev.preventDefault();
-            const inputs = document.querySelectorAll("#logform input");
-            const usernameText = inputs[0].value;
-            const passText = inputs[1].value;
+        ev.preventDefault();
 
-            let res = await fetch(app.getServerURL() + "/login", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: usernameText,
-                    pass: passText
-                })
-            });
-            if (res.status === 200) {
-                res = await res.json();
-                if (typeof res === "string")
-                    this.setState({
-                        warningMsg: res
-                    });
-                else {
-                    app.updateUser(res);
-                    app.changeMainPage("Profile");
+        this.setState({
+            isLoading: true
+        });
+
+        ; (async () => {
+            try {
+                const inputs = document.querySelectorAll("#logform input");
+                const usernameText = inputs[0].value;
+                const passText = inputs[1].value;
+
+                let res = await fetch(app.getServerURL() + "/login", {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: usernameText,
+                        pass: passText
+                    })
+                });
+                if (res.status === 200) {
+                    res = await res.json();
+                    if (typeof res === "string")
+                        this.setState({
+                            warningMsg: res
+                        });
+                    else {
+                        app.updateUser(res);
+                        app.changeMainPage("Profile");
+                    }
                 }
-            }
-            else {
-                console.log(await res.json());
-            }
+                else {
+                    console.log(await res.json());
+                }
 
-        } catch (err) {
-            console.log("___________ERROR___________\n", err.message);
-        }
-    }
+            } catch (err) {
+                console.log("___________ERROR___________\n", err.message);
+            }
+            finally {
+                this.setState({
+                    isLoading: false
+                });
+            }
+        })();
+    };
 
     render = () => {
+        const { warningMsg, isLoading } = this.state;
+
         return (
             <main className="mainRegLog boxShow">
                 <form onSubmit={this.onLogin} id="logform" className="subblock boxShow">
@@ -58,9 +73,9 @@ class Login extends React.Component {
                     <div className="fields">
                         <span>Username/Email: </span><input type="text" name="username" />
                         <span>Password: </span><input type="password" name="password" />
-                        <span>Remember Me? <input type="checkbox" name="member" /></span>
-                        <span className={this.state.warningMsg === null ? "hidden" : "warning"}>{this.state.warningMsg}</span>
-                        <input className="ftButton" type="submit" value="Login" />
+                        <span disabled={isLoading} >Remember Me? <input type="checkbox" name="member" /></span>
+                        <span className={warningMsg === null ? "hidden" : "warning"}>{this.state.warningMsg}</span>
+                        <input disabled={isLoading} className="ftButton" type="submit" value="Login" />
                     </div>
                     {/*
                     <div className="loglinks">
@@ -69,8 +84,8 @@ class Login extends React.Component {
                     </div>
                     */}
                     <div className="loglinks">
-                        <span onClick={() => app.changeMainPage("Home")}>Forgot Password?</span>
-                        <span onClick={() => app.changeMainPage("Register")}>New here? Go Register!</span>
+                        <span disabled={isLoading} onClick={() => app.changeMainPage("Home")}>Forgot Password?</span>
+                        <span disabled={isLoading} onClick={() => app.changeMainPage("Register")}>New here? Go Register!</span>
                     </div>
                 </form>
             </main>

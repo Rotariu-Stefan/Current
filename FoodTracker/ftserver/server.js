@@ -60,9 +60,9 @@ server.post("/login", (req, res) => runTransaction(req, res, "POST", "/login", a
     const { username, pass } = reqData;
     console.log("ReqData:", username, pass);
 
-    const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass" +
+    const qsel = await client.query("SELECT userid, username, email, firstname, lastname, dob, sex, describe, pic, diet, defaultmeals, access, pass" +
         " FROM users" +
-        " WHERE (username=$1 OR email=$1)"
+        " WHERE username=$1"
         , [username]);
     if (qsel.rowCount === 1)
         if (bcrypt.compareSync(pass, qsel.rows[0].pass)) {
@@ -202,7 +202,7 @@ server.get("/yourfoods", (req, res) => runTransaction(req, res, "GET", "/yourfoo
 }));
 
 server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register", async (reqData, res, client) => {
-    const { username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass } = reqData;
+    const { username, email, firstname, lastname, dob, sex, describe, pic, diet, defaultmeals, access, pass } = reqData;
     console.log("ReqData:", reqData);
 
     const qselU = await client.query("SELECT userid" +
@@ -213,12 +213,11 @@ server.put("/register", (req, res) => runTransaction(req, res, "PUT", "/register
         res.json("Invalid info at Register - Username already exists!");
     else if (qselE.rowCount > 0)
         res.json("Invalid info at Register - Email already exists!");
-
     else if (qselU.rowCount === 0) {
-        const qinsU = await client.query("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, defaultmeals, access, pass)" +
-            " VALUES($1, $2, $3, $4, $5, $6, $7, $8, 'Breakfast,Lunch,Dinner', 'User', $9)" +
+        const qinsU = await client.query("INSERT INTO users(username, email, firstname, lastname, dob, sex, describe, pic, diet, defaultmeals, access, pass)" +
+            " VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Breakfast,Lunch,Dinner', 'User', $10)" +
             " RETURNING userid;"
-            , [username, email, firstname, lastname, dob, sex, describe, pic === "" ? null : pic, bcrypt.hashSync(pass)]);
+            , [username, email, firstname, lastname, dob, sex, describe, pic, diet, bcrypt.hashSync(pass)]);
 
         res.json({ userid: qinsU.rows[0].userid });
     }
@@ -353,15 +352,25 @@ server.put("/dailymeals", (req, res) => runTransaction(req, res, "PUT", "/dailym
 }));
 
 server.post("/profile", (req, res) => runTransaction(req, res, "POST", "/profile", async (reqData, res, client) => {
-    const { userid, username, email, firstname, lastname, dob, sex, describe, pic } = reqData;
-    console.log("ReqData:", userid, reqdate);
+    const { userid, username, email, firstname, lastname, dob, sex, describe, pic, diet } = reqData;
+    console.log("ReqData:", reqData);
 
-    const qupd = await client.query("UPDATE users" +
-        " SET username=$1, email=$2, firstname=$3, lastname=$4, dob=$5, sex=$6, describe=$7, pic=$8" +
-        " WHERE userid=$9;"
-        , [username, email, firstname, lastname, dob, sex, describe, pic, userid]);
+    const qselU = await client.query("SELECT userid" +
+        " FROM users WHERE username=$1;", [username]);
+    const qselE = await client.query("SELECT userid" +
+        " FROM users WHERE email=$1;", [email]);
+    if (qselU.rowCount > 0 && qselU.rows[0].userid !== reqData.userid)
+        res.json("Invalid info at Register - Username already exists!");
+    else if (qselE.rowCount > 0 && qselU.rows[0].userid !== reqData.userid)
+        res.json("Invalid info at Register - Email already exists!");
+    else {
+        const qupd = await client.query("UPDATE users" +
+            " SET username=$1, email=$2, firstname=$3, lastname=$4, dob=$5, sex=$6, describe=$7, pic=$8, diet=$9" +
+            " WHERE userid=$10;"
+            , [username, email, firstname, lastname, dob, sex, describe, pic, diet, userid]);
 
-    res.json("User Profile Updated!");
+        res.json("User Profile Updated!");
+    }
 }));
 
 server.post("/profile/changepass", (req, res) => runTransaction(req, res, "POST", "/profile/changepass", async (reqData, res, client) => {
@@ -464,13 +473,15 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
     //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP DEFAULT;");
     //let res = await client.query("ALTER TABLE mealdata DROP CONSTRAINT FK_MealData_Food");
     //res = await client.query("ALTER TABLE mealdata ADD CONSTRAINT FK_MealData_Food FOREIGN KEY(FoodID) REFERENCES FoodItems(FoodID) ON DELETE SET NULL");
+    //let res = await client.query("ALTER TABLE users ADD COLUMN diet varchar(50);");
+    let res = await client.query("SELECT * FROM users;");
 
     //const res = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
     //    " VALUES('halva', 'suntat', 35, 47, 12, 0, 1, null, default, false, null)" +
     //    " RETURNING foodid;");
 
 
-
-    //console.log(res.rows);
+    
+    console.log(res.rows);
     await client.end();
 })();
