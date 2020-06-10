@@ -660,7 +660,7 @@ class DailyMeals extends React.Component {
                             {searchareaIsLoading ? "LOADING..." : sFoodItems}
                         </div>]}
                     <div className="amountForm boxShow">
-                        <label className="textHigh">Amount: </label>{/*aaaaaaaaaaaaaaaaaa*/}
+                        <label className="textHigh">Quantity: </label>
                         <input disabled={searchareaIsLoading} id="amountSize" type="text" value={amount}
                             onChange={(ev) => this.setState({ amount: ev.currentTarget.value })}
                             onKeyDown={this.onAmountKey}

@@ -25,7 +25,7 @@ import YourFood from '../MainPages/YourFood';
 import YourPlans from '../MainPages/YourPlans';
 import YourStats from '../MainPages/YourStats';
 import GlobalStats from '../MainPages/GlobalStats';
-import GlobalData from '../MainPages/GlobalData';
+import GlobalData from '../MainPages/UsersData';
 import Profile from '../MainPages/Profile';
 import Login from '../MainPages/Login';
 import Register from '../MainPages/Register';

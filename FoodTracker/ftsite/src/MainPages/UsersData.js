@@ -1,13 +1,13 @@
 import React from 'react';
 
-const GlobalData = () => {
+const UsersData = () => {
     return (
         <main className="boxShow">
             <div className="subblock">
-                <h1>GLOBAL DATA!</h1>
+                <h1>USERS DATA!</h1>
             </div>
         </main>
     );
 }
 
-export default GlobalData;
+export default UsersData;

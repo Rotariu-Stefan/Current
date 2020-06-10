@@ -25,7 +25,7 @@ class Nav extends React.Component {
             <span onClick={() => app.changeMainPage("YourPlans")} className="navlink textHigh">Your Plans</span>|
             <span onClick={() => app.changeMainPage("YourStats")} className="navlink textHigh">Your Stats</span>|
             <span onClick={() => app.changeMainPage("GlobalStats")} className="navlink textHigh">Global Stats</span>|
-            <span onClick={() => app.changeMainPage("GlobalData")} className="navlink textHigh">Global Data</span>
+            <span onClick={() => app.changeMainPage("GlobalData")} className="navlink textHigh">Users Data</span>
             </nav>
         );
     };

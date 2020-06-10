@@ -460,7 +460,7 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
 
     //let res = await client.query(
     //    "ALTER TABLE users ALTER COLUMN username TYPE varchar(50);");
-    //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP NOT NULL;");
+    //res = await client.query("ALTER TABLE users ALTER COLUMN firstname DROP NOT NULL;");
     //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP DEFAULT;");
     //let res = await client.query("ALTER TABLE mealdata DROP CONSTRAINT FK_MealData_Food");
     //res = await client.query("ALTER TABLE mealdata ADD CONSTRAINT FK_MealData_Food FOREIGN KEY(FoodID) REFERENCES FoodItems(FoodID) ON DELETE SET NULL");

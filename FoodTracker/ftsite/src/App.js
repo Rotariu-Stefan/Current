@@ -59,6 +59,12 @@ class App extends React.Component {
         }
     };
 
+    updateUserProfile = (data) => {
+        const { currentUser } = this.state;
+
+        //TODO:ETC!!
+    };
+
     changeMainPage = (newPage) => refs.main.current.changePage(newPage);
 
     render = () => {
@@ -66,7 +72,7 @@ class App extends React.Component {
             [
                 <Header ref={refs.header} key="H" />,
                 <Nav ref={refs.nav} key="N" />,
-                <Main ref={refs.main} page="Register" key="M" />,
+                <Main ref={refs.main} page="Login" key="M" />,
                 <Footer ref={refs.footer} key="F" />
             ]
         );
