@@ -61,9 +61,10 @@
     text-align: center;
     color: red;
 }
-.req{
-    text-decoration:underline;
-    font-weight:bold;
+
+.req {
+    text-decoration: underline;
+    font-weight: bold;
 }
 
 .loglinks {
@@ -77,11 +78,8 @@
 /*#endregion Main*/
 
 /*#region Profile*/
-.profileButtons{
-    display:flex;
-    justify-content:space-around;
+.profileButtons {
+    display: flex;
+    justify-content: space-around;
 }
-
-
-
 /*#endregion Profile*/

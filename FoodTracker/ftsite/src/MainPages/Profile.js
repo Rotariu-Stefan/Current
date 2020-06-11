@@ -145,7 +145,7 @@ class Profile extends React.Component {
     browseUserPic = (ev) => {
         ev.preventDefault();
 
-        console.log("BrowsePic");
+        alert("Sorry. Not implemented yet...")
     };
 
     render = () => {

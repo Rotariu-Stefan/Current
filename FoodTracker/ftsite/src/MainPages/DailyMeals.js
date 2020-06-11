@@ -13,7 +13,8 @@ class DailyMeals extends React.Component {
 
         this.newFoodKey = "mustchange";
         this.state = {
-            selectedDay: app.dateToStr(new Date()),//'2020-11-11')),
+            selectedDay: app.dateToStr(
+                app.state.currentUser.access === "Guest" ? new Date("2020-06-07"): new Date()),//'2020-11-11')),
             dayEntry: {},
             dayFat: 0,
             dayCarbs: 0,
@@ -41,7 +42,7 @@ class DailyMeals extends React.Component {
                 sizeinfo: 100,
                 isdish: false,
                 pic: "empty.png",
-                userid: 0,
+                userid: app.state.currentUser.userid,
                 noteid: null,
             },
 
@@ -54,6 +55,11 @@ class DailyMeals extends React.Component {
     }
 
     loadDailyMeals = (day) => {
+        if (app.state.currentUser.access === "Guest" && (new Date(day) < new Date("2020-06-04") || new Date(day) > new Date("2020-06-11"))) {
+            alert("As Guest user you can Only select from the 2020-06-04 to 2020-06-11 period!");
+            return;
+        }
+
         this.setState({
             mealEntries: [],
             selectedMeal: null,
@@ -65,15 +71,13 @@ class DailyMeals extends React.Component {
 
         ; (async () => {
             let { mealCounter } = this.state;
-            //If app.currentUser is Guest pretend it's SV
-            const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
 
             let res = await fetch(app.getServerURL() + "/dailymeals", {
                 method: "get",
                 headers: {
                     "content-type": "application/json",
                     "reqdate": day,
-                    "userid": userId,
+                    "userid": app.state.currentUser.userid,
                 }
             });
             res = await res.json();
@@ -126,15 +130,11 @@ class DailyMeals extends React.Component {
                 return;
 
             let { sFoodCounter } = this.state;
-            //If app.currentUser is Guest pretend it's SV
-            const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
-
-            let res;
-            res = await fetch(app.getServerURL() + "/dailymeals/foodsearch", {
+            let res = await fetch(app.getServerURL() + "/dailymeals/foodsearch", {
                 method: "get",
                 headers: {
                     "content-type": "application/json",
-                    "userid": userId,
+                    "userid": app.state.currentUser.userid,
                     "search": searchTerms,
                     "isall": isAll
                 }
@@ -171,13 +171,14 @@ class DailyMeals extends React.Component {
     };
 
     onCommit = (ev) => {
+        this.setState({
+            searchareaIsLoading: true
+        });
         ; (async (searchCounter) => {
             const { dayEntry, selectedDay } = this.state;
-            //IF Guest assume SV
-            const userId = app.state.currentUser.userid === 0 ? 1 : app.state.currentUser.userid;
 
             const dayPutReq = dayEntry;
-            dayPutReq.userid = userId;
+            dayPutReq.userid = app.state.currentUser.userid;
             dayPutReq.date = selectedDay;
 
             let res = await fetch(app.getServerURL() + "/dailymeals", {
@@ -194,9 +195,17 @@ class DailyMeals extends React.Component {
             alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
             console.log(res);
         })();
+        this.setState({
+            searchareaIsLoading: false
+        });
     };
 
     onAddNewMeal = (ev) => {
+        if (app.state.currentUser.access === "Guest" && this.state.mealEntries.length === 5) {
+            alert("As Guest user you cannot enter more than 5 Meals per day!");
+            return;
+        }
+
         const { mealEntries, dayEntry, newFoodForm } = this.state;
         let { mealCounter } = this.state;
 
@@ -320,6 +329,11 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewFoodEntry = (ev) => {
+        if (app.state.currentUser.access === "Guest" && this.state.selectedMeal.state.foodEntries.length === 7) {
+            alert("As Guest user you cannot enter more than 7 Food Items per meal!");
+            return;
+        }
+
         const { selectedMeal, selectedFood, dayEntry, amount, measure, newFoodForm, newFoodItem } = this.state;
 
         if (selectedMeal === null) {
@@ -372,7 +386,7 @@ class DailyMeals extends React.Component {
                 sizeinfo: 100,
                 isdish: false,
                 pic: "empty.png",
-                userid: 0,
+                userid: app.state.currentUser.userid,
                 noteid: null,
             }
         });
@@ -445,7 +459,7 @@ class DailyMeals extends React.Component {
                 amount={amount}
                 measure={measure}
                 key={this.newFoodKey}
-                readOnly="true"/>
+                readOnly="true" />
         }
         else
             if (selectedFood) {
@@ -469,13 +483,17 @@ class DailyMeals extends React.Component {
                 psi.disabled = true;
                 psi.value = "";
                 aux.sizeinfo = null;
-                this.state.amount = 1;
+                this.setState({
+                    amount : 1
+                });
             }
             else {
                 document.querySelector(".PSInput").disabled = false;
                 psi.value = 100;
                 aux.sizeinfo = 100;
-                this.state.amount = 100;
+                this.setState({
+                    amount: 100
+                });
             }
         }
         else {
@@ -689,8 +707,9 @@ class DailyMeals extends React.Component {
                     <div id="foodDetailsArea" className="subblock boxShow">
                         <div className="foodDetailsHeader">
                             <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
-                            <Note removeNote={() => { }} note={selectedFoodDetails ? selectedFoodDetails.note : null}
-                                key={"F" + (selectedFoodDetails.note ? selectedFoodDetails.note.noteid : "0")} />
+                            {/*<Note removeNote={() => { }} note={selectedFoodDetails ? selectedFoodDetails.note : null}
+                                key={"F" + (selectedFoodDetails.note ? selectedFoodDetails.note.noteid : "0")}
+                            />*/}
                         </div>
                         <div className="foodPic boxShow">
                             <img src={`FoodPics/${pic ? pic : "empty.png"}`} alt="[NO FOOD PIC]" />

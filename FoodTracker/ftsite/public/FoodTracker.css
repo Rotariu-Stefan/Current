@@ -192,4 +192,13 @@ footer {
 textarea {
     resize: none;
 }
+
+p {
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-bottom: dotted 1px;
+}
+p span{
+    color:red;
+}
 /*#endregion Misc Classes*/

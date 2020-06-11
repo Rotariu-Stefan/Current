@@ -62,13 +62,13 @@ class Register extends React.Component {
                     });
                     res = await res.json();
 
-                    if (res.includes("Username"))
+                    if (res.userid) {
+                        app.changeMainPage("Login");
+                    }
+                    else if (res.includes("Username"))
                         this.setState({ warning: "username" });
                     else if (res.includes("Email"))
                         this.setState({ warning: "email" });
-                    else if (res.userid) {
-                        app.changeMainPage("Login");
-                    }
                     else
                         console.log(res);
                 }
@@ -87,7 +87,7 @@ class Register extends React.Component {
     browseUserPic = (ev) => {
         ev.preventDefault();
 
-        console.log("BrowsePic");
+        alert("Sorry. Not implemented yet...")
     }
 
     render = () => {
@@ -99,7 +99,7 @@ class Register extends React.Component {
                     <h1 className="lineDown">Please Complete Required fields to Register</h1>
                     <div className="fields">
                         <span className="req">Username:</span>
-                        <input onChange={(ev) => this.setState({ user: ev.currentTarget.value })} type="text" name="username" pattern=".{3,}" required title="3 characters minimum" />
+                        <input onChange={(ev) => this.setState({ username: ev.currentTarget.value })} type="text" name="username" pattern=".{3,}" required title="3 characters minimum" />
                         <span className={"warning" + (warning === "username" ? "" : " hidden")}>Username is Already Taken!</span>
                         <span className="req">Email:</span>
                         <input onChange={(ev) => this.setState({ email: ev.currentTarget.value })} type="email" name="email" />

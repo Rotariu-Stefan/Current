@@ -453,12 +453,6 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
 }));
 
 ; (async () => {
-    //await showDB(process.argv[2]);
-    //bcrypt.hash("mamapass", null, null, async function (err, hash) {
-    //    console.log(bcrypt.compareSync("mamapass", hash));
-    //});
-
-
     const client = new pg.Client({
         connectionString: process.env.DATABASE_URL || process.argv[2],
         ssl: {
@@ -467,21 +461,22 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
     });
     await client.connect();
 
-    //let res = await client.query(
+    let res;
+    //res = await client.query(
     //    "ALTER TABLE users ALTER COLUMN username TYPE varchar(50);");
     //res = await client.query("ALTER TABLE users ALTER COLUMN firstname DROP NOT NULL;");
     //res = await client.query("ALTER TABLE mealdata ALTER COLUMN foodid DROP DEFAULT;");
-    //let res = await client.query("ALTER TABLE mealdata DROP CONSTRAINT FK_MealData_Food");
+    //res = await client.query("ALTER TABLE mealdata DROP CONSTRAINT FK_MealData_Food");
     //res = await client.query("ALTER TABLE mealdata ADD CONSTRAINT FK_MealData_Food FOREIGN KEY(FoodID) REFERENCES FoodItems(FoodID) ON DELETE SET NULL");
-    //let res = await client.query("ALTER TABLE users ADD COLUMN diet varchar(50);");
-    let res = await client.query("SELECT * FROM users;");
+    //res = await client.query("ALTER TABLE users ADD COLUMN diet varchar(50);");
 
-    //const res = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
+    //res = await client.query("INSERT INTO fooditems (foodname, brand, fat, carbs, protein, sizeinfo, userid, pic, price, isdish, noteid)" +
     //    " VALUES('halva', 'suntat', 35, 47, 12, 0, 1, null, default, false, null)" +
     //    " RETURNING foodid;");
 
+    //res = await client.query("INSERT INTO Users OVERRIDING SYSTEM VALUE VALUES (0, 'Guest', 'guest@nomail.com', 'John', 'Doe', '2020/01/01', null, 'Nobody...', 'profileEmpty.png', default, 'Guest', 'password', null);");
 
-    
+    res = await client.query("SELECT * FROM users;");
     console.log(res.rows);
     await client.end();
 })();
