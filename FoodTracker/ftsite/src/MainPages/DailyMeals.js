@@ -350,6 +350,10 @@ class DailyMeals extends React.Component {
                 alert("Macro value are wrong!");
                 return;
             }
+            if (isNaN(newFoodItem.price)) {
+                alert("Price value is wrong!");
+                return;
+            }
         }
         else if (selectedFood === null) {
             alert("Must select a Food Item !");
