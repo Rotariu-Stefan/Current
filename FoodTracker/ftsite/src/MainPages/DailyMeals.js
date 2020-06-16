@@ -14,7 +14,7 @@ class DailyMeals extends React.Component {
         this.newFoodKey = "mustchange";
         this.state = {
             selectedDay: app.dateToStr(
-                app.state.currentUser.access === "Guest" ? new Date("2020-06-07"): new Date()),//'2020-11-11')),
+                app.state.currentUser.access === "Guest" ? new Date("2020-06-07") : new Date()),//'2020-11-11')),
             dayEntry: {},
             dayFat: 0,
             dayCarbs: 0,
@@ -354,6 +354,10 @@ class DailyMeals extends React.Component {
                 alert("Price value is wrong!");
                 return;
             }
+            if (isNaN(newFoodItem.sizeinfo) || newFoodItem.sizeinfo < 0) {
+                alert("Piece Size value is wrong!");
+                return;
+            }
         }
         else if (selectedFood === null) {
             alert("Must select a Food Item !");
@@ -488,7 +492,7 @@ class DailyMeals extends React.Component {
                 psi.value = "";
                 aux.sizeinfo = null;
                 this.setState({
-                    amount : 1
+                    amount: 1
                 });
             }
             else {
@@ -503,6 +507,8 @@ class DailyMeals extends React.Component {
         else {
             if (field === "sizeinfo")
                 value = value === "" ? null : value;
+            if (field === "fat" || field === "carbs" || field === "protein")
+                value = value === "" ? 0 : value;
             aux[field] = value;
         }
         this.setState({
