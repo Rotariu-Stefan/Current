@@ -1,0 +1,93 @@
+import React from 'react';
+import logo from './logo.svg';
+import './App.css';
+import TestLabel from './TestLabel';
+
+class App extends React.Component {
+    state = {
+        isNothing: true
+    };
+
+    showLabel = () => {
+        const { isNothing } = this.state;
+
+        if (isNothing)
+            return <TestLabel />;
+        else
+            return <TestLabel text="some random text lul!" />;
+    };
+
+    showLabel2 = () => {
+        const { isNothing } = this.state;
+
+        if (isNothing)
+            return <TestLabel key="N" />;
+        else
+            return <TestLabel text="some random text lul!" />;
+    };
+
+    showLabel3 = () => {
+        const { isNothing } = this.state;
+
+        if (isNothing)
+            return <TestLabel key="N2" />;
+        else
+            return <TestLabel text="some random text lul!" key="N2" />;
+    };
+
+    showLabel4 = () => {
+        const { isNothing } = this.state;
+
+        if (isNothing)
+            return "Nothing Plain Text";
+        else
+            return <TestLabel text="some random text lul!" />;
+    };
+
+    showLabelB = () => {
+        const { isNothing } = this.state;
+
+        if (isNothing)
+            return <TestLabel text="some random text lul!" />;
+        else
+            return <TestLabel text="some OTHER random text lul!" />;
+    };
+
+    showLabelB2 = () => {
+        const { isNothing } = this.state;
+
+        if (isNothing)
+            return <TestLabel text="some random text lul!" key="ETC" />;
+        else
+            return <TestLabel text="some OTHER random text lul!" />;
+    };
+
+    render = () => {
+        const { isNothing } = this.state;
+
+        return (
+            <div className="App">
+                <button onClick={() => this.setState({
+                    isNothing: !isNothing
+                })}>{"It's " + (isNothing ? "Nothing" : "Some Text")}</button>
+                {
+                    this.showLabel()    //nu merge
+                }
+                {
+                    this.showLabel2()   //merge
+
+                    //this.showLabel3()   //nu merge
+                    //this.showLabel4()   //merge
+                }
+                {
+                    this.showLabelB()   //nu merge
+                }
+                {
+                    this.showLabelB2()  //merge
+                }
+            </div>
+        );
+    }
+}
+
+export default App;

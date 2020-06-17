@@ -63,15 +63,15 @@ class FoodEntry extends React.Component {
                         : <img className="managerImg" src="SitePics/icons8-closeM-window-16.png" alt="X" onClick={(ev) => this.props.removeFoodEntry(ev, this)} />}
                 </span>
             </div>
-                );
+        );
     };
 
     componentDidMount = () => {
-        const {fatRes, carbsRes, proteinRes } = this.state;
+        const { fatRes, carbsRes, proteinRes } = this.state;
 
         if (this.props.addToMeal) {
-                    this.props.addToMeal(fatRes, carbsRes, proteinRes);
-                }
+            this.props.addToMeal(fatRes, carbsRes, proteinRes);
+        }
     }
 }
 
