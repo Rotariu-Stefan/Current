@@ -396,7 +396,7 @@ server.post("/profile/changepass", (req, res) => runTransaction(req, res, "POST"
 }));
 
 server.post("/yourfoods", (req, res) => runTransaction(req, res, "POST", "/yourfoods", async (reqData, res, client) => {
-    const { foodid, foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish, note, composition } = reqData;
+    const { foodid, foodname, brand, fat, carbs, protein, sizeinfo, pic, price, isdish, note, foodentries } = reqData;
     console.log("ReqData:", reqData);
 
     const returnData = { foodid: foodid };
@@ -443,6 +443,25 @@ server.post("/yourfoods", (req, res) => runTransaction(req, res, "POST", "/yourf
 
 }));
 
+server.post("/dailymeals/dishupdate", (req, res) => runTransaction(req, res, "POST", "/dailymeals/dishupdate", async (reqData, res, client) => {
+    const { dishid, foodentries } = reqData;
+    console.log("ReqData:", reqData);
+
+    const qdel = await client.query("DELETE FROM dishdata" +
+        " WHERE dishid=$1;"
+        , [dishid]);
+    const returnData = { dishid: dishid, entryids: [] };
+    for (entry of foodentries) {
+        const { foodid, amount, measure } = entry;
+        const qins = await client.query("INSERT INTO dishdata (dishid, ingredientid, amount, measure)" +
+            " VALUES($1, $2, $3, $4)" +
+            " RETURNING entryid;"
+            , [dishid, foodid, amount, measure]);
+        returnData.entryids.push(qins.rows[0].entryid);
+    }
+    res.json(returnData);
+}));
+
 server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/yourfoods", async (reqData, res, client) => {
     const { foodid } = reqData;
 
@@ -476,7 +495,7 @@ server.delete("/yourfoods", (req, res) => runTransaction(req, res, "DELETE", "/y
 
     //res = await client.query("INSERT INTO Users OVERRIDING SYSTEM VALUE VALUES (0, 'Guest', 'guest@nomail.com', 'John', 'Doe', '2020/01/01', null, 'Nobody...', 'profileEmpty.png', default, 'Guest', 'password', null);");
 
-    res = await client.query("SELECT * FROM users;");
-    console.log(res.rows);
+    //res = await client.query("SELECT * FROM users;");
+    //console.log(res.rows);
     await client.end();
 })();

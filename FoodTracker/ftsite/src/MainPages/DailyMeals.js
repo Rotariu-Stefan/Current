@@ -44,10 +44,12 @@ class DailyMeals extends React.Component {
                 pic: "empty.png",
                 userid: app.state.currentUser.userid,
                 noteid: null,
+                foodentries: null
             },
 
             selectedFoodDetails: null,
-            composition: []
+            composition: [],
+            dishSelected: false
         };
 
         this.loadDailyMeals(this.state.selectedDay);
@@ -115,7 +117,7 @@ class DailyMeals extends React.Component {
                 mealareaIsLoading: false,
             });
         })();
-    }
+    };
 
     loadSFoodItems = (searchTerms, isAll) => {
         this.setState({
@@ -192,7 +194,10 @@ class DailyMeals extends React.Component {
 
             this.loadDailyMeals(this.state.selectedDay);
 
-            alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
+            if (typeof res !== "string")
+                alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
+            else
+                alert("There was an Error!");
             console.log(res);
         })();
         this.setState({
@@ -292,7 +297,8 @@ class DailyMeals extends React.Component {
             sender.toggleHighlight();
 
             this.setState({
-                selectedMeal: sender
+                selectedMeal: sender,
+                dishSelected: false
             });
         }
     };
@@ -329,15 +335,17 @@ class DailyMeals extends React.Component {
     };
 
     onAddNewFoodEntry = (ev) => {
-        if (app.state.currentUser.access === "Guest" && this.state.selectedMeal.state.foodEntries.length === 7) {
+        const { selectedMeal, selectedFood, dayEntry, amount, measure, newFoodForm, newFoodItem, dishSelected, composition, selectedFoodDetails } = this.state;
+
+        if (app.state.currentUser.access === "Guest" && (
+            (selectedMeal && selectedMeal.state.foodEntries.length >= 7)
+            || (dishSelected && selectedFoodDetails.foodentries.length >= 7))) {
             alert("As Guest user you cannot enter more than 7 Food Items per meal!");
             return;
         }
 
-        const { selectedMeal, selectedFood, dayEntry, amount, measure, newFoodForm, newFoodItem } = this.state;
-
-        if (selectedMeal === null) {
-            alert("Must select a Meal !");
+        if (selectedMeal === null && dishSelected === false) {
+            alert("Must select a Meal or Dish!");
             return;
         }
         if (newFoodForm) {
@@ -375,34 +383,171 @@ class DailyMeals extends React.Component {
         newFoodEntry.amount = amount ? amount : document.querySelector("#amountSize").placeholder;
         newFoodEntry.measure = measure;
 
-        selectedMeal.addNewFoodEntry(ev, newFoodEntry);
-        for (let m of dayEntry.meals)
-            if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-                || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
-                m.foodentries.push(newFoodEntry);
-                break;
-            }
+        if (dishSelected) {
+            let { sFoodCounter } = this.state;
+            composition.push(<FoodEntry
+                foodEntry={newFoodEntry}
+                removeFoodEntry={this.onRemoveFoodEntry}
+                key={sFoodCounter++} />);
+            selectedFoodDetails.foodentries.push(newFoodEntry);
 
-        this.setState({
-            dayEntry: dayEntry,
-            newFoodForm: false,
-            newFoodItem: {
-                foodname: "",
-                brand: "",
-                fat: 0, carbs: 0, protein: 0,
-                price: 0,
-                sizeinfo: 100,
-                isdish: false,
-                pic: "empty.png",
-                userid: app.state.currentUser.userid,
-                noteid: null,
-            }
-        });
+            this.setState({
+                composition: composition,
+                selectedFoodDetails: selectedFoodDetails,
+                sFoodCounter: sFoodCounter,
+                newFoodForm: false,
+                newFoodItem: {
+                    foodname: "",
+                    brand: "",
+                    fat: 0, carbs: 0, protein: 0,
+                    price: 0,
+                    sizeinfo: 100,
+                    isdish: false,
+                    pic: "empty.png",
+                    userid: app.state.currentUser.userid,
+                    noteid: null,
+                    foodentries: null
+                }
+            });
+        }
+
+        else if (selectedMeal) {
+            selectedMeal.addNewFoodEntry(ev, newFoodEntry);
+            for (let m of dayEntry.meals)
+                if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
+                    || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
+                    m.foodentries.push(newFoodEntry);
+                    break;
+                }
+
+            this.setState({
+                dayEntry: dayEntry,
+                newFoodForm: false,
+                newFoodItem: {
+                    foodname: "",
+                    brand: "",
+                    fat: 0, carbs: 0, protein: 0,
+                    price: 0,
+                    sizeinfo: 100,
+                    isdish: false,
+                    pic: "empty.png",
+                    userid: app.state.currentUser.userid,
+                    noteid: null,
+                }
+            });
+        }
+
         setTimeout(() => document.querySelector("#search").select(), 0);
     };
 
+    onRemoveFoodEntry = (ev, sender) => {
+        const { composition, selectedFoodDetails } = this.state;
+
+        for (let i = 0; i < composition.length; i++)
+            if (composition[i].key.toString() === sender._reactInternalFiber.key) {
+                selectedFoodDetails.foodentries.splice(i, 1);
+                composition.splice(i, 1)
+
+                this.setState({
+                    composition: composition,
+                    selectedFoodDetails: selectedFoodDetails
+                });
+            }
+    };
+
+    saveDishIngr = (ev) => {
+        const { selectedFoodDetails } = this.state;
+
+        this.setState({
+            selectedFoodDetails: null,
+            dishSelected: false,
+            searchareaIsLoading: true
+        });
+        ; (async () => {
+
+            const dishData = {};
+            dishData.dishid = selectedFoodDetails.foodid;
+            dishData.foodentries = [];
+            for (let f of selectedFoodDetails.foodentries)
+                dishData.foodentries.push({ foodid: f.foodid, amount: f.amount, measure: f.measure });
+
+            let res = await fetch(app.getServerURL() + "/dailymeals/dishupdate", {
+                method: "post",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify(dishData)
+            });
+            res = await res.json();
+
+            document.querySelector("#search").value = selectedFoodDetails.foodname + " " + selectedFoodDetails.brand;
+            this.loadSFoodItems(selectedFoodDetails.foodname + " " + selectedFoodDetails.brand,
+                document.querySelector("#isAll").checked);
+
+            if (typeof res !== "string")
+                alert(`Successfully saved dish: ${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}!\n --You can view resulting entry in the console`);
+            else
+                alert("There was an Error!");
+            console.log(res);
+        })();
+    };
+
+    calculateValues = (ev) => {
+        this.setState({
+            selectedFoodDetails: null,
+            dishSelected: false,
+            searchareaIsLoading: true
+        });
+        ; (async () => {
+            const { selectedFoodDetails } = this.state;
+
+            let fat = 0, carbs = 0, protein = 0;
+            for (let f of selectedFoodDetails.foodentries) {
+                const { amount, measure, sizeinfo } = f;
+                if (measure === "Pieces")
+                    if (sizeinfo === null) {
+                        fat += (f.fat * amount);
+                        carbs += (f.carbs * amount);
+                        protein += (f.protein * amount);
+                    }
+                    else {
+                        fat += (f.fat * amount * sizeinfo / 100);
+                        carbs += (f.carbs * amount * sizeinfo / 100);
+                        protein += (f.protein * amount * sizeinfo / 100);
+                    }
+                else if (measure === "Grams") {
+                    fat += (f.fat * amount / 100);
+                    carbs += (f.carbs * amount / 100);
+                    protein += (f.protein * amount / 100);
+                }
+            }
+            selectedFoodDetails.fat = Number(fat.toFixed(1));
+            selectedFoodDetails.carbs = Number(carbs.toFixed(1));
+            selectedFoodDetails.protein = Number(protein.toFixed(1));
+
+            let res = await fetch(app.getServerURL() + "/yourfoods", {
+                method: "post",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify(selectedFoodDetails)
+            });
+            res = await res.json();
+
+            document.querySelector("#search").value = selectedFoodDetails.foodname + " " + selectedFoodDetails.brand;
+            this.loadSFoodItems(selectedFoodDetails.foodname + " " + selectedFoodDetails.brand,
+                document.querySelector("#isAll").checked);
+
+            if (typeof res !== "string")
+                alert(`Successfully calculated values for dish: ${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}!\n --You can view resulting entry in the console`);
+            else
+                alert("There was an Error!");
+            console.log(res);
+        })();
+    };
+
     onSelectedFoodChanged = (ev, sender) => {
-        const { selectedFood } = this.state;
+        const { selectedFood, dishSelected } = this.state;
 
         if (sender !== selectedFood) {
             if (selectedFood)
@@ -415,37 +560,69 @@ class DailyMeals extends React.Component {
                 selectedFood: sender,
                 amount: "",
                 measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams",
-                selectedFoodDetails: null
+                selectedFoodDetails: dishSelected ? this.state.selectedFoodDetails : null
             });
 
-            ; (async () => {
-                let { sFoodCounter, composition } = this.state;
-                const { foodid, isdish, noteid } = sender.state.foodItem;
-                let res = await fetch(app.getServerURL() + "/dailymeals/fooddetails", {
-                    method: "get",
-                    headers: {
-                        "content-type": "application/json",
-                        "foodid": foodid,
-                        "isdish": isdish,
-                        "noteid": noteid ? noteid : null
+            if (!dishSelected) {
+                ; (async () => {
+                    let { sFoodCounter, composition } = this.state;
+                    const { foodid, isdish, noteid } = sender.state.foodItem;
+                    let res = await fetch(app.getServerURL() + "/dailymeals/fooddetails", {
+                        method: "get",
+                        headers: {
+                            "content-type": "application/json",
+                            "foodid": foodid,
+                            "isdish": isdish,
+                            "noteid": noteid ? noteid : null
+                        }
+                    });
+                    res = await res.json();
+
+                    composition = [];
+                    if (res.foodentries) {
+                        for (let f of res.foodentries)
+                            composition.push(<FoodEntry
+                                foodEntry={f}
+                                removeFoodEntry={this.onRemoveFoodEntry}
+                                key={sFoodCounter++} />);
                     }
-                });
-                res = await res.json();
 
-                composition = [];
-                if (res.foodentries) {
-                    for (let f of res.foodentries)
-                        composition.push(<FoodEntry
-                            foodEntry={f}
-                            key={sFoodCounter++} />);
-                }
+                    this.setState({
+                        selectedFoodDetails: res,
+                        sFoodCounter: sFoodCounter,
+                        composition: composition
+                    });
+                })();
+            }
+        }
+    };
 
+    onDishSelect = (ev) => {
+        const { dishSelected, selectedMeal, selectedFood, selectedFoodDetails } = this.state;
+
+        if (!dishSelected) {
+            if (selectedFood && selectedFood.state.foodItem.isdish) {
+                const { foodname, brand, fat, carbs, protein, price, pic, isdish, note, measure } = selectedFood.state.foodItem;
+
+                selectedFoodDetails.foodname = foodname;
+                selectedFoodDetails.brand = brand;
+                selectedFoodDetails.fat = fat;
+                selectedFoodDetails.carbs = carbs;
+                selectedFoodDetails.protein = protein;
+                selectedFoodDetails.price = price;
+                selectedFoodDetails.pic = pic;
+                selectedFoodDetails.measure = measure;
+                selectedFoodDetails.isdish = true;
+                selectedFoodDetails.note = note;
+
+
+                if (selectedMeal)
+                    selectedMeal.toggleHighlight();
                 this.setState({
-                    selectedFoodDetails: res,
-                    sFoodCounter: sFoodCounter,
-                    composition: composition
+                    selectedMeal: null,
+                    dishSelected: true
                 });
-            })();
+            }
         }
     };
 
@@ -505,12 +682,15 @@ class DailyMeals extends React.Component {
             }
         }
         else {
+            if (field === "isdish")
+                aux["foodentries"] = value === true ? [] : null;
             if (field === "sizeinfo")
                 value = value === "" ? null : value;
             if (field === "fat" || field === "carbs" || field === "protein")
                 value = value === "" ? 0 : value;
             aux[field] = value;
         }
+
         this.setState({
             newFoodItem: aux,
             measure: aux.sizeinfo === null ? "Pieces" : "Grams",
@@ -524,7 +704,7 @@ class DailyMeals extends React.Component {
         d.setDate(d.getDate() + nrDays);
 
         this.loadDailyMeals(app.dateToStr(d));
-    }
+    };
 
     onSearchKey = (ev) => {
         const { selectedFood, sFoodItems } = this.state;
@@ -597,8 +777,12 @@ class DailyMeals extends React.Component {
     };//TODO?
 
     render = () => {
-        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, dayFat, dayCarbs, dayProtein, newFoodForm } = this.state;
-        const { foodname, brand, fat, carbs, protein, price, pic } = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
+        const { selectedDay, mealEntries, selectedFood, amount, measure, dayEntry, selectedFoodDetails, composition, mealareaIsLoading, searchareaIsLoading, sFoodItems, dayFat, dayCarbs, dayProtein, newFoodForm, dishSelected } = this.state;
+        const { foodname, brand, fat, carbs, protein, price, pic } = dishSelected ?
+            selectedFoodDetails
+            : selectedFood ?
+                selectedFood.state.foodItem
+                : FoodItem.defaultFoodItem;
 
         return (
             <main className="mainDailyMeals boxShow">
@@ -714,7 +898,7 @@ class DailyMeals extends React.Component {
                 </div>
 
                 {selectedFoodDetails ? (
-                    <div id="foodDetailsArea" className="subblock boxShow">
+                    <div onClick={this.onDishSelect} id="foodDetailsArea" className={"subblock boxShow" + (dishSelected ? " highlight" : "")}>
                         <div className="foodDetailsHeader">
                             <div className="textHigh boxShow">{`${foodname} ${brand ? "@" + brand : ""}`}</div>
                             {/*<Note removeNote={() => { }} note={selectedFoodDetails ? selectedFoodDetails.note : null}
@@ -733,29 +917,33 @@ class DailyMeals extends React.Component {
                                 </thead>
                                 <tbody>
                                     <tr><td>Fat</td>
-                                        <td>{measure === "Grams" ? fat + "g" : "--"}</td>
-                                        <td>{measure === "Pieces" ? fat + "g" : "--"}</td></tr>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Grams" ? fat + "g" : "--"}</td>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Pieces" ? fat + "g" : "--"}</td></tr>
                                     <tr><td>Carbs</td>
-                                        <td>{measure === "Grams" ? carbs + "g" : "--"}</td>
-                                        <td>{measure === "Pieces" ? carbs + "g" : "--"}</td></tr>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Grams" ? carbs + "g" : "--"}</td>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Pieces" ? carbs + "g" : "--"}</td></tr>
                                     <tr><td>Protein</td>
-                                        <td>{measure === "Grams" ? protein + "g" : "--"}</td>
-                                        <td>{measure === "Pieces" ? protein + "g" : "--"}</td></tr>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Grams" ? protein + "g" : "--"}</td>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Pieces" ? protein + "g" : "--"}</td></tr>
                                     <tr><td>Calories</td>
-                                        <td>{measure === "Grams" ? (fat * 9 + protein * 4 + carbs * 4)
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Grams" ? (fat * 9 + protein * 4 + carbs * 4)
                                             .toFixed(1)
                                             + "Kc" : "--"}</td>
-                                        <td>{measure === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4)
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Pieces" ? (fat * 9 + protein * 4 + carbs * 4)
                                             .toFixed(1)
                                             + "Kc" : "--"}</td></tr>
                                     <tr><td>Price</td>
-                                        <td>{measure === "Grams" ? price + "Lei" : "--"}</td>
-                                        <td>{measure === "Pieces" ? price + "Lei" : "--"}</td></tr>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Grams" ? price + "Lei" : "--"}</td>
+                                        <td>{(dishSelected ? selectedFoodDetails.measure : measure) === "Pieces" ? price + "Lei" : "--"}</td></tr>
                                 </tbody>
                             </table>
-                            <div className="comp textHigh">{composition.length > 0 ? "Composition:" : ""}</div>
+                            <div className="comp textHigh">{(selectedFood && selectedFood.state.foodItem.isdish) || dishSelected ? "Composition:" : ""}</div>
                             <div className="foodEntries boxShow">
-                                {composition}
+                                {dishSelected || (selectedFood && selectedFood.state.foodItem.isdish) ? composition : ""}
+                            </div>
+                            <div className="tcenter">
+                                {dishSelected ? <button onClick={this.saveDishIngr} className="ftButton">SAVE DISH</button> : ""}
+                                {dishSelected ? <button onClick={this.calculateValues} className="ftButton">ADD VALUES</button> : ""}
                             </div>
                         </div>
                     </div>
