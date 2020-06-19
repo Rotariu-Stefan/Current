@@ -192,6 +192,9 @@ footer {
 textarea {
     resize: none;
 }
+.tcenter{
+    text-align:center;
+}
 
 p {
     font-size: 1.3rem;
