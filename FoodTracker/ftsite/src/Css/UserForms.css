@@ -1,85 +1,86 @@
-﻿/*#region Main*/
-.mainRegLog {
-    padding: 0.3rem;
-    display: grid;
-    grid-template-columns: minmax(30rem, 50rem);
-    align-content: center;
-    justify-content: center;
+/*#region Main*/
+.mainUserForm {
+  padding: 0.3rem;
+  display: grid;
+  grid-template-columns: minmax(30rem, 50rem);
+  align-content: center;
+  justify-content: center;
 }
 
-#regform, #logform {
-    min-height: 30rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.userform {
+  min-height: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-    #regform h1, #logform h1 {
-        margin: 1rem;
-        text-align: center;
-    }
+.userform h1 {
+  margin: 1rem;
+  text-align: center;
+}
 
 .fields {
-    width: 70%;
-    display: grid;
-    font-size: 1.5rem;
+  width: 70%;
+  display: grid;
+  font-size: 1.5rem;
 }
 
-    .fields input, .fields select, .fields option {
-        font-size: 1.5rem;
-    }
+.fields input, .fields select, .fields option {
+  font-size: 1.5rem;
+}
 
-    .fields .detail {
-        font-size: 0.7rem;
-    }
+.fields .detail {
+  font-size: 0.7rem;
+}
 
 .personal {
-    padding: 0.5rem;
-    display: grid;
-    grid-gap: 1rem;
-    grid-template-columns: auto 1fr;
+  padding: 0.5rem;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: auto 1fr;
 }
 
-    .personal img, .personal button {
-        width: 8rem;
-    }
+.personal img, .personal button {
+  width: 8rem;
+}
 
-    .personal span {
-        height: 15%;
-    }
+.personal span {
+  height: 15%;
+}
 
-    .personal textarea {
-        width: 100%;
-        height: 85%;
-    }
+.personal textarea {
+  width: 100%;
+  height: 85%;
+}
 
 .warning {
-    font-size: 1.2rem;
-    text-decoration: underline;
-    font-weight: bold;
-    text-align: center;
-    color: red;
+  font-size: 1.2rem;
+  text-decoration: underline;
+  font-weight: bold;
+  text-align: center;
+  color: red;
 }
 
 .req {
-    text-decoration: underline;
-    font-weight: bold;
+  text-decoration: underline;
+  font-weight: bold;
 }
 
 .loglinks {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    color: rebeccapurple;
-    text-decoration: underline;
-    cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  color: rebeccapurple;
+  text-decoration: underline;
+  cursor: pointer;
 }
-/*#endregion Main*/
 
-/*#region Profile*/
 .profileButtons {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
+
+/*#endregion Main*/
+/*#region Profile*/
 /*#endregion Profile*/
