@@ -1,6 +1,8 @@
-import React from 'react';
-import "../Css/UserForms.css"; //TODO: Replace somehow! (this is just copy/pasted from register)
-import { app } from '../App';
+import React from "react";
+
+import "../Css/UserForms.css"; // TODO: Replace somehow! (this is just copy/pasted from register)
+import { app } from "../App";
+
 
 class Profile extends React.Component {
   passRegex = /^(?=.*?\d)(?=.*?[a-zA-Z]).+$/;
@@ -10,75 +12,67 @@ class Profile extends React.Component {
     const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = app.state.currentUser;
 
     this.state = {
-      username: username,
-      email: email,
-      firstname: firstname,
-      lastname: lastname,
-      dob: dob,
-      sex: sex,
-      describe: describe,
-      pic: pic,
-      diet: diet,
+      username,
+      email,
+      firstname,
+      lastname,
+      dob,
+      sex,
+      describe,
+      pic,
+      diet,
 
       passNow: "",
       passNew: "",
       passConfirm: "",
 
       warning: null,
-      isLoading: false
+      isLoading: false,
     };
   }
 
-  onChangeProfile = async (ev) => {
+  onChangeProfile = async(ev) => {
     ev.preventDefault();
-    this.setState({
-      isLoading: true
-    });
+    this.setState({ isLoading: true });
 
-    ; (async () => {
+    (async() => {
       try {
         const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.state;
-        if (dob !== "" && new Date(dob) > new Date())
-        this.setState({ warning: "dob" });
-        else {
-          let res = await fetch(app.getServerURL() + "/profile", {
+        if (dob !== "" && new Date(dob) > new Date()) {
+          this.setState({ warning: "dob" });
+        } else {
+          let res = await fetch(`${app.getServerURL()}/profile`, {
             method: "post",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               userid: app.state.currentUser.userid,
-              username: username,
-              email: email,
+              username,
+              email,
               firstname: firstname === "" ? null : firstname,
               lastname: lastname === "" ? null : lastname,
               dob: dob === "" ? null : dob,
               sex: sex === "" ? null : sex,
               describe: describe === "" ? null : describe,
               pic: pic === "" ? null : pic,
-              diet: diet
-            })
+              diet,
+            }),
           });
           res = await res.json();
 
-          if (res.includes("Username"))
-          this.setState({ warning: "username" });
-          else if (res.includes("Email"))
-          this.setState({ warning: "email" });
-          else if (res === "User Profile Updated!") {
+          if (res.includes("Username")) {
+            this.setState({ warning: "username" });
+          } else if (res.includes("Email")) {
+            this.setState({ warning: "email" });
+          } else if (res === "User Profile Updated!") {
             app.updateUserProfile(this.state);
+          } else {
+            console.log(res);
           }
-          else
-          console.log(res);
         }
-      }
-      catch (err) {
+      } catch (err) {
         console.log("___________ERROR___________\n", err.message);
-      }
-      finally {
-        this.setState({
-          isLoading: false
-        });
+      } finally {
+        this.setState({ isLoading: false });
       }
     })();
   };
@@ -88,15 +82,15 @@ class Profile extends React.Component {
     const { username, email, firstname, lastname, dob, sex, pic, describe, diet } = app.state.currentUser;
 
     this.setState({
-      username: username,
-      email: email,
-      firstname: firstname,
-      lastname: lastname,
-      dob: dob,
-      sex: sex,
-      describe: describe,
-      pic: pic,
-      diet: diet
+      username,
+      email,
+      firstname,
+      lastname,
+      dob,
+      sex,
+      describe,
+      pic,
+      diet,
     });
   };
 
@@ -104,39 +98,31 @@ class Profile extends React.Component {
     ev.preventDefault();
     const { passNow, passNew, passConfirm } = this.state;
 
-    if (!passNew.match(this.passRegex))
-    this.setState({ warning: "passNew" });
-    else if (passNew !== passConfirm)
-    this.setState({ warning: "passConfirm" });
-    else {
+    if (!passNew.match(this.passRegex)) {
+      this.setState({ warning: "passNew" });
+    } else if (passNew !== passConfirm) {
+      this.setState({ warning: "passConfirm" });
+    } else {
       ev.preventDefault();
-      this.setState({
-        isLoading: true
-      });
+      this.setState({ isLoading: true });
 
-      ; (async () => {
+      (async() => {
         try {
-          let res = await fetch(app.getServerURL() + "/profile/changepass", {
+          let res = await fetch(`${app.getServerURL()}/profile/changepass`, {
             method: "post",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               userid: app.state.currentUser.userid,
               oldpass: passNow,
-              newpass: passNew
-            })
+              newpass: passNew,
+            }),
           });
           res = await res.json();
           console.log(res);
-        }
-        catch (err) {
+        } catch (err) {
           console.log("___________ERROR___________\n", err.message);
-        }
-        finally {
-          this.setState({
-            isLoading: false
-          });
+        } finally {
+          this.setState({ isLoading: false });
         }
       })();
     }
@@ -145,7 +131,7 @@ class Profile extends React.Component {
   browseUserPic = (ev) => {
     ev.preventDefault();
 
-    alert("Sorry. Not implemented yet...")
+    alert("Sorry. Not implemented yet...");
   };
 
   render = () => {
@@ -153,41 +139,41 @@ class Profile extends React.Component {
 
     return (
       <main className="mainUserForm boxShow">
-        <form className="userform subblock boxShow" onSubmit={this.onChangeProfile} onReset={this.cancelChangeProfile}>
+        <form className="userform subblock boxShow" onReset={this.cancelChangeProfile} onSubmit={this.onChangeProfile}>
           <h1 className="lineDown">Profile Info</h1>
           <div className="fields">
             <span>Username:</span>
-            <input onChange={(ev) => this.setState({ username: ev.currentTarget.value })} type="text" name="username" value={username} minLength="3" />
-            <span className={"warning" + (warning === "username" ? "" : " hidden")}>Username is Already Taken!</span>
+            <input minLength="3" name="username" type="text" value={username} onChange={(ev) => this.setState({ username: ev.currentTarget.value })} />
+            <span className={`warning${warning === "username" ? "" : " hidden"}`}>Username is Already Taken!</span>
             <span>Email:</span>
-            <input onChange={(ev) => this.setState({ email: ev.currentTarget.value })} type="text" name="email" value={email} />
-            <span className={"warning" + (warning === "email" ? "" : " hidden")}>Email is Already Taken!</span>
+            <input name="email" type="text" value={email} onChange={(ev) => this.setState({ email: ev.currentTarget.value })} />
+            <span className={`warning${warning === "email" ? "" : " hidden"}`}>Email is Already Taken!</span>
             <div className="personal">
               <div>
-                <img src={"UserPics/" + pic} alt="[NO PIC]" /><br />
-                <button className="ftButton" onClick={this.browseUserPic} disabled={isLoading}>Browse</button>
+                <img alt="[NO PIC]" src={`UserPics/${pic}`} /><br />
+                <button className="ftButton" disabled={isLoading} onClick={this.browseUserPic}>Browse</button>
               </div>
               <div>
                 <span>Description:</span><br />
-                <textarea onChange={(ev) => this.setState({ describe: ev.currentTarget.value })} value={describe} placeholder="Say who you are in a few short phrases.."></textarea>
+                <textarea placeholder="Say who you are in a few short phrases.." value={describe} onChange={(ev) => this.setState({ describe: ev.currentTarget.value })} />
               </div>
             </div>
             <span>First Name:</span>
-            <input onChange={(ev) => this.setState({ firstname: ev.currentTarget.value })} type="text" name="firstname" value={firstname} />
+            <input name="firstname" type="text" value={firstname} onChange={(ev) => this.setState({ firstname: ev.currentTarget.value })} />
             <span>Last Name:</span>
-            <input onChange={(ev) => this.setState({ lastname: ev.currentTarget.value })} type="text" name="lastname" value={lastname} />
+            <input name="lastname" type="text" value={lastname} onChange={(ev) => this.setState({ lastname: ev.currentTarget.value })} />
             <div>
               <span>Sex:</span>
-              <input onChange={(ev) => this.setState({ sex: "1" })} type="radio" name="sex" value="male" checked={sex === "1"} />
+              <input checked={sex === "1"} name="sex" type="radio" value="male" onChange={(ev) => this.setState({ sex: "1" })} />
               <span>Male </span>
-              <input onChange={(ev) => this.setState({ sex: "0" })} type="radio" name="sex" value="female" checked={sex === "0"} />
+              <input checked={sex === "0"} name="sex" type="radio" value="female" onChange={(ev) => this.setState({ sex: "0" })} />
               <span>Female</span>
             </div>
             <span>Date Of Birth:</span>
-            <input onChange={(ev) => this.setState({ dob: ev.currentTarget.value })} type="date" name="dob" value={dob} />
-            <span className={"warning" + (warning === "dob" ? "" : " hidden")}>Incorrect date!</span>
+            <input name="dob" type="date" value={dob} onChange={(ev) => this.setState({ dob: ev.currentTarget.value })} />
+            <span className={`warning${warning === "dob" ? "" : " hidden"}`}>Incorrect date!</span>
             <span>Diet Plans:</span>
-            <select onChange={(ev) => this.setState({diet: (ev.currentTarget.value === "none" ? null : ev.currentTarget.value)})} value={diet ? diet : "none"}>
+            <select value={diet ? diet : "none"} onChange={(ev) => this.setState({ diet: (ev.currentTarget.value === "none" ? null : ev.currentTarget.value) })}>
               <option>none</option>
               <option>Calorie Restrict</option>
               <option>Paleo</option>
@@ -202,27 +188,27 @@ class Profile extends React.Component {
               <option>Specific/Personal Plan</option>
             </select>
             <div className="profileButtons">
-              <input className="ftButton" type="submit" value="Save Changes" disabled={isLoading} />
-              <input className="ftButton" type="reset" value="Cancel" disabled={isLoading} />
+              <input className="ftButton" disabled={isLoading} type="submit" value="Save Changes" />
+              <input className="ftButton" disabled={isLoading} type="reset" value="Cancel" />
             </div>
           </div>
         </form>
-        
+
         <form className="userform subblock boxShow" onSubmit={this.onChangePassword}>
           <h1 className="lineDown">Change Password</h1>
           <div className="fields">
             <span>Current Password:</span>
-            <input onChange={(ev) => this.setState({ passNow: ev.currentTarget.value })} type="password" name="passnow" minLength="8" />
+            <input minLength="8" name="passnow" type="password" onChange={(ev) => this.setState({ passNow: ev.currentTarget.value })} />
             <span>New Password: </span>
-            <input onChange={(ev) => this.setState({ passNew: ev.currentTarget.value })} type="password" name="passnew" minLength="8" />
-            <span className={"warning" + (warning === "passNew" ? "" : " hidden")}>Invalid Password!</span>
+            <input minLength="8" name="passnew" type="password" onChange={(ev) => this.setState({ passNew: ev.currentTarget.value })} />
+            <span className={`warning${warning === "passNew" ? "" : " hidden"}`}>Invalid Password!</span>
             <span className="detail">Password must be at least 8characters long and have both numbers and letters!</span>
             <span>Confirm New Password:</span>
-            <input onChange={(ev) => this.setState({ passConfirm: ev.currentTarget.value })} type="password" name="passConfirm" minLength="8" />
-            <span className={"warning" + (warning === "passConfirm" ? "" : " hidden")}>Passwords do Not Match!</span>
+            <input minLength="8" name="passConfirm" type="password" onChange={(ev) => this.setState({ passConfirm: ev.currentTarget.value })} />
+            <span className={`warning${warning === "passConfirm" ? "" : " hidden"}`}>Passwords do Not Match!</span>
             <div className="profileButtons">
-              <input className="ftButton" type="submit" value="Save Changes" disabled={isLoading} />
-              <input className="ftButton" type="reset" value="Cancel" disabled={isLoading} />
+              <input className="ftButton" disabled={isLoading} type="submit" value="Save Changes" />
+              <input className="ftButton" disabled={isLoading} type="reset" value="Cancel" />
             </div>
           </div>
         </form>
