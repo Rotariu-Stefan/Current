@@ -1,9 +1,10 @@
-import React from 'react';
-import { app } from '../App';
+import React from "react";
 
-//import { NavLink } from 'react-router-dom';
+import { AppContext } from "../AppContext";
+
+// import { NavLink } from 'react-router-dom';
 //
-//const Nav = () => {
+// const Nav = () => {
 //    return (
 //        <nav className="subblock boxShow">
 //            <NavLink className="navlink textHigh" to="/DailyMeals">Daily Meals</NavLink>|
@@ -14,21 +15,21 @@ import { app } from '../App';
 //            <NavLink className="navlink textHigh" to="/GlobalData">Global Data</NavLink>
 //        </nav>
 //    );
-//}
+// }
 
 class Nav extends React.Component {
-    render = () => {
-        return (
-            <nav className="subblock boxShow">
-                <span onClick={() => app.changeMainPage("DailyMeals")} className="navlink textHigh">Daily Meals</span>|
-            <span onClick={() => app.changeMainPage("YourFood")} className="navlink textHigh">Your Food</span>|
-            <span onClick={() => app.changeMainPage("YourPlans")} className="navlink textHigh">Your Plans</span>|
-            <span onClick={() => app.changeMainPage("YourStats")} className="navlink textHigh">Your Stats</span>|
-            <span onClick={() => app.changeMainPage("GlobalStats")} className="navlink textHigh">Global Stats</span>|
-            <span onClick={() => app.changeMainPage("GlobalData")} className="navlink textHigh">Users Data</span>
-            </nav>
-        );
-    };
+    static contextType = AppContext;
+
+    render = () => (
+      <nav className="subblock boxShow">
+        <span className="navlink textHigh" onClick={() => this.context.changeMainPage("DailyMeals")}>Daily Meals</span>|
+        <span className="navlink textHigh" onClick={() => this.context.changeMainPage("YourFood")}>Your Food</span>|
+        <span className="navlink textHigh" onClick={() => this.context.changeMainPage("YourPlans")}>Your Plans</span>|
+        <span className="navlink textHigh" onClick={() => this.context.changeMainPage("YourStats")}>Your Stats</span>|
+        <span className="navlink textHigh" onClick={() => this.context.changeMainPage("GlobalStats")}>Global Stats</span>|
+        <span className="navlink textHigh" onClick={() => this.context.changeMainPage("GlobalData")}>Users Data</span>
+      </nav>
+    );
 }
 
 export default Nav;

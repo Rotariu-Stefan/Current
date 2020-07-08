@@ -1,9 +1,10 @@
-/*#region Main Outline*/
+/* #region Main Outline */
 .mainDailyMeals {
-  padding: 0.3rem;
   display: grid;
   grid-gap: 0.3rem;
   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+
+  padding: 0.3rem;
   align-content: center;
 }
 
@@ -18,61 +19,75 @@
     justify-items: center;
   }
 
-  #dayArea, #addFoodArea, #foodDetailsArea {
+  .dayArea,
+  .addFoodArea,
+  .foodDetailsArea {
     width: 35rem;
   }
 }
 
-#dayArea, #addFoodArea, #foodDetailsArea {
+.dayArea,
+.addFoodArea,
+.foodDetailsArea {
+  display: flex;
+  flex-direction: column;
+
   height: 40rem;
   padding: 0.1rem;
 }
-/*#endregion Main Outline*/
 
-/*#region DayArea Block*/
-#dayArea {
-  display: flex;
-  flex-direction: column;
-}
+/* #endregion Main Outline */
 
+/* #region DayArea Block */
 .datepick {
   text-align: center;
 }
 
 .datepick input {
-  height: 2rem;
   font-size: 1rem;
-  text-align: center;
   font-weight: bold;
+
+  height: 2rem;
+
+  text-align: center;
 }
 
 .mealsArea {
-  margin: 0.3rem 0;
   flex: auto;
+
   overflow: auto;
+
+  margin: 0.3rem 0;
 }
 
 .mealArea {
-  margin-top: 0.5rem;
   display: flex;
   flex-direction: column;
+
+  margin-top: 0.5rem;
 }
 
-.mealArea:hover {
+.mealArea:hover,
+.mealArea:focus {
   background-color: rgba(255, 228, 196, 0.75);
 }
 
-.mealTitle, .mealTotal, .macroRes, .dayTotal {
+.mealTitle,
+.mealTotal,
+.macroRes,
+.dayTotal {
   font-size: 1.1rem;
   font-weight: bold;
 }
 
 .managerImg {
   float: right;
+
   padding: 0 0.3rem;
 }
 
-.managerImg:hover {
+.managerImg:hover,
+.managerImg:focus {
   color: coral;
   background-color: saddlebrown;
 }
@@ -82,43 +97,53 @@
   grid-template-columns: 2.5rem 1fr 6.2rem;
 }
 
-.foodEntry:hover {
+.foodEntry:hover,
+.foodEntry:focus {
   color: brown;
 }
 
-.name_brand, .amount, .macro {
+.name_brand,
+.amount,
+.macro {
   overflow: hidden;
-  text-overflow: ellipsis;
+
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.name_brand:hover, .amount:hover, .macro:hover {
+.name_brand:hover,
+.amount:hover,
+.macro:hover,
+.name_brand:focus,
+.amount:focus,
+.macro:focus {
   white-space: normal;
   word-break: break-word;
 }
 
 .macroRes {
   grid-column: span 3;
+
   text-align: center;
 }
 
-.mealTotal, .dayTotal {
+.mealTotal,
+.dayTotal {
   text-align: right;
 }
 
-.mealTotal span:first-child, .dayTotal span:first-child {
-  width: 0px;
-  white-space: nowrap;
+.mealTotal span:first-child,
+.dayTotal span:first-child {
   float: left;
-}
-/*#endregion DayArea Block*/
 
-/*#region addFoodArea Block*/
-#addFoodArea {
-  display: flex;
-  flex-direction: column;
+  width: 0;
+
+  white-space: nowrap;
 }
 
+/* #endregion DayArea Block */
+
+/* #region addFoodArea Block */
 .searchForm {
   font-weight: bold;
 }
@@ -129,38 +154,42 @@
 
 .amountForm {
   padding: 0.2rem;
+
   text-align: right;
 }
 
-.amountForm label {
+.amountForm span {
   float: left;
 }
 
-#addFoodArea .search {
-  height: 2rem;
-  width: 100%;
+.addFoodArea .search {
   font-size: 1rem;
   font-weight: bold;
+
+  width: 100%;
+  height: 2rem;
 }
 
-#addFoodArea .amountSize {
-  height: 2rem;
-  width: 30%;
-  padding: 0 0.2rem;
+.addFoodArea .amountSize {
   font-size: 1rem;
   font-weight: bold;
+
+  width: 30%;
+  height: 2rem;
+  padding: 0 0.2rem;
+}
+
+.addFoodArea hr {
+  margin: 1rem 0;
 }
 
 .searchResults {
-  flex: auto;
   display: flex;
-  flex-direction: column;
   overflow: auto;
-  background-color: rgba(255, 241, 224, 0.5);
-}
+  flex-direction: column;
 
-#addFoodArea hr {
-  margin: 1rem 0;
+  background-color: rgba(255, 241, 224, 0.5);
+  flex: auto;
 }
 
 .foodItem {
@@ -168,14 +197,16 @@
   grid-template-columns: 1fr 6.5rem 2.1rem;
 }
 
-.foodItem:hover {
+.foodItem:hover,
+.foodItem:focus {
   background-color: rgba(139, 69, 19, 0.75);
 }
 
 .feSelected {
+  font-weight: bold;
+
   color: orange;
   background-color: rgba(139, 69, 19, 0.75);
-  font-weight: bold;
 }
 
 .feSelected * {
@@ -184,8 +215,9 @@
 }
 
 .searchEntry {
-  text-align: center;
   font-size: 1.1rem;
+
+  text-align: center;
 }
 
 .addMealArea {
@@ -196,15 +228,16 @@
   display: flex;
 }
 
-.addMealArea label {
+.addMealArea span {
   flex-shrink: 0;
 }
 
 .addMealArea input {
-  height: 2rem;
-  padding: 0 0.2rem;
   font-size: 1rem;
   font-weight: bold;
+
+  height: 2rem;
+  padding: 0 0.2rem;
 }
 
 .newMName {
@@ -221,17 +254,20 @@
   grid-row-gap: 1rem;
 }
 
-.newFoodForm .newFoodHeader, .afaInfo {
+.newFoodForm .newFoodHeader,
+.afaInfo {
   grid-column: 1 / span 2;
 }
 
-.newFoodForm input, .newFoodForm select {
-  height: 1.7rem;
-  padding: 0 0.2rem;
-  margin: 0 0.1rem;
+.newFoodForm input,
+.newFoodForm select {
   font-size: 1rem;
   font-weight: bold;
+
   min-width: 15%;
+  height: 1.7rem;
+  margin: 0 0.1rem;
+  padding: 0 0.2rem;
 }
 
 .newFoodForm div {
@@ -245,6 +281,7 @@
 
 .newFoodForm span {
   flex-shrink: 0;
+
   font-size: 1.2rem;
   font-weight: bold;
 }
@@ -255,26 +292,26 @@
 
 .afaInfo {
   margin: 2rem 0;
+
   color: purple;
 }
-/*#endregion addFoodArea Block*/
 
-/*#region FoodDetailsArea Block*/
-#foodDetailsArea {
-  display: flex;
-  flex-direction: column;
-}
+/* #endregion addFoodArea Block */
 
-#foodDetailsArea table {
+/* #region FoodDetailsArea Block */
+.foodDetailsArea table {
   width: 100%;
 }
 
-#foodDetailsArea table, #foodDetailsArea td, #foodDetailsArea th {
-  border: 1px solid red;
+.foodDetailsArea table,
+.foodDetailsArea td,
+.foodDetailsArea th {
   border-collapse: collapse;
+
+  border: 1px solid red;
 }
 
-#foodDetailsArea td {
+.foodDetailsArea td {
   width: 33%;
 }
 
@@ -284,21 +321,25 @@
 
 .foodPic {
   max-height: 50%;
+
   text-align: center;
 }
 
 .foodPic img {
   width: auto;
+  max-width: 100%;
   height: auto;
   max-height: 100%;
-  max-width: 100%;
   padding: 0.2rem;
+
   text-align: center;
+
   opacity: 0.9;
 }
 
 .foodInfo {
   flex: auto;
+
   overflow: auto;
 }
 
@@ -306,17 +347,22 @@
   text-align: center;
   text-decoration: underline;
 }
-/*#endregion FoodDetailsArea Block*/
 
-/*#region Note*/
-.note, .noteEdit {
+/* #endregion FoodDetailsArea Block */
+
+/* #region Note */
+.note,
+.noteEdit {
   color: black;
-  background-color: rgba(143, 136, 80, 0.25);
   border: 1px dotted slategrey;
   border-radius: 10px;
+  background-color: rgba(143, 136, 80, 0.25);
 }
 
-.note .managerImg:hover, .noteView:hover {
+.note .managerImg:hover,
+.noteView:hover,
+.note .managerImg:focus,
+.noteView:focus {
   background-color: slategrey;
 }
 
@@ -327,12 +373,14 @@
 
 .note .scoreImg {
   float: left;
+
   padding: 0 0.3rem;
 }
 
-.note .title, .noteView .title {
-  font-weight: bold;
+.note .title,
+.noteView .title {
   font-size: 1rem;
+  font-weight: bold;
 }
 
 .note .notetext {
@@ -348,13 +396,17 @@
   margin: 0 0.3rem;
 }
 
-.note button, .noteEdit button {
-  height: 1.3rem;
-  color: lightyellow;
-  background-color: slategrey;
+.note button,
+.noteEdit button {
   font-size: 0.8rem;
+
   float: right;
+
+  height: 1.3rem;
+
+  color: lightyellow;
   border-radius: 5px;
+  background-color: slategrey;
 }
 
 .noteEdit .newNote {
@@ -363,23 +415,28 @@
 }
 
 .noteEdit .noteSearch {
-  height: 1.5rem;
   display: flex;
+
+  height: 1.5rem;
 }
 
 .noteEdit .noteSearch input {
+  font-size: 0.8rem;
+
   height: 1.3rem;
   flex: auto;
-  font-size: 0.8rem;
 }
 
 .noteEdit .noteaddFoodArea {
-  max-height: 8rem;
   overflow: auto;
+
+  max-height: 8rem;
 }
 
 .noteSearchArea {
-  height: 10rem;
   overflow: auto;
+
+  height: 10rem;
 }
-/*#endregion Note*/
+
+/* #endregion Note */

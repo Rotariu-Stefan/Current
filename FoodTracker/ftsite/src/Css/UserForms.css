@@ -1,32 +1,39 @@
-/*#region Main*/
+/* #region Main */
 .mainUserForm {
-  padding: 0.3rem;
   display: grid;
+
+  padding: 0.3rem;
   grid-template-columns: minmax(30rem, 50rem);
   align-content: center;
   justify-content: center;
 }
 
 .userform {
-  min-height: 30rem;
   display: flex;
   flex-direction: column;
+
+  min-height: 30rem;
   align-items: center;
   justify-content: center;
 }
 
 .userform h1 {
   margin: 1rem;
+
   text-align: center;
 }
 
 .fields {
-  width: 70%;
-  display: grid;
   font-size: 1.5rem;
+
+  display: grid;
+
+  width: 70%;
 }
 
-.fields input, .fields select, .fields option {
+.fields input,
+.fields select,
+.fields option {
   font-size: 1.5rem;
 }
 
@@ -35,13 +42,15 @@
 }
 
 .personal {
-  padding: 0.5rem;
   display: grid;
+
+  padding: 0.5rem;
   grid-gap: 1rem;
   grid-template-columns: auto 1fr;
 }
 
-.personal img, .personal button {
+.personal img,
+.personal button {
   width: 8rem;
 }
 
@@ -56,24 +65,30 @@
 
 .warning {
   font-size: 1.2rem;
-  text-decoration: underline;
   font-weight: bold;
+
   text-align: center;
+  text-decoration: underline;
+
   color: red;
 }
 
 .req {
-  text-decoration: underline;
   font-weight: bold;
+
+  text-decoration: underline;
 }
 
 .loglinks {
-  width: 100%;
   display: flex;
-  justify-content: space-around;
-  color: rebeccapurple;
-  text-decoration: underline;
+
+  width: 100%;
+
   cursor: pointer;
+  text-decoration: underline;
+
+  color: rebeccapurple;
+  justify-content: space-around;
 }
 
 .profileButtons {
@@ -81,6 +96,4 @@
   justify-content: space-around;
 }
 
-/*#endregion Main*/
-/*#region Profile*/
-/*#endregion Profile*/
+/* #endregion Main */

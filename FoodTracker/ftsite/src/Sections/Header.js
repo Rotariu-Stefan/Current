@@ -1,6 +1,6 @@
-//import { NavLink } from 'react-router-dom';
+// import { NavLink } from 'react-router-dom';
 //
-//const Header = () => {
+// const Header = () => {
 //    return (
 //        <header className="subblock boxShow">
 //            <img src="SitePics/head.png" alt="[NO LOGO]" className="logo" />
@@ -20,65 +20,65 @@
 //            </div>
 //        </header>
 //    );
-//}
+// }
 
-import React from 'react';
-import { app } from '../App';
+import React from "react";
+
+import { AppContext } from "../AppContext";
+
 
 class Header extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isLogged: false,
-            username: app.defaultUser.username,
-            pic: app.defaultUser.pic
-        };
+   static contextType = AppContext;
+
+   constructor(props) {
+     super(props);
+
+     this.state = { isLogged: false };
+   }
+
+   render = () => {
+     const { isLogged } = this.state;
+     const { changeMainPage } = this.context;
+     const { username, pic } = this.context.currentUser;
+
+     return (
+       <header className="subblock boxShow">
+         <img alt="[NO LOGO]" className="logo" src="SitePics/head.png" />
+         <div id="titleArea" onClick={() => changeMainPage("Home")}>
+           <h1 id="title">FoodTracker</h1>
+           <h3 id="subtitle">Define and Track your Food and diet goals on Your own terms!</h3>
+         </div>
+         <div className="boxShow" id="profileArea">
+           <span onClick={() => changeMainPage(isLogged ? "Profile" : "Register")}>
+             {username}
+             <br />
+             <img alt="[NO PIC]" src={`UserPics/${pic}`} />
+           </span>
+           <span className="navlink" onClick={() => changeMainPage(isLogged ? "Profile" : "Register")}>
+             {isLogged ? "Profile" : "Register"}
+           </span>
+           <span className="navlink" onClick={this.onLogClick}>
+             {isLogged ? "Logout" : "Login"}
+           </span>
+         </div>
+       </header>
+     );
+   };
+
+  onLogClick = () => {
+    const { isLogged } = this.state;
+    const { updateUser, changeMainPage } = this.context;
+
+    if (isLogged) {
+      updateUser(null);
+      changeMainPage("Home");
+    } else {
+      changeMainPage("Login");
     }
+  };
 
-    updateUser = (newIsLogged, newUsername, newPic) => {
-        this.setState({
-            isLogged: newIsLogged,
-            username: newUsername,
-            pic: newPic
-        });
-    }
-
-    onLogClick = () => {
-        const { isLogged } = this.state;
-
-        if (isLogged) {
-            app.updateUser(null);
-            app.changeMainPage("Home");
-        }
-        else
-            app.changeMainPage("Login");
-    }
-
-    render = () => {
-        const { isLogged, username, pic } = this.state;
-
-        return (
-            <header className="subblock boxShow">
-                <img src="SitePics/head.png" alt="[NO LOGO]" className="logo" />
-                <div onClick={() => app.changeMainPage("Home")} id="titleArea">
-                    <h1 id="title">FoodTracker</h1>
-                    <h3 id="subtitle">Define and Track your Food and diet goals on Your own terms!</h3>
-                </div>
-                <div id="profileArea" className="boxShow">
-                    <span onClick={() => app.changeMainPage(isLogged ? "Profile" : "Register")}>
-                        {username}
-                        <br />
-                        <img src={`UserPics/${pic ? pic : "profileEmpty.png"}`} alt="[NO PIC]" />
-                    </span>
-                    <span onClick={() => app.changeMainPage(isLogged ? "Profile" : "Register")} className="navlink">
-                        {isLogged ? "Profile" : "Register"}
-                    </span>
-                    <span onClick={this.onLogClick} className="navlink">
-                        {isLogged ? "Logout" : "Login"}
-                    </span>
-                </div>
-            </header>
-        );
+    updateUser = (newIsLogged) => {
+      this.setState({ isLogged: newIsLogged });
     };
 }
 

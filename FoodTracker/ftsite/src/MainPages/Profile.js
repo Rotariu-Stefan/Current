@@ -1,26 +1,27 @@
 import React from "react";
 
-import "../Css/UserForms.css"; // TODO: Replace somehow! (this is just copy/pasted from register)
-import { app } from "../App";
+import "../Css/UserForms.css";
+import { AppContext } from "../AppContext";
+import { getServerURL } from "../methods";
 
 
 class Profile extends React.Component {
-  passRegex = /^(?=.*?\d)(?=.*?[a-zA-Z]).+$/;
+  static contextType = AppContext;
 
   constructor(props) {
     super(props);
-    const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = app.state.currentUser;
+    // const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.context.currentUser;
 
     this.state = {
-      username,
-      email,
-      firstname,
-      lastname,
-      dob,
-      sex,
-      describe,
-      pic,
-      diet,
+      // username,
+      // email,
+      // firstname,
+      // lastname,
+      // dob,
+      // sex,
+      // describe,
+      // pic,
+      // diet,
 
       passNow: "",
       passNew: "",
@@ -31,55 +32,10 @@ class Profile extends React.Component {
     };
   }
 
-  onChangeProfile = async(ev) => {
-    ev.preventDefault();
-    this.setState({ isLoading: true });
+  passRegex = /^(?=.*?\d)(?=.*?[a-zA-Z]).+$/;
 
-    (async() => {
-      try {
-        const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.state;
-        if (dob !== "" && new Date(dob) > new Date()) {
-          this.setState({ warning: "dob" });
-        } else {
-          let res = await fetch(`${app.getServerURL()}/profile`, {
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userid: app.state.currentUser.userid,
-              username,
-              email,
-              firstname: firstname === "" ? null : firstname,
-              lastname: lastname === "" ? null : lastname,
-              dob: dob === "" ? null : dob,
-              sex: sex === "" ? null : sex,
-              describe: describe === "" ? null : describe,
-              pic: pic === "" ? null : pic,
-              diet,
-            }),
-          });
-          res = await res.json();
-
-          if (res.includes("Username")) {
-            this.setState({ warning: "username" });
-          } else if (res.includes("Email")) {
-            this.setState({ warning: "email" });
-          } else if (res === "User Profile Updated!") {
-            app.updateUserProfile(this.state);
-          } else {
-            console.log(res);
-          }
-        }
-      } catch (err) {
-        console.log("___________ERROR___________\n", err.message);
-      } finally {
-        this.setState({ isLoading: false });
-      }
-    })();
-  };
-
-  cancelChangeProfile = (ev) => {
-    ev.preventDefault();
-    const { username, email, firstname, lastname, dob, sex, pic, describe, diet } = app.state.currentUser;
+  UNSAFE_componentWillMount = () => {
+    const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.context.currentUser;
 
     this.setState({
       username,
@@ -92,46 +48,6 @@ class Profile extends React.Component {
       pic,
       diet,
     });
-  };
-
-  onChangePassword = (ev) => {
-    ev.preventDefault();
-    const { passNow, passNew, passConfirm } = this.state;
-
-    if (!passNew.match(this.passRegex)) {
-      this.setState({ warning: "passNew" });
-    } else if (passNew !== passConfirm) {
-      this.setState({ warning: "passConfirm" });
-    } else {
-      ev.preventDefault();
-      this.setState({ isLoading: true });
-
-      (async() => {
-        try {
-          let res = await fetch(`${app.getServerURL()}/profile/changepass`, {
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userid: app.state.currentUser.userid,
-              oldpass: passNow,
-              newpass: passNew,
-            }),
-          });
-          res = await res.json();
-          console.log(res);
-        } catch (err) {
-          console.log("___________ERROR___________\n", err.message);
-        } finally {
-          this.setState({ isLoading: false });
-        }
-      })();
-    }
-  };
-
-  browseUserPic = (ev) => {
-    ev.preventDefault();
-
-    alert("Sorry. Not implemented yet...");
   };
 
   render = () => {
@@ -214,6 +130,107 @@ class Profile extends React.Component {
         </form>
       </main>
     );
+  };
+
+  onChangeProfile = (ev) => {
+    ev.preventDefault();
+    this.setState({ isLoading: true });
+
+    (async() => {
+      const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.state;
+      const { updateUser, currentUser } = this.context;
+
+      if (dob !== "" && new Date(dob) > new Date()) {
+        this.setState({ warning: "dob" });
+      } else {
+        let res = await fetch(`${getServerURL()}/profile`, {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userid: currentUser.userid,
+            username,
+            email,
+            firstname: firstname === "" ? null : firstname,
+            lastname: lastname === "" ? null : lastname,
+            dob: dob === "" ? null : dob,
+            sex: sex === "" ? null : sex,
+            describe: describe === "" ? null : describe,
+            pic: pic === "" ? null : pic,
+            diet,
+          }),
+        });
+        res = await res.json();
+
+        if (res.includes("Username")) {
+          this.setState({ warning: "username" });
+        } else if (res.includes("Email")) {
+          this.setState({ warning: "email" });
+        } else if (res === "User Profile Updated!") {
+          updateUser(this.state);
+        } else {
+          console.log(res);
+        }
+      }
+      this.setState({ isLoading: false });
+    })();
+  };
+
+  onChangePassword = (ev) => {
+    ev.preventDefault();
+    const { passNow, passNew, passConfirm } = this.state;
+    const { currentUser } = this.context;
+
+    if (!passNew.match(this.passRegex)) {
+      this.setState({ warning: "passNew" });
+    } else if (passNew !== passConfirm) {
+      this.setState({ warning: "passConfirm" });
+    } else {
+      ev.preventDefault();
+      this.setState({ isLoading: true });
+
+      (async() => {
+        try {
+          let res = await fetch(`${getServerURL()}/profile/changepass`, {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userid: currentUser.userid,
+              oldpass: passNow,
+              newpass: passNew,
+            }),
+          });
+          res = await res.json();
+          console.log(res);
+        } catch (err) {
+          console.log("___________ERROR___________\n", err.message);
+        } finally {
+          this.setState({ isLoading: false });
+        }
+      })();
+    }
+  };
+
+  cancelChangeProfile = (ev) => {
+    ev.preventDefault();
+    const { username, email, firstname, lastname, dob, sex, pic, describe, diet } = this.context.currentUser;
+
+    this.setState({
+      username,
+      email,
+      firstname,
+      lastname,
+      dob,
+      sex,
+      describe,
+      pic,
+      diet,
+    });
+  };
+
+  browseUserPic = (ev) => {
+    ev.preventDefault();
+
+    alert("Sorry. Not implemented yet...");
   };
 }
 

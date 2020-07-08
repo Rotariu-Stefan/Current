@@ -1,37 +1,37 @@
 import React from "react";
 
+
 class NoteView extends React.Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.state = {
-            note: props.note,
-            isSelected: false
-        };
-    }
-
-    toggleSelected = () => this.setState({
-        isSelected: !this.state.isSelected
-    });
-
-    render = () => {
-        const { isSelected, note } = this.state;
-        const { score, title, notetext } = note;
-
-        return (
-            <div onClick={(ev) => this.props.selectedChanged(ev, this)} className={"noteView boxShow lineDown" + (isSelected ? " nSelected" : "")}>
-                <img src={`SitePics/star${score}.png`} alt={"S=" + (score)} className="scoreImg" />
-                <span className="title">{title}</span>
-                <span>{"--" + (notetext ? notetext : "<Empty>")}</span>
-            </div>
-        );
-
+    this.state = {
+      note: props.note,
+      isSelected: false,
     };
+  }
 
     componentDidMount = () => {
-        if (this.props.signalSelect)
-            this.props.selectedChanged(null, this);
+      if (this.props.signalSelect) {
+        this.props.selectedChanged(null, this);
+      }
     };
+
+    render = () => {
+      const { isSelected, note } = this.state;
+      const { score, title, notetext } = note;
+
+      return (
+        <div className={`noteView boxShow lineDown${isSelected ? " nSelected" : ""}`} onClick={(ev) => this.props.selectedChanged(ev, this)}>
+          <img alt={`S=${score}`} className="scoreImg" src={`SitePics/star${score}.png`} />
+          <span className="title">{title}</span>
+          <span>{`--${notetext ? notetext : "<Empty>"}`}</span>
+        </div>
+      );
+
+    };
+
+    toggleSelected = () => this.setState({ isSelected: !this.state.isSelected });
 }
 
 export default NoteView;

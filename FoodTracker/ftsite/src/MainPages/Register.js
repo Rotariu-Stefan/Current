@@ -1,11 +1,12 @@
 import React from "react";
 
 import "../Css/UserForms.css";
-import { app } from "../App";
+import { AppContext } from "../AppContext";
+import { getServerURL } from "../methods";
 
 
 class Register extends React.Component {
-  passRegex = /^(?=.*?\d)(?=.*?[a-zA-Z]).+$/;
+  static contextType = AppContext;
 
   constructor(props) {
     super(props);
@@ -28,61 +29,7 @@ class Register extends React.Component {
     };
   }
 
-  onRegister = async(ev) => {
-    ev.preventDefault();
-    this.setState({ isLoading: true });
-
-    (async() => {
-      try {
-        const { pass, passC, username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.state;
-        if (!pass.match(this.passRegex)) {
-          this.setState({ warning: "pass" });
-        } else if (pass !== passC) {
-          this.setState({ warning: "passC" });
-        } else if (dob !== "" && new Date(dob) > new Date()) {
-          this.setState({ warning: "dob" });
-        } else {
-          let res = await fetch(`${app.getServerURL()}/register`, {
-            method: "put",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username,
-              email,
-              firstname: firstname === "" ? null : firstname,
-              lastname: lastname === "" ? null : lastname,
-              dob: dob === "" ? null : dob,
-              sex: sex === "" ? null : sex,
-              describe: describe === "" ? null : describe,
-              pic: pic === "" ? null : pic,
-              diet: diet === "none" ? null : diet,
-              pass,
-            }),
-          });
-          res = await res.json();
-
-          if (res.userid) {
-            app.changeMainPage("Login");
-          } else if (res.includes("Username")) {
-            this.setState({ warning: "username" });
-          } else if (res.includes("Email")) {
-            this.setState({ warning: "email" });
-          } else {
-            console.log(res);
-          }
-        }
-      } catch (err) {
-        console.log("___________ERROR___________\n", err.message);
-      } finally {
-        this.setState({ isLoading: false });
-      }
-    })();
-  };
-
-  browseUserPic = (ev) => {
-    ev.preventDefault();
-
-    alert("Sorry. Not implemented yet...");
-  }
+  passRegex = /^(?=.*?\d)(?=.*?[a-zA-Z]).+$/;
 
   render = () => {
     const { sex, warning, isLoading } = this.state;
@@ -151,6 +98,64 @@ class Register extends React.Component {
         </form>
       </main>
     );
+  };
+
+  onRegister = (ev) => {
+    ev.preventDefault();
+    this.setState({ isLoading: true });
+
+    (async() => {
+      try {
+        const { pass, passC, username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.state;
+        const { changeMainPage } = this.context;
+
+        if (!pass.match(this.passRegex)) {
+          this.setState({ warning: "pass" });
+        } else if (pass !== passC) {
+          this.setState({ warning: "passC" });
+        } else if (dob !== "" && new Date(dob) > new Date()) {
+          this.setState({ warning: "dob" });
+        } else {
+          let res = await fetch(`${getServerURL()}/register`, {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username,
+              email,
+              firstname: firstname === "" ? null : firstname,
+              lastname: lastname === "" ? null : lastname,
+              dob: dob === "" ? null : dob,
+              sex: sex === "" ? null : sex,
+              describe: describe === "" ? null : describe,
+              pic: pic === "" ? null : pic,
+              diet: diet === "none" ? null : diet,
+              pass,
+            }),
+          });
+          res = await res.json();
+
+          if (res.userid) {
+            changeMainPage("Login");
+          } else if (res.includes("Username")) {
+            this.setState({ warning: "username" });
+          } else if (res.includes("Email")) {
+            this.setState({ warning: "email" });
+          } else {
+            console.log(res);
+          }
+        }
+      } catch (err) {
+        console.log("___________ERROR___________\n", err.message);
+      } finally {
+        this.setState({ isLoading: false });
+      }
+    })();
+  };
+
+  browseUserPic = (ev) => {
+    ev.preventDefault();
+
+    alert("Sorry. Not implemented yet...");
   }
 }
 
