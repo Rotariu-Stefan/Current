@@ -157,9 +157,10 @@ class FoodDetailsArea extends React.Component {
   };
 
   onDishSelect = () => {
+    const { isdish } = this.state.selectedFoodDetails;
     const { isDishSelected } = this.props;
 
-    if (!isDishSelected) {
+    if (isdish && !isDishSelected) {
       this.props.updateDishSelect(true);
     }
   };
@@ -277,10 +278,9 @@ class FoodDetailsArea extends React.Component {
   };
 
   _compositionOrNot = () => {
-    const { selectedFood, composition } = this.state;
-    const { isDishSelected } = this.props;
+    const { composition, selectedFoodDetails } = this.state;
 
-    if ((selectedFood && selectedFood.state.foodItem.isdish) || isDishSelected) {
+    if (selectedFoodDetails.isdish) {
       return (
         <div className="foodEntries boxShow">
           <div className="comp textHigh">Composition:</div>

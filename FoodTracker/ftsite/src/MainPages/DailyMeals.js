@@ -20,9 +20,9 @@ class DailyMeals extends React.Component {
     super(props);
 
     this.state = {
-      dayArea: React.createRef(),
-      addFoodArea: React.createRef(),
-      foodDetailsArea: React.createRef(),
+      dayArea: null,
+      addFoodArea: null,
+      foodDetailsArea: null,
       isDishSelected: false,
     };
   }
@@ -32,13 +32,13 @@ class DailyMeals extends React.Component {
 
     return (
       <main className="mainDailyMeals boxShow" >
-        <DayArea ref={this.state.dayArea} updateDishSelect={this.updateDishSelect} />
+        <DayArea ref={this.dayAreaRef} updateDishSelect={this.updateDishSelect} />
         <AddFoodArea
-          ref={this.state.addFoodArea} onAddNewFoodEntry={this.onAddNewFoodEntry}
+          ref={this.addFoodAreaRef} onAddNewFoodEntry={this.onAddNewFoodEntry}
           onAddNewMeal={this.onAddNewMeal} onSelectedFoodChanged={this.onSelectedFoodChanged}
         />
         <FoodDetailsArea
-          ref={this.state.foodDetailsArea} isDishSelected={isDishSelected}
+          ref={this.foodDetailsAreaRef} isDishSelected={isDishSelected}
           updateDishSelect={this.updateDishSelect}
         />
       </main>
@@ -49,16 +49,16 @@ class DailyMeals extends React.Component {
     const { isDishSelected } = this.state;
 
     if (!isDishSelected) {
-      this.state.foodDetailsArea.current.onSelectedFoodChanged(selectedFood);
+      this.state.foodDetailsArea.onSelectedFoodChanged(selectedFood);
     }
   };
 
   onAddNewMeal = (mealName, portion) => {
-    const errorMessage = this.state.dayArea.current.onAddNewMeal(mealName, portion);
+    const errorMessage = this.state.dayArea.onAddNewMeal(mealName, portion);
     if (errorMessage) {
       alert(errorMessage);
     } else {
-      this.state.addFoodArea.current.resetAfterAdd();
+      this.state.addFoodArea.resetAfterAdd();
     }
   };
 
@@ -67,19 +67,26 @@ class DailyMeals extends React.Component {
 
     let errorMessage = "";
     if (isDishSelected) {
-      errorMessage = this.state.foodDetailsArea.current.onAddNewFoodEntry(newFoodEntry);
+      errorMessage = this.state.foodDetailsArea.onAddNewFoodEntry(newFoodEntry);
     } else {
-      errorMessage = this.state.dayArea.current.onAddNewFoodEntry(newFoodEntry);
+      errorMessage = this.state.dayArea.onAddNewFoodEntry(newFoodEntry);
     }
 
     if (errorMessage) {
       alert(errorMessage);
     } else {
-      this.state.addFoodArea.current.resetAfterAdd();
+      this.state.addFoodArea.resetAfterAdd();
     }
   };
 
+  dayAreaRef = (node) => this.setState({ dayArea: node });
+  addFoodAreaRef = (node) => this.setState({ addFoodArea: node });
+  foodDetailsAreaRef = (node) => this.setState({ foodDetailsArea: node });
+
   updateDishSelect = (status) => {
+    if (status) {
+      this.state.dayArea.onMealSelect(null, null);
+    }
     this.setState({ isDishSelected: status });
   };
 }

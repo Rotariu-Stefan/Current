@@ -12,7 +12,7 @@ class App extends React.Component {
         const { isNothing } = this.state;
 
         if (isNothing)
-            return <TestLabel />;
+            return <TestLabel text="ceva"/>;
         else
             return <TestLabel text="some random text lul!" />;
     };

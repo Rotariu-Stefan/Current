@@ -1,3 +1,4 @@
+//       // SEND ANDU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! JOS !!
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 /* eslint-disable max-lines */
@@ -9,6 +10,21 @@ import FoodItem from "../../Components/FoodItem";
 import { getServerURL } from "../../methods";
 import { AppContext } from "../../AppContext";
 
+
+const getNewFoodItem = (currentUser) => {
+  return {
+    foodname: "",
+    brand: "",
+    fat: 0, carbs: 0, protein: 0,
+    price: 0,
+    sizeinfo: 100,
+    isdish: false,
+    pic: "empty.png",
+    userid: currentUser.userid,
+    noteid: null,
+    foodentries: null,
+  };
+};
 
 class AddFoodArea extends React.Component {
   static contextType = AppContext;
@@ -60,6 +76,8 @@ class AddFoodArea extends React.Component {
     }, 0);
   };
 
+  // const currFoodIted = this.state.newFoodItem ? this.state.newFoodItem : getNewFoodItem(asdf);
+
   render = () => {
     const { amount, measure, mealareaIsLoading, searchareaIsLoading, sFoodItems, newFoodForm }
       = this.state;
@@ -78,28 +96,29 @@ class AddFoodArea extends React.Component {
             <span>Name:</span>
             <input
               maxLength="50" placeholder="name" type="text"
-              onChange={(ev) => this.changeNewFoodValue("foodname", ev.currentTarget.value)}
+              onChange={(ev) => this.onChangeFoodValue("foodname", ev.currentTarget.value)}
             />
             <span>Brand:</span>
             <input
               maxLength="50" placeholder="brand" type="text"
-              onChange={(ev) => this.changeNewFoodValue("brand", ev.currentTarget.value)}
+              onChange={(ev) => this.onChangeFoodValue("brand", ev.currentTarget.value)}
             />
             <span>Macros:</span>
             <div>
               <input
-                maxLength="5" placeholder="0" type="text"
-                onChange={(ev) => this.changeNewFoodValue("fat", ev.currentTarget.value)}
+                data-extra-value="fat" maxLength="5" placeholder="0"
+                type="text"
+                onChange={this.onChange}
               />
               <span>Fat</span>
               <input
                 maxLength="5" placeholder="0" type="text"
-                onChange={(ev) => this.changeNewFoodValue("carbs", ev.currentTarget.value)}
+                onChange={(ev) => this.onChangeFoodValue("carbs", ev.currentTarget.value)}
               />
               <span>Carbs</span>
               <input
                 maxLength="5" placeholder="0" type="text"
-                onChange={(ev) => this.changeNewFoodValue("protein", ev.currentTarget.value)}
+                onChange={(ev) => this.onChangeFoodValue("protein", ev.currentTarget.value)}
               />
               <span>Protein</span>
             </div>
@@ -107,7 +126,7 @@ class AddFoodArea extends React.Component {
             <div>
               <select
                 className="smallerInput"
-                onChange={(ev) => this.changeNewFoodValue("per", ev.currentTarget.value)}
+                onChange={(ev) => this.onChangeFoodValue("per", ev.currentTarget.value)}
               >
                 <option>100Grams</option>
                 <option>1Piece</option>
@@ -115,18 +134,18 @@ class AddFoodArea extends React.Component {
               <span>Piece Size:</span>
               <input
                 className="PSInput smallerInput" defaultValue="100" maxLength="5" placeholder="null" type="text"
-                onChange={(ev) => this.changeNewFoodValue("sizeinfo", ev.currentTarget.value)}
+                onChange={(ev) => this.onChangeFoodValue("sizeinfo", ev.currentTarget.value)}
               />
             </div>
             <span>Price:</span>
             <div>
               <input
                 className="smallerInput" maxLength="10" placeholder="0" type="text"
-                onChange={(ev) => this.changeNewFoodValue("price", ev.currentTarget.value)}
+                onChange={(ev) => this.onChangeFoodValue("price", ev.currentTarget.value)}
               />
               <div>
                 <span>Is Dish?</span>
-                <input type="checkbox" onChange={(ev) => this.changeNewFoodValue("isdish", ev.currentTarget.checked)} />
+                <input type="checkbox" onChange={(ev) => this.onChangeFoodValue("isdish", ev.currentTarget.checked)} />
               </div>
             </div>
             <span className="afaInfo">
@@ -138,7 +157,7 @@ class AddFoodArea extends React.Component {
             <span className="textHigh">Search Food: </span>
             <input
               className="isAll" maxLength="100" type="checkbox"
-              onChange={(ev) => this.loadSFoodItems(document.querySelector(".search").value, ev.currentTarget.checked)}
+              onChange={(ev) => this.onLoadSFoodItems(document.querySelector(".search").value, ev.currentTarget.checked)}
             />
             ALL
             <button
@@ -254,6 +273,49 @@ class AddFoodArea extends React.Component {
           first = false;
         }
       }
+
+      // renderFoodItems = () => {
+      //   return mFoodItems.map((iten) => {
+      //     return (
+      //       <FoodItem
+      //         key={item.ceva}
+      //         foodItem={item.ceva}
+      //         signalSelect={item.ceva}
+      //         onSelectedFoodChanged={this.onSelectedFoodChanged}
+      //       />
+      //     )
+      //   })
+      // }
+
+      // renderFoodItems = () => mFoodItems.map(this.renderFoodItem)
+      // renderFoodItem = (item) => {
+      //  return (
+      //   <FoodItem
+      //     key={item.ceva}
+      //     foodItem={item.ceva}
+      //     signalSelect={item.ceva}
+      //     onSelectedFoodChanged={this.onSelectedFoodChanged}
+      //   />
+      //  )
+      // }
+
+
+      // SEND ANDU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // if (first) {
+      //   this.setState({
+      //     selectedFood: null,
+      //     measure: "---",
+      //     sFoodItems,
+      //     sFoodCounter,
+      //     searchareaIsLoading: false,
+      //   })
+      // } else {
+      //   this.setState({
+      //     sFoodItems,
+      //     sFoodCounter,
+      //     searchareaIsLoading: false,
+      //   })
+      // }
 
       this.setState({
         selectedFood: first ? null : this.state.selectedFood,
@@ -380,6 +442,41 @@ class AddFoodArea extends React.Component {
     }
   };
 
+  onChangeFoodValue = (field, value) => {
+    const aux = this.state.newFoodItem;
+
+    if (field === "per") {
+      const psi = document.querySelector(".PSInput");
+      if (value === "1Piece") {
+        psi.disabled = true;
+        psi.value = "";
+        aux.sizeinfo = null;
+        this.setState({ amount: 1 });
+      } else {
+        document.querySelector(".PSInput").disabled = false;
+        psi.value = 100;
+        aux.sizeinfo = 100;
+        this.setState({ amount: 100 });
+      }
+    } else {
+      if (field === "isdish") {
+        aux.foodentries = value === true ? [] : null;
+      }
+      if (field === "sizeinfo") {
+        value = value === "" ? null : value;
+      }
+      if (field === "fat" || field === "carbs" || field === "protein") {
+        value = value === "" ? 0 : value;
+      }
+      aux[field] = value;
+    }
+
+    this.setState({
+      newFoodItem: aux,
+      measure: aux.sizeinfo === null ? "Pieces" : "Grams",
+    });
+  };
+
   addNewFoodEntryChecks = () => {
     const { newFoodForm, newFoodItem, selectedFood, amount, measure } = this.state;
 
@@ -429,41 +526,6 @@ class AddFoodArea extends React.Component {
       }, () => document.querySelector(".search").select());
     }
     document.querySelector(".search").select();
-  };
-
-  changeNewFoodValue = (field, value) => {
-    const aux = this.state.newFoodItem;
-
-    if (field === "per") {
-      const psi = document.querySelector(".PSInput");
-      if (value === "1Piece") {
-        psi.disabled = true;
-        psi.value = "";
-        aux.sizeinfo = null;
-        this.setState({ amount: 1 });
-      } else {
-        document.querySelector(".PSInput").disabled = false;
-        psi.value = 100;
-        aux.sizeinfo = 100;
-        this.setState({ amount: 100 });
-      }
-    } else {
-      if (field === "isdish") {
-        aux.foodentries = value === true ? [] : null;
-      }
-      if (field === "sizeinfo") {
-        value = value === "" ? null : value;
-      }
-      if (field === "fat" || field === "carbs" || field === "protein") {
-        value = value === "" ? 0 : value;
-      }
-      aux[field] = value;
-    }
-
-    this.setState({
-      newFoodItem: aux,
-      measure: aux.sizeinfo === null ? "Pieces" : "Grams",
-    });
   };
 
   _currentEntry = () => {

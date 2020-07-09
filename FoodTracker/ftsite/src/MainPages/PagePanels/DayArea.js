@@ -30,39 +30,20 @@ class DayArea extends React.Component {
     };
   }
 
-  // componentDidMount() {
-  //   this.setInitialState();
-  // }
-  //
-  // setInitialState() {
-  //
-  // }
-
-  componentDidMount() {
+  componentDidMount = () => {
     this.setInitialState();
   }
 
   render = () => {
-    const {
-      selectedDay,
-      mealEntries,
-      dayEntry,
-      mealareaIsLoading,
-      dayFat,
-      dayCarbs,
-      dayProtein,
-    } = this.state;
+    const { selectedDay, mealEntries, dayEntry, mealareaIsLoading, dayFat, dayCarbs, dayProtein } = this.state;
 
     const mealsAreaOrLoading = mealareaIsLoading ? "LOADING..." : mealEntries;
     const noteOrLoading = mealareaIsLoading ? "LOADING..." : (
       <Note
-        key={`D${dayEntry.note ? dayEntry.note.noteid : "D0"}`}
-        note={dayEntry.note}
-        removeNote={this.removeNote}
-        updateDayNote={this.updateDayNote}
+        key={`D${dayEntry.note ? dayEntry.note.noteid : "D0"}`} note={dayEntry.note}
+        removeNote={this.removeNote} updateDayNote={this.updateDayNote}
       />
     );
-
 
     return (
       <div className="dayArea subblock boxShow">
@@ -70,18 +51,18 @@ class DayArea extends React.Component {
           <div className="datepick boxShow">
             <span className="textHigh">Day: </span>
             <button
-              className="ftButton" disabled={mealareaIsLoading}
-              onClick={() => this.onDayButtons(-1)}
+              className="ftButton" data-offset="-1"
+              disabled={mealareaIsLoading} onClick={this.onDayOffset}
             >
               {"<"}
             </button>
             <input
               className="selectedDay" disabled={mealareaIsLoading} type="date" value={selectedDay}
-              onChange={(ev) => this.loadDailyMeals(ev.currentTarget.value)}
+              onChange={this.onLoadDailyMeals}
             />
             <button
-              className="ftButton" disabled={mealareaIsLoading}
-              onClick={() => this.onDayButtons(1)}
+              className="ftButton" data-offset="1"
+              disabled={mealareaIsLoading} onClick={this.onDayOffset}
             >{">"}</button>
           </div>
           {noteOrLoading}
@@ -99,18 +80,10 @@ class DayArea extends React.Component {
     );
   };
 
-  setInitialState = () => {
+  onLoadDailyMeals = (dayParam) => {
     const { currentUser } = this.context;
 
-    this.setState({ selectedDay: dateToStr(currentUser.access === "Guest" ? new Date("2020-06-07") : new Date()) });
-
-    setTimeout(() => {
-      this.onLoadDailyMeals(this.state.selectedDay);
-    }, 0);
-  }
-
-  onLoadDailyMeals = (day) => {
-    const { currentUser } = this.context;
+    const day = (typeof dayParam === "string") ? dayParam : dayParam.currentTarget.value;
 
     if (currentUser.access === "Guest" &&
       (new Date(day) < new Date("2020-06-04") || new Date(day) > new Date("2020-06-11"))) {
@@ -219,11 +192,10 @@ class DayArea extends React.Component {
   onMealSelect = (ev, sender) => {
     const { selectedMeal } = this.state;
 
-    if (sender === null) {
+    if (sender === null && selectedMeal !== null) {
       selectedMeal.toggleHighlight();
       this.setState({ selectedMeal: null });
-    }
-    if (sender !== selectedMeal) {
+    } else if (sender !== selectedMeal) {
       if (selectedMeal) {
         selectedMeal.toggleHighlight();
       }
@@ -258,13 +230,12 @@ class DayArea extends React.Component {
     return "";
   };
 
-  onDayButtons = (nrDays) => {
+  onDayOffset = (ev) => {
     const { selectedDay } = this.state;
 
     const d = new Date(selectedDay);
-    d.setDate(d.getDate() + nrDays);
-
-    this.loadDailyMeals(dateToStr(d));
+    d.setDate(d.getDate() + Number(ev.currentTarget.getAttribute("data-offset")));
+    this.onLoadDailyMeals(dateToStr(d));
   };
 
   onCommit = () => {
@@ -347,6 +318,17 @@ class DayArea extends React.Component {
       dayProtein: dayProtein + newprotein,
     });
   };
+
+  setInitialState = () => {
+    const { currentUser } = this.context;
+
+    const initialDate = currentUser.access === "Guest" ? new Date("2020-06-07") : new Date();
+    this.setState({ selectedDay: dateToStr(initialDate) });
+
+    setTimeout(() => {
+      this.onLoadDailyMeals(this.state.selectedDay);
+    }, 0);
+  }
 }
 
 export default DayArea;
