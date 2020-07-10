@@ -7,9 +7,11 @@ import PropTypes from "prop-types";
 import FoodItem from "../../Components/FoodItem";
 import FoodEntry from "../../Components/FoodEntry";
 import { getServerURL } from "../../methods";
+import { AppContext } from "../../AppContext";
 
 
 class FoodDetailsArea extends React.Component {
+  static contextType = AppContext;
   static propTypes = {
     isDishSelected: PropTypes.bool.isRequired,
     updateDishSelect: PropTypes.func.isRequired,
@@ -28,12 +30,6 @@ class FoodDetailsArea extends React.Component {
 
   render = () => {
     const { selectedFoodDetails } = this.state;
-    const { isDishSelected } = this.props;
-    const { foodname, brand, fat, carbs, protein, price, pic } = selectedFoodDetails;
-
-    const calories = ((fat * 9) + (protein * 4) + (carbs * 4)).toFixed(1);
-    const highlightOrNot = isDishSelected ? " highlight" : "";
-    const brandOrNot = brand ? `@${brand}` : "";
 
     if (!selectedFoodDetails) {
       return (
@@ -42,6 +38,16 @@ class FoodDetailsArea extends React.Component {
         </div>
       );
     }
+
+    const { isDishSelected } = this.props;
+    const { foodname, brand, fat, carbs, protein, price, pic } = selectedFoodDetails;
+
+    const calories = ((fat * 9) + (protein * 4) + (carbs * 4)).toFixed(1);
+    const highlightOrNot = isDishSelected ? " highlight" : "";
+    const brandOrNot = brand ? `@${brand}` : "";
+    const picOrNot = pic === null ? "empty.png" : pic;
+
+    console.log("BULEAAAAAAA !!!", this.state.composition);
 
     return (
       <div
@@ -55,7 +61,7 @@ class FoodDetailsArea extends React.Component {
           />*/}
         </div>
         <div className="foodPic boxShow">
-          <img alt="[NO FOOD PIC]" src={`FoodPics/${pic}`} />
+          <img alt="[NO FOOD PIC]" src={`FoodPics/${picOrNot}`} />
         </div>
         <div className="foodInfo">
           <table>
@@ -82,7 +88,8 @@ class FoodDetailsArea extends React.Component {
                 <td>{this._infoForMeasure("Pieces", price)}</td></tr>
             </tbody>
           </table>
-          {this._compositionOrNot()}
+          {this.state.compFoodCounter}
+          {this.state.composition}
           {this._dishButtonsOrNot()}
         </div>
       </div>
@@ -90,15 +97,16 @@ class FoodDetailsArea extends React.Component {
   };
 
   onSelectedFoodChanged = (selectedFood) => {
-    // this.setState({
-    //   selectedFoodDetails: null,
-    //   compFoodCounter: 0,
-    //   composition: [],
-    // });
+    this.setState({
+      selectedFoodDetails: null,
+      compFoodCounter: 0,
+      composition: [],
+    });
 
     (async() => {
       let { compFoodCounter } = this.state;
       const { foodid, isdish, noteid } = selectedFood.state.foodItem;
+
       let res = await fetch(`${getServerURL()}/dailymeals/fooddetails`, {
         method: "get",
         headers: {
@@ -110,50 +118,29 @@ class FoodDetailsArea extends React.Component {
       });
       res = await res.json();
 
-      const composition = [];
+      const newComposition = [];
+      const newFoodDetails = selectedFood.state.foodItem;
       if (isdish && res.foodentries) {
+        newFoodDetails.foodentries = res.foodentries;
         for (const f of res.foodentries) {
           compFoodCounter += 1;
-          composition.push(
+          newComposition.push(
             <FoodEntry
               key={compFoodCounter} foodEntry={f}
               onRemoveFoodEntry={this.onRemoveFoodEntry}
             />);
         }
       }
+      if (res.note) {
+        newFoodDetails.note = res.note;
+      }
 
       this.setState({
-        selectedFoodDetails: selectedFood.state.foodItem,
+        selectedFoodDetails: newFoodDetails,
         compFoodCounter,
-        composition,
+        composition: newComposition,
       });
     })();
-  };
-
-  onAddNewFoodEntry = (keyValue, newFoodEntry) => {
-    const { composition, selectedFoodDetails } = this.state;
-    const { currentUser } = this.context;
-    let { compFoodCounter } = this.state;
-
-    if (currentUser.access === "Guest" && selectedFoodDetails.foodentries.length) {
-      return "As Guest user you cannot enter more than 7 Food Items per Dish!";
-    }
-
-    compFoodCounter += 1;
-    composition.push(
-      <FoodEntry
-        key={compFoodCounter}
-        foodEntry={newFoodEntry}
-        onRemoveFoodEntry={this.onRemoveFoodEntry}
-      />);
-    selectedFoodDetails.foodentries.push(newFoodEntry);
-    this.setState({
-      composition,
-      selectedFoodDetails,
-      compFoodCounter,
-    });
-
-    return "";
   };
 
   onDishSelect = () => {
@@ -268,6 +255,29 @@ class FoodDetailsArea extends React.Component {
         });
       }
     }
+  };
+
+  onAddNewFoodEntry = (newFoodEntry) => {
+    // if (currentUser.access === "Guest" && selectedFoodDetails.foodentries.length >= 7) {
+    //   return "As Guest user you cannot enter more than 7 Food Items per Dish!";
+    // }
+    const { composition, selectedFoodDetails } = this.state;
+    let { compFoodCounter } = this.state;
+
+    compFoodCounter += 1;
+    // const newComp = composition;
+    composition.push(
+      <FoodEntry
+        key={compFoodCounter} foodEntry={newFoodEntry}
+        onRemoveFoodEntry={this.onRemoveFoodEntry}
+      />);
+    selectedFoodDetails.foodentries.push(newFoodEntry);
+
+    this.setState({
+      selectedFoodDetails,
+      composition,
+      compFoodCounter,
+    });
   };
 
   _infoForMeasure = (measureStr, infoValue) => {

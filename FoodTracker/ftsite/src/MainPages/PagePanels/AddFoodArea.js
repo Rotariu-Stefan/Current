@@ -106,9 +106,8 @@ class AddFoodArea extends React.Component {
             <span>Macros:</span>
             <div>
               <input
-                data-extra-value="fat" maxLength="5" placeholder="0"
-                type="text"
-                onChange={this.onChange}
+                data-field="fat" maxLength="5" placeholder="0" type="text"
+                onChange={(ev) => this.onChangeFoodValue("fat", ev.currentTarget.value)}
               />
               <span>Fat</span>
               <input
@@ -218,6 +217,23 @@ class AddFoodArea extends React.Component {
   };
 
   onAddNewMeal = () => {
+    let { sFoodCounter } = this.state;
+    const { sFoodItems } = this.state;
+
+    sFoodCounter += 1;
+    sFoodItems.push(
+      <FoodItem
+        key={sFoodCounter} foodItem={FoodItem.defaultFoodItem}
+        onSelectedFoodChanged={this.onSelectedFoodChanged}
+      />);
+
+    this.setState({
+      sFoodItems,
+      sFoodCounter,
+    });
+
+    return;
+
     const newMName = document.querySelector(".newMName");
     const newMPortion = document.querySelector(".newMPortion");
     this.props.onAddNewMeal(newMName, newMPortion);

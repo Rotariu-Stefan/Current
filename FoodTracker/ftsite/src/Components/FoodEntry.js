@@ -39,7 +39,7 @@ class FoodEntry extends React.Component {
     componentDidMount = () => {
       const { fatRes, carbsRes, proteinRes } = this.state;
 
-      if (this.props.addToMeal) {
+      if (this.props.updateMealMacros) {
         this.props.updateMealMacros(fatRes, carbsRes, proteinRes);
       }
     }
