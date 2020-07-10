@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { Component } from "react";
+import React from "react";
 
 import FoodEntry from "./FoodEntry";
 import Note from "./Note";
 
 
-class MealEntry extends Component {
+class MealEntry extends React.Component {
     static defaultMealEntry = {
       mealname: "New Meal",
       portion: 1,
@@ -18,34 +18,28 @@ class MealEntry extends Component {
     constructor(props) {
       super(props);
 
+      this.fat = 0;
+      this.carbs = 0;
+      this.protein = 0;
       this.state = {
         mealEntry: props.mealEntry ? props.mealEntry : { ...MealEntry.defaultMealEntry },
-        foodEntries: [],
-        foodCounter: 0,
-        isHighlighted: false,
-        isMin: false,
+
         fat: 0,
         carbs: 0,
         protein: 0,
-      };
 
-      if (props.mealEntry) {
-        for (const f of props.mealEntry.foodentries) {
-          this.state.foodEntries.push(
-            <FoodEntry
-              key={this.state.foodCounter}
-              className="lineDown"
-              foodEntry={f}
-              updateMealMacros={this.updateMealMacros}
-              onRemoveFoodEntry={this.onRemoveFoodEntry}
-            />);
-          this.state.foodCounter += 1;
-        }
-      }
+        isHighlighted: false,
+        isMin: false,
+      };
+      this.foodEntriesCounter = 0;
     }
 
-    render = () => {
-      const { mealEntry, isHighlighted, isMin, foodEntries, fat, carbs, protein } = this.state;
+    componentDidMount() {
+      this.props.updateDayMacros(this.fat, this.carbs, this.protein);
+    }
+
+    render() {
+      const { mealEntry, isHighlighted, isMin, fat, carbs, protein } = this.state;
       const { mealname, note, portion } = mealEntry;
 
       return (
@@ -69,7 +63,7 @@ class MealEntry extends Component {
             removeNote={this.onRemoveNote} updateAttach={this.onUpdateAttach}
           />
           <div className={`foodEntries lineDown${isMin ? " hidden" : ""}`}>
-            {foodEntries}
+            {this._getFoodEntries()}
           </div>
           <div className="mealTotal">
             <span>Meal Total:</span>
@@ -77,31 +71,7 @@ class MealEntry extends Component {
           </div>
         </div>
       );
-    };
-
-    onRemoveFoodEntry = (ev, sender) => {
-      const { foodEntries, mealEntry, fat, carbs, protein } = this.state;
-      const { portion } = mealEntry;
-
-      for (let i = 0; i < foodEntries.length; i += 1) {
-        if (foodEntries[i].key.toString() === sender._reactInternalFiber.key) {
-          mealEntry.foodentries.splice(i, 1);
-          foodEntries.splice(i, 1);
-
-          this.setState({
-            foodEntries,
-            mealEntry,
-            fat: fat - (sender.state.fatRes * portion),
-            carbs: carbs - (sender.state.carbsRes * portion),
-            protein: protein - (sender.state.proteinRes * portion),
-          });
-          this.props.addToDay(0 - (sender.state.fatRes * portion), 0 - (sender.state.carbsRes * portion)
-            , 0 - (sender.state.proteinRes * portion));
-        }
-      }
-
-      this.props.updateMealFoodEntries(this);
-    };
+    }
 
     onUpdateAttach = (newNote) => {
       const { mealEntry } = this.state;
@@ -118,6 +88,36 @@ class MealEntry extends Component {
       this.props.updateMealNote();
     };
 
+    updateRemoveFoodEntry = (sender) => {
+      const { mealEntry } = this.state;
+
+      mealEntry.foodentries.splice(sender._reactInternalFiber.key, 1);
+      this.setState({ mealEntry });
+    };
+
+    updateNewFoodEntry = (newFoodEntry) => {
+      const { mealEntry } = this.state;
+
+      mealEntry.foodentries.push(newFoodEntry);
+      this.setState({ mealEntry });
+
+      return "";
+    };
+
+    updateMealMacros = (newFat, newCarbs, newProtein) => {
+      const { portion } = this.state.mealEntry;
+
+      this.fat += (newFat * portion);
+      this.carbs += (newCarbs * portion);
+      this.protein += (newProtein * portion);
+
+      // this.setState({
+      //   fat: this.fat,
+      //   carbs: this.carbs,
+      //   protein: this.protein,
+      // });
+    };
+
     toggleHighlight = () => this.setState({ isHighlighted: !this.state.isHighlighted });
 
     toggleMinMax = (ev) => {
@@ -125,33 +125,23 @@ class MealEntry extends Component {
       ev.stopPropagation();
     };
 
-    addNewFoodEntry = (newFoodEntry) => {
-      const { foodEntries } = this.state;
-      let { foodCounter } = this.state;
+    _getFoodEntries = () => {
+      const { mealEntry } = this.state;
 
-      foodCounter += 1;
-      foodEntries.push(
-        <FoodEntry
-          key={foodCounter} className="lineDown" foodEntry={newFoodEntry}
-          updateMealMacros={this.updateMealMacros} onRemoveFoodEntry={this.onRemoveFoodEntry}
-        />);
+      this.foodEntriesCounter = 0;
 
-      this.setState({
-        foodEntries,
-        foodCounter,
-      });
+      return mealEntry.foodentries.map(this._getFoodEntry);
     };
 
-    updateMealMacros = (newFat, newCarbs, newProtein) => {
-      const { portion, fat, carbs, protein } = this.state.mealEntry;
+    _getFoodEntry = (entry) => {
+      const fe = (
+        <FoodEntry
+          key={this.foodEntriesCounter} className="lineDown" foodEntry={entry}
+          updateMealMacros={this.updateMealMacros} updateRemoveFoodEntry={this.updateRemoveFoodEntry}
+        />);
+      this.foodEntriesCounter += 1;
 
-      this.setState({
-        fat: fat + (newFat * portion),
-        carbs: carbs + (newCarbs * portion),
-        protein: protein + (newProtein * portion),
-      });
-
-      this.props.addToDay(newFat * portion, newCarbs * portion, newProtein * portion);
+      return fe;
     };
 }
 

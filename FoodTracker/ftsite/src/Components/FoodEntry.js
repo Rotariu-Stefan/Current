@@ -29,14 +29,15 @@ class FoodEntry extends React.Component {
         foodEntry = { ...FoodEntry.defaultFoodEntry };
       }
 
-      this.state = { foodEntry };
-
-      this.state.fatRes = this.getMacroRes("fat");
-      this.state.carbsRes = this.getMacroRes("carbs");
-      this.state.proteinRes = this.getMacroRes("protein");
+      this.state = {
+        foodEntry,
+        fatRes: this.getMacroRes("fat", foodEntry),
+        carbsRes: this.getMacroRes("carbs", foodEntry),
+        proteinRes: this.getMacroRes("protein", foodEntry),
+      };
     }
 
-    componentDidMount = () => {
+    componentDidMount() {
       const { fatRes, carbsRes, proteinRes } = this.state;
 
       if (this.props.updateMealMacros) {
@@ -44,33 +45,46 @@ class FoodEntry extends React.Component {
       }
     }
 
-    render = () => {
+    componentDidUpdate() {
+      if (this.props.foodEntry !== this.state.foodEntry) {
+        this.setState({ foodEntry: this.props.foodEntry });
+      }
+    }
+
+    render() {
       const { foodEntry, fatRes, carbsRes, proteinRes } = this.state;
-      const { foodname, brand, amount, fat, carbs, protein } = foodEntry;
+      const { foodname, brand, amount, fat, carbs, protein } = (foodEntry ? foodEntry : FoodEntry.defaultFoodEntry);
+
+      const brandOrNot = brand ? `@${brand}` : "";
+      const removeImgOrNot = this.props.readOnly ? "" : (
+        <img
+          alt="X" className="managerImg" src="SitePics/icons8-closeM-window-16.png"
+          onClick={this.onRemoveFoodEntry}
+        />);
 
       return (
         <div className={`foodEntry ${this.props.className}`}>
           <span className="amount">{amount}</span>
-          <span className="name_brand">{`${foodname} ${brand ? `@${brand}` : ""}`}</span>
+          <span className="name_brand">{`${foodname} ${brandOrNot}`}</span>
           <span className="macro">{`${fat}/${carbs}/${protein}`}</span>
-          <span className="macroRes">{`${fatRes}/${carbsRes}/${proteinRes}`}
-            {this.props.readOnly ? "" : <img alt="X" className="managerImg" src="SitePics/icons8-closeM-window-16.png" onClick={(ev) => this.props.onRemoveFoodEntry(ev, this)} />}
-          </span>
+          <span className="macroRes">{`${fatRes}/${carbsRes}/${proteinRes}`}{removeImgOrNot}</span>
         </div>
       );
-    };
+    }
 
-    getMacroRes = (mstr) => {
-      const { amount, measure, sizeinfo } = this.state.foodEntry;
+    onRemoveFoodEntry = () => this.props.updateRemoveFoodEntry(this);
+
+    getMacroRes = (mstr, foodEntry) => {
+      const { amount, measure, sizeinfo } = foodEntry;
       if (measure === "Pieces") {
         if (sizeinfo === null) {
-          return (this.state.foodEntry[mstr] * amount).toFixed(1);
+          return Number((foodEntry[mstr] * amount).toFixed(1));
         }
 
-        return (this.state.foodEntry[mstr] * amount * sizeinfo / 100).toFixed(1);
+        return Number((foodEntry[mstr] * amount * sizeinfo / 100).toFixed(1));
       }
 
-      return (this.state.foodEntry[mstr] * amount / 100).toFixed(1);
+      return Number((foodEntry[mstr] * amount / 100).toFixed(1));
     };
 }
 

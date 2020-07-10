@@ -34,7 +34,7 @@ class DailyMeals extends React.Component {
       <main className="mainDailyMeals boxShow" >
         <DayArea ref={this.dayAreaRef} updateDishSelect={this.updateDishSelect} />
         <AddFoodArea
-          ref={this.addFoodAreaRef} onAddNewFoodEntry={this.onAddNewFoodEntry}
+          ref={this.addFoodAreaRef} updateAddNewFoodEntry={this.updateAddNewFoodEntry}
           onAddNewMeal={this.onAddNewMeal} onSelectedFoodChanged={this.onSelectedFoodChanged}
         />
         <FoodDetailsArea
@@ -49,7 +49,7 @@ class DailyMeals extends React.Component {
     const { isDishSelected } = this.state;
 
     if (!isDishSelected) {
-      this.state.foodDetailsArea.onSelectedFoodChanged(selectedFood);
+      this.state.foodDetailsArea.updateSelectedFoodDetails(selectedFood);
     }
   };
 
@@ -62,14 +62,14 @@ class DailyMeals extends React.Component {
     }
   };
 
-  onAddNewFoodEntry = (newFoodEntry) => {
+  updateAddNewFoodEntry = (newFoodEntry) => {
     const { isDishSelected } = this.state;
 
     let errorMessage = "";
     if (isDishSelected) {
-      errorMessage = this.state.foodDetailsArea.onAddNewFoodEntry(newFoodEntry);
+      errorMessage = this.state.foodDetailsArea.updateNewFoodEntry(newFoodEntry);
     } else {
-      errorMessage = this.state.dayArea.onAddNewFoodEntry(newFoodEntry);
+      errorMessage = this.state.dayArea.updateNewFoodEntry(newFoodEntry);
     }
 
     if (errorMessage) {

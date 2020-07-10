@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from "react";
 
 
@@ -11,7 +12,6 @@ class FoodItem extends React.Component {
       sizeinfo: null, userid: 0, pic: "empty.png", price: 0,
       isdish: false,
       note: null,
-      // measure: "Pieces"
     };
 
     constructor(props) {
@@ -23,24 +23,34 @@ class FoodItem extends React.Component {
       };
     }
 
-    componentDidMount = () => {
+    componentDidMount() {
       if (this.props.signalSelect) {
-        this.props.onSelectedFoodChanged(null, this);
+        this.onSelectedFoodChanged(this);
       }
-    };
+    }
 
     render = () => {
       const { foodItem, isSelected } = this.state;
       const { foodname, brand, fat, carbs, protein, sizeinfo } = foodItem;
 
+      const selectedOrNot = isSelected ? " feSelected" : "";
+      const per = sizeinfo === null ? "1" : "100g";
+
       return (
-        <div className={`foodItem lineDown${isSelected ? " feSelected" : ""}`} onClick={(ev) => this.props.onSelectedFoodChanged(ev, this)} >
+        <div
+          className={`foodItem lineDown${selectedOrNot}`} role="menuitem" tabIndex="0"
+          onClick={this.onSelectedFoodChanged}
+        >
           <span className="name_brand">{`${foodname} ${brand ? `@${brand}` : ""}`}</span>
           <span className="macro">{`${fat}/${carbs}/${protein}`}</span>
-          <span className="per">{sizeinfo === null ? "1" : "100g"}</span>
+          <span className="per">{per}</span>
         </div>
       );
     };
+
+    onSelectedFoodChanged = () => {
+      this.props.updateSelectedFood(this);
+    }
 
     toggleSelected = () => this.setState({ isSelected: !this.state.isSelected });
 }

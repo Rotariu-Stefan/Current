@@ -9,7 +9,7 @@ class TestLabel extends React.Component {
         };
     }
 
-    componentDidUpdate() {  //HAPPPENS IF PROPS  CHANGE
+    componentDidUpdate() {  //HAPPPENS IF PROPS CHANGE
       if (this.props.text !== this.state.text) {
         this.setState({ text: this.props.text })
       }

@@ -20,12 +20,8 @@ class FoodDetailsArea extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      selectedFoodDetails: FoodItem.defaultFoodItem,
-
-      composition: [],
-      compFoodCounter: 0,
-    };
+    this.state = { selectedFoodDetails: FoodItem.defaultFoodItem };
+    this.foodEntriesCounter = 0;
   }
 
   render = () => {
@@ -45,9 +41,7 @@ class FoodDetailsArea extends React.Component {
     const calories = ((fat * 9) + (protein * 4) + (carbs * 4)).toFixed(1);
     const highlightOrNot = isDishSelected ? " highlight" : "";
     const brandOrNot = brand ? `@${brand}` : "";
-    const picOrNot = pic === null ? "empty.png" : pic;
-
-    console.log("BULEAAAAAAA !!!", this.state.composition);
+    const picOrEmpty = pic === null ? "empty.png" : pic;
 
     return (
       <div
@@ -61,7 +55,7 @@ class FoodDetailsArea extends React.Component {
           />*/}
         </div>
         <div className="foodPic boxShow">
-          <img alt="[NO FOOD PIC]" src={`FoodPics/${picOrNot}`} />
+          <img alt="[NO FOOD PIC]" src={`FoodPics/${picOrEmpty}`} />
         </div>
         <div className="foodInfo">
           <table>
@@ -88,59 +82,11 @@ class FoodDetailsArea extends React.Component {
                 <td>{this._infoForMeasure("Pieces", price)}</td></tr>
             </tbody>
           </table>
-          {this.state.compFoodCounter}
-          {this.state.composition}
+          {this._compositionOrNot()}
           {this._dishButtonsOrNot()}
         </div>
       </div>
     );
-  };
-
-  onSelectedFoodChanged = (selectedFood) => {
-    this.setState({
-      selectedFoodDetails: null,
-      compFoodCounter: 0,
-      composition: [],
-    });
-
-    (async() => {
-      let { compFoodCounter } = this.state;
-      const { foodid, isdish, noteid } = selectedFood.state.foodItem;
-
-      let res = await fetch(`${getServerURL()}/dailymeals/fooddetails`, {
-        method: "get",
-        headers: {
-          "content-type": "application/json",
-          foodid,
-          isdish,
-          "noteid": noteid ? noteid : null,
-        },
-      });
-      res = await res.json();
-
-      const newComposition = [];
-      const newFoodDetails = selectedFood.state.foodItem;
-      if (isdish && res.foodentries) {
-        newFoodDetails.foodentries = res.foodentries;
-        for (const f of res.foodentries) {
-          compFoodCounter += 1;
-          newComposition.push(
-            <FoodEntry
-              key={compFoodCounter} foodEntry={f}
-              onRemoveFoodEntry={this.onRemoveFoodEntry}
-            />);
-        }
-      }
-      if (res.note) {
-        newFoodDetails.note = res.note;
-      }
-
-      this.setState({
-        selectedFoodDetails: newFoodDetails,
-        compFoodCounter,
-        composition: newComposition,
-      });
-    })();
   };
 
   onDishSelect = () => {
@@ -153,66 +99,55 @@ class FoodDetailsArea extends React.Component {
   };
 
   onCalculateDishValues = () => {
-    this.setState({
-      selectedFoodDetails: null,
-      searchareaIsLoading: true,
-    });
-    (async() => {
-      const { selectedFoodDetails } = this.state;
-
-      let fat = 0; let carbs = 0; let protein = 0;
-      for (const f of selectedFoodDetails.foodentries) {
-        const { amount, measure, sizeinfo } = f;
-        if (measure === "Pieces") {
-          if (sizeinfo === null) {
-            fat += (f.fat * amount);
-            carbs += (f.carbs * amount);
-            protein += (f.protein * amount);
-          } else {
-            fat += (f.fat * amount * sizeinfo / 100);
-            carbs += (f.carbs * amount * sizeinfo / 100);
-            protein += (f.protein * amount * sizeinfo / 100);
+    const { selectedFoodDetails } = this.state;
+    this.setState({ selectedFoodDetails: null },
+      async() => {
+        let fat = 0; let carbs = 0; let protein = 0;
+        for (const entry of selectedFoodDetails.foodentries) {
+          const { amount, measure, sizeinfo } = entry;
+          if (measure === "Pieces") {
+            if (sizeinfo === null) {
+              fat += (entry.fat * amount);
+              carbs += (entry.carbs * amount);
+              protein += (entry.protein * amount);
+            } else {
+              fat += (entry.fat * amount * sizeinfo / 100);
+              carbs += (entry.carbs * amount * sizeinfo / 100);
+              protein += (entry.protein * amount * sizeinfo / 100);
+            }
+          } else if (measure === "Grams") {
+            fat += (entry.fat * amount / 100);
+            carbs += (entry.carbs * amount / 100);
+            protein += (entry.protein * amount / 100);
           }
-        } else if (measure === "Grams") {
-          fat += (f.fat * amount / 100);
-          carbs += (f.carbs * amount / 100);
-          protein += (f.protein * amount / 100);
         }
-      }
-      selectedFoodDetails.fat = Number(fat.toFixed(1));
-      selectedFoodDetails.carbs = Number(carbs.toFixed(1));
-      selectedFoodDetails.protein = Number(protein.toFixed(1));
+        selectedFoodDetails.fat = Number(fat.toFixed(1));
+        selectedFoodDetails.carbs = Number(carbs.toFixed(1));
+        selectedFoodDetails.protein = Number(protein.toFixed(1));
 
-      let res = await fetch(`${getServerURL()}/yourfoods`, {
-        method: "post",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(selectedFoodDetails),
-      });
-      res = await res.json();
+        let res = await fetch(`${getServerURL()}/yourfoods`, {
+          method: "post",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(selectedFoodDetails),
+        });
+        res = await res.json();
 
-      document.querySelector(".search").value = `${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}`;
-      this.loadSFoodItems(`${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}`,
-        document.querySelector("#isAll").checked);
-
-      if (typeof res !== "string") {
-        alert(`Successfully calculated values for dish: ${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}!\n
+        this.setState({ selectedFoodDetails }, () => {
+          console.log(res);
+          if (typeof res !== "string") {
+            alert(`Successfully calculated dish values: ${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}!\n
             --You can view resulting entry in the console`);
-      } else {
-        alert("There was an Error!");
-      }
-      console.log(res);
-    })();
-  };
+          } else {
+            alert("There was an Error!");
+          }
+        });
+      });
+  }
 
   onSaveDishIngr = () => {
     const { selectedFoodDetails } = this.state;
 
-    this.setState({
-      selectedFoodDetails: null,
-      searchareaIsLoading: true,
-    });
-    (async() => {
-
+    this.setState({ selectedFoodDetails: null }, async() => {
       const dishData = {};
       dishData.dishid = selectedFoodDetails.foodid;
       dishData.foodentries = [];
@@ -227,58 +162,60 @@ class FoodDetailsArea extends React.Component {
       });
       res = await res.json();
 
-      document.querySelector(".search").value = `${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}`;
-      this.loadSFoodItems(`${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}`,
-        document.querySelector("#isAll").checked);
-
-      if (typeof res !== "string") {
-        alert(`Successfully saved dish: ${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}!\n
-                --You can view resulting entry in the console`);
-      } else {
-        alert("There was an Error!");
-      }
-      console.log(res);
-    })();
-  };
-
-  onRemoveFoodEntry = (ev, sender) => {
-    const { composition, selectedFoodDetails } = this.state;
-
-    for (let i = 0; i < composition.length; i += 1) {
-      if (composition[i].key.toString() === sender._reactInternalFiber.key) {
-        selectedFoodDetails.foodentries.splice(i, 1);
-        composition.splice(i, 1);
-
-        this.setState({
-          composition,
-          selectedFoodDetails,
-        });
-      }
-    }
-  };
-
-  onAddNewFoodEntry = (newFoodEntry) => {
-    // if (currentUser.access === "Guest" && selectedFoodDetails.foodentries.length >= 7) {
-    //   return "As Guest user you cannot enter more than 7 Food Items per Dish!";
-    // }
-    const { composition, selectedFoodDetails } = this.state;
-    let { compFoodCounter } = this.state;
-
-    compFoodCounter += 1;
-    // const newComp = composition;
-    composition.push(
-      <FoodEntry
-        key={compFoodCounter} foodEntry={newFoodEntry}
-        onRemoveFoodEntry={this.onRemoveFoodEntry}
-      />);
-    selectedFoodDetails.foodentries.push(newFoodEntry);
-
-    this.setState({
-      selectedFoodDetails,
-      composition,
-      compFoodCounter,
+      this.setState({ selectedFoodDetails }, () => {
+        console.log(res);
+        if (typeof res !== "string") {
+          alert(`Successfully saved dish: ${selectedFoodDetails.foodname} ${selectedFoodDetails.brand}!\n
+                      --You can view resulting entry in the console`);
+        } else {
+          alert("There was an Error!");
+        }
+      });
     });
+  }
+
+  updateRemoveFoodEntry = (sender) => {
+    const { selectedFoodDetails } = this.state;
+
+    selectedFoodDetails.foodentries.splice(sender._reactInternalFiber.key, 1);
+    this.setState({ selectedFoodDetails });
   };
+
+  updateNewFoodEntry = (newFoodEntry) => {
+    const { selectedFoodDetails } = this.state;
+    const { currentUser } = this.context;
+
+    if (currentUser.access === "Guest" && selectedFoodDetails.foodentries.length >= 7) {
+      return "As Guest user you cannot enter more than 7 Food Items per Dish!";
+    }
+
+    selectedFoodDetails.foodentries.push(newFoodEntry);
+    this.setState({ selectedFoodDetails });
+
+    return "";
+  };
+
+  updateSelectedFoodDetails = (selectedFood) => this.setState({ selectedFoodDetails: null },
+    async() => {
+      const { foodid, isdish, noteid } = selectedFood.state.foodItem;
+
+      let res = await fetch(`${getServerURL()}/dailymeals/fooddetails`, {
+        method: "get",
+        headers: {
+          "content-type": "application/json",
+          foodid,
+          isdish,
+          "noteid": noteid ? noteid : null,
+        },
+      });
+      res = await res.json();
+
+      const newFoodDetails = selectedFood.state.foodItem;
+      newFoodDetails.foodentries = res.foodentries;
+      newFoodDetails.note = res.note;
+
+      this.setState({ selectedFoodDetails: newFoodDetails });
+    });
 
   _infoForMeasure = (measureStr, infoValue) => {
     const { sizeinfo } = this.state.selectedFoodDetails;
@@ -288,18 +225,39 @@ class FoodDetailsArea extends React.Component {
   };
 
   _compositionOrNot = () => {
-    const { composition, selectedFoodDetails } = this.state;
+    const { selectedFoodDetails } = this.state;
 
     if (selectedFoodDetails.isdish) {
+      this.foodEntriesCounter = 0;
+
       return (
         <div className="foodEntries boxShow">
           <div className="comp textHigh">Composition:</div>
-          {composition}
+          {this._getFoodEntries()}
         </div>
       );
     }
 
     return "";
+  };
+
+  _getFoodEntries = () => {
+    const { selectedFoodDetails } = this.state;
+
+    this.foodEntriesCounter = 0;
+
+    return selectedFoodDetails.foodentries.map(this._getFoodEntry);
+  };
+
+  _getFoodEntry = (entry) => {
+    const fe = (
+      <FoodEntry
+        key={this.foodEntriesCounter} foodEntry={entry}
+        updateRemoveFoodEntry={this.updateRemoveFoodEntry}
+      />);
+    this.foodEntriesCounter += 1;
+
+    return fe;
   };
 
   _dishButtonsOrNot = () => {
@@ -308,8 +266,8 @@ class FoodDetailsArea extends React.Component {
     if (isDishSelected) {
       return (
         <div className="tcenter">
-          <button className="ftButton" onClick={this.onSaveDishIngr}>SAVE DISH</button>
-          <button className="ftButton" onClick={this.onCalculateValues}>ADD VALUES</button>
+          <button className="ftButton" onClick={this.onSaveDishIngr}>SAVE ENTRIES</button>
+          <button className="ftButton" onClick={this.onCalculateDishValues}>CALC VALUES</button>
         </div>
       );
     }
