@@ -11,27 +11,12 @@ import { getServerURL } from "../../methods";
 import { AppContext } from "../../AppContext";
 
 
-const getNewFoodItem = (currentUser) => {
-  return {
-    foodname: "",
-    brand: "",
-    fat: 0, carbs: 0, protein: 0,
-    price: 0,
-    sizeinfo: 100,
-    isdish: false,
-    pic: "empty.png",
-    userid: currentUser.userid,
-    noteid: null,
-    foodentries: null,
-  };
-};
-
 class AddFoodArea extends React.Component {
   static contextType = AppContext;
   static propTypes = {
     updateAddNewFoodEntry: PropTypes.func.isRequired,
+    updateSelectedFood: PropTypes.func.isRequired,
     onAddNewMeal: PropTypes.func.isRequired,
-    onSelectedFoodChanged: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -43,14 +28,13 @@ class AddFoodArea extends React.Component {
       amount: "",
       measure: "---",
 
-      sFoodItems: [],
-      sFoodCounter: 0,
       searchareaIsLoading: true,
       searchCounter: 0,
 
       newFoodForm: false,
       newFoodItem: null,
     };
+    this.foodItemsCounter = 0;
   }
 
   componentDidMount() {
@@ -58,10 +42,10 @@ class AddFoodArea extends React.Component {
   }
 
   render() {
-    const { amount, measure, mealareaIsLoading, searchareaIsLoading, sFoodItems, newFoodForm }
+    const { amount, measure, mealareaIsLoading, searchareaIsLoading, newFoodForm }
       = this.state;
 
-    const searchAreaOrLoading = searchareaIsLoading ? "LOADING..." : sFoodItems;
+    const searchAreaOrLoading = searchareaIsLoading ? "LOADING..." : this._getFoodItems();
 
 
     return (
@@ -71,7 +55,8 @@ class AddFoodArea extends React.Component {
             <div className="newFoodHeader">
               <span className="textHigh">Create New Food:</span>
               <button className="ftButton" onClick={this.onToggleFoodForm}>
-                +Select</button>
+                +Select
+              </button>
             </div>
             <span>Name:</span>
             <input
@@ -133,18 +118,15 @@ class AddFoodArea extends React.Component {
             <span className="textHigh">Search Food: </span>
             <input
               className="isAll" maxLength="100" type="checkbox"
-              onChange={(ev) => this.onSearchFoodItems(document.querySelector(".search").value, ev.currentTarget.checked)}
+              onChange={(ev) => this.onLoadSearchFoodItems(document.querySelector(".search").value, ev.currentTarget.checked)}
             />
             ALL
-            <button
-              className="ftButton"
-              onClick={this.onToggleFoodForm}
-            >
+            <button className="ftButton" onClick={this.onToggleFoodForm} >
               +New
             </button>
             <input
               className="search" placeholder="search text" type="text"
-              onChange={(ev) => this.onSearchFoodItems(ev.currentTarget.value, document.querySelector(".isAll").checked)}
+              onChange={(ev) => this.onLoadSearchFoodItems(ev.currentTarget.value, document.querySelector(".isAll").checked)}
               onKeyDown={this.onSearchKey}
             />
           </div>,
@@ -193,7 +175,7 @@ class AddFoodArea extends React.Component {
     );
   }
 
-  onSearchFoodItems = (searchTerms, isAll) => {
+  onLoadSearchFoodItems = (searchTerms, isAll) => {
     this.setState({
       sFoodItems: [],
       searchareaIsLoading: true,
@@ -207,7 +189,6 @@ class AddFoodArea extends React.Component {
         return;
       }
 
-      let { sFoodCounter } = this.state;
       const { currentUser } = this.context;
 
       let res = await fetch(`${getServerURL()}/dailymeals/foodsearch`, {
@@ -224,72 +205,35 @@ class AddFoodArea extends React.Component {
         return;
       }
 
-      const sFoodItems = [];
-      let first = true;
-      for (const f of res) {
-        sFoodCounter += 1;
-        if (!first) {
-          sFoodItems.push(
-            <FoodItem
-              key={sFoodCounter} foodItem={f}
-              updateSelectedFood={this.updateSelectedFood}
-            />);
-        } else {
-          sFoodItems.push(
-            <FoodItem
-              key={sFoodCounter} foodItem={f} signalSelect={true}
-              updateSelectedFood={this.updateSelectedFood}
-            />);
-          first = false;
-        }
+      if (res.length === 0) {
+        this.setState({
+          selectedFood: null,
+          measure: "---",
+          amount: "",
+        });
       }
-
-      // SEND ANDU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // if (first) {
-      //   this.setState({
-      //     selectedFood: null,
-      //     measure: "---",
-      //     sFoodItems,
-      //     sFoodCounter,
-      //     searchareaIsLoading: false,
-      //   })
-      // } else {
-      //   this.setState({
-      //     sFoodItems,
-      //     sFoodCounter,
-      //     searchareaIsLoading: false,
-      //   })
-      // }
-
       this.setState({
-        selectedFood: first ? null : this.state.selectedFood,
-        measure: first ? "---" : this.state.measure,
-        sFoodItems,
-        sFoodCounter,
+        sFoodItems: res,
         searchareaIsLoading: false,
       });
     }, typeDelay);
-  };
 
-  updateSelectedFood = (sender) => {
-    const { selectedFood } = this.state;
-
-    if (sender === selectedFood) {
-      return;
-    }
-    if (selectedFood) {
-      selectedFood.toggleSelected();
-    }
-    sender.toggleSelected();
-    document.querySelector(".search").select();
-
-    this.setState({
-      selectedFood: sender,
-      amount: "",
-      measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams",
-    });
-
-    this.props.onSelectedFoodChanged(sender);
+    // SEND ANDU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // if (first) {
+    //   this.setState({
+    //     selectedFood: null,
+    //     measure: "---",
+    //     sFoodItems,
+    //     sFoodCounter,
+    //     searchareaIsLoading: false,
+    //   })
+    // } else {
+    //   this.setState({
+    //     sFoodItems,
+    //     sFoodCounter,
+    //     searchareaIsLoading: false,
+    //   })
+    // }
   };
 
   onSearchKey = (ev) => {
@@ -469,13 +413,32 @@ class AddFoodArea extends React.Component {
     return "";
   };
 
+  updateSelectedFood = (sender) => {
+    const { selectedFood } = this.state;
+
+    if (sender === selectedFood) {
+      return;
+    }
+    if (selectedFood) {
+      selectedFood.toggleSelected();
+    }
+    sender.toggleSelected();
+
+    this.setState({
+      selectedFood: sender,
+      amount: "",
+      measure: sender.state.foodItem.sizeinfo === null ? "Pieces" : "Grams",
+    });
+
+    this.props.updateSelectedFood(sender);
+  };
+
   resetAfterAdd = () => {
     const { newFoodForm } = this.state;
     const { currentUser } = this.context;
 
     if (newFoodForm) {
       this.setState({
-        newFoodForm: false,
         newFoodItem: {
           foodname: "",
           brand: "",
@@ -488,9 +451,10 @@ class AddFoodArea extends React.Component {
           noteid: null,
           foodentries: null,
         },
-      }, () => document.querySelector(".search").select());
+      });
+    } else {
+      document.querySelector(".search").select();
     }
-    document.querySelector(".search").select();
   };
 
   setInitialState=() => {
@@ -512,51 +476,29 @@ class AddFoodArea extends React.Component {
     });
 
     setTimeout(() => {
-      this.onSearchFoodItems("", false);
+      this.onLoadSearchFoodItems("", false);
     }, 0);
   };
 
   _currentEntry = () => {
-    const { selectedFood, amount, measure, newFoodForm, newFoodItem } = this.state;
+    const { selectedFood, measure, newFoodForm, newFoodItem } = this.state;
 
-    if (newFoodForm) {
-      this.newFoodKey = this.newFoodKey === "mustchange" ? "willchange" : "mustchange";
+    const selectedOrNull = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
+    const newEntry = newFoodForm ? newFoodItem : selectedOrNull;
+    newEntry.measure = measure;
+    newEntry.amount = this._getAmountCurrent();
 
-      return (
-        <FoodEntry
-          key={this.newFoodKey} amount={amount} foodItem={newFoodItem}
-          measure={measure} readOnly="true"
-        />);
-    } else
-    if (selectedFood) {
-      return (
-        <FoodEntry
-          key={selectedFood.state.foodItem.foodid.toString() + amount + measure}
-          amount={this._getAmountCurrent()} foodItem={selectedFood.state.foodItem} measure={measure} readOnly="true"
-        />);
-    }
-
-    return <FoodEntry key={"F0"} readOnly="true" />;
+    return <FoodEntry foodEntry={newEntry} readOnly="true" />;
   };
 
   _getAmountCurrent = () => {
-    const { amount, measure, selectedFood } = this.state;
-    const { sizeinfo } = selectedFood.state.foodItem;
+    const { amount } = this.state;
 
     if (amount) {
       return amount;
     }
-    if (!selectedFood) {
-      return 0;
-    }
-    if (measure === "Pieces") {
-      return 1;
-    }
-    if (measure === "Grams") {
-      return sizeinfo === 0 ? 100 : sizeinfo;
-    }
 
-    return 0;
+    return this._getAmountDefault();
   };
 
   _getAmountDefault = () => {
@@ -568,9 +510,9 @@ class AddFoodArea extends React.Component {
     if (measure === "Pieces") {
       return 1;
     }
-    const { foodItem } = selectedFood.state;
+    const { sizeinfo } = selectedFood.state.foodItem;
 
-    return foodItem.sizeinfo === 0 ? 100 : foodItem.sizeinfo;
+    return sizeinfo === 0 ? 100 : sizeinfo;
   };
 
   _getMeasureVisible = (measure) => {
@@ -588,6 +530,26 @@ class AddFoodArea extends React.Component {
     }
 
     return "";
+  };
+
+  _getFoodItems = () => {
+    const { sFoodItems } = this.state;
+
+    this.foodItemsCounter = 0;
+
+    return sFoodItems.map(this._getFoodItem);
+
+  };
+
+  _getFoodItem = (item) => {
+    const fi = (
+      <FoodItem
+        key={this.foodItemsCounter} foodItem={item} signalSelect={this.foodItemsCounter === 0}
+        updateSelectedFood={this.updateSelectedFood}
+      />);
+    this.foodItemsCounter += 1;
+
+    return fi;
   };
 }
 

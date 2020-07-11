@@ -35,7 +35,7 @@ class DailyMeals extends React.Component {
         <DayArea ref={this.dayAreaRef} updateDishSelect={this.updateDishSelect} />
         <AddFoodArea
           ref={this.addFoodAreaRef} updateAddNewFoodEntry={this.updateAddNewFoodEntry}
-          onAddNewMeal={this.onAddNewMeal} onSelectedFoodChanged={this.onSelectedFoodChanged}
+          updateSelectedFood={this.updateSelectedFood} onAddNewMeal={this.onAddNewMeal}
         />
         <FoodDetailsArea
           ref={this.foodDetailsAreaRef} isDishSelected={isDishSelected}
@@ -45,20 +45,20 @@ class DailyMeals extends React.Component {
     );
   };
 
-  onSelectedFoodChanged = (selectedFood) => {
-    const { isDishSelected } = this.state;
-
-    if (!isDishSelected) {
-      this.state.foodDetailsArea.updateSelectedFoodDetails(selectedFood);
-    }
-  };
-
   onAddNewMeal = (mealName, portion) => {
     const errorMessage = this.state.dayArea.onAddNewMeal(mealName, portion);
     if (errorMessage) {
       alert(errorMessage);
     } else {
       this.state.addFoodArea.resetAfterAdd();
+    }
+  };
+
+  updateSelectedFood = (selectedFood) => {
+    const { isDishSelected } = this.state;
+
+    if (!isDishSelected) {
+      this.state.foodDetailsArea.updateSelectedFoodDetails(selectedFood);
     }
   };
 
@@ -85,7 +85,7 @@ class DailyMeals extends React.Component {
 
   updateDishSelect = (status) => {
     if (status) {
-      this.state.dayArea.onMealSelect(null, null);
+      this.state.dayArea.updateSelectedMeal(null);
     }
     this.setState({ isDishSelected: status });
   };

@@ -26,21 +26,20 @@ class DayArea extends React.Component {
       dayCarbs: 0,
       dayProtein: 0,
 
-      mealEntries: [],
-      mealCounter: 0,
       selectedMeal: null,
       mealareaIsLoading: true,
     };
+    this.mealsEntriesCounter = 0;
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.setInitialState();
   }
 
-  render = () => {
-    const { selectedDay, mealEntries, dayEntry, mealareaIsLoading, dayFat, dayCarbs, dayProtein } = this.state;
+  render() {
+    const { selectedDay, dayEntry, mealareaIsLoading, dayFat, dayCarbs, dayProtein } = this.state;
 
-    const mealsAreaOrLoading = mealareaIsLoading ? "LOADING..." : mealEntries;
+    const mealsAreaOrLoading = mealareaIsLoading ? "LOADING..." : this._getMealEntries();
     const noteOrLoading = mealareaIsLoading ? "LOADING..." : (
       <Note
         key={`D${dayEntry.note ? dayEntry.note.noteid : "D0"}`} note={dayEntry.note}
@@ -81,7 +80,7 @@ class DayArea extends React.Component {
         <button className="ftButton" disabled={mealareaIsLoading} onClick={this.onCommit}>COMMIT DAY!</button>
       </div>
     );
-  };
+  }
 
   onLoadDailyMeals = (dayParam) => {
     const { currentUser } = this.context;
@@ -95,17 +94,18 @@ class DayArea extends React.Component {
       return;
     }
 
+    this.fat = 0;
+    this.carbs = 0;
+    this.protein = 0;
     this.setState({
-      mealEntries: [],
-      selectedMeal: null,
       mealareaIsLoading: true,
+      selectedMeal: null,
+      dayEntry: null,
       dayFat: 0,
       dayCarbs: 0,
       dayProtein: 0,
-    });
-
-    (async() => {
-      const { mealCounter } = this.state;
+    },
+    async() => {
 
       let res = await fetch(`${getServerURL()}/dailymeals`, {
         method: "get",
@@ -117,97 +117,12 @@ class DayArea extends React.Component {
       });
       res = await res.json();
 
-      const mealEntries = [];
-      for (const m of res.meals) {
-        mealEntries.push(
-          <MealEntry
-            key={mealCounter} mealEntry={m} updateDayMacros={this.updateDayMacros}
-            updateMealFoodEntries={this.updateMealFoodEntries} updateMealNote={this.updateMealNote}
-            onMealSelect={this.onMealSelect} onRemoveMeal={this.onRemoveMeal}
-          />);
-      }
-
       this.setState({
+        mealareaIsLoading: false,
         selectedDay: day,
         dayEntry: res,
-        mealEntries,
-        mealCounter,
-        mealareaIsLoading: false,
       });
-    })();
-  };
-
-  onAddNewMeal = (mealName = "", portion = 1) => {
-    const { currentUser } = this.context;
-    if (currentUser.access === "Guest" && this.state.mealEntries.length === 5) {
-      return "As Guest user you cannot enter more than 5 Meals per day!";
-    }
-    if (isNaN(portion)) {
-      return "Must Enter Valid Number for Portion!";
-    }
-
-    const { mealEntries, dayEntry } = this.state;
-    const { mealCounter } = this.state;
-
-    const newMeal = {
-      mealname: mealName === "" ? `Meal${mealEntries.length + 1}` : mealName,
-      portion: portion === "" ? 1 : portion,
-      noteid: null,
-      foodentries: [],
-    };
-
-    mealEntries.push(
-      <MealEntry
-        key={mealCounter} mealEntry={newMeal} signalSelect={true}
-        updateDayMacros={this.updateDayMacros} updateMealFoodEntries={this.updateMealFoodEntries}
-        updateMealNote={this.updateMealNote}
-        onMealSelect={this.onMealSelect} onRemoveMeal={this.onRemoveMeal}
-      />);
-    newMeal.key = mealCounter;
-    dayEntry.meals.push(newMeal);
-
-    this.setState({
-      mealEntries,
-      mealCounter: mealCounter + 1,
-      dayEntry,
     });
-
-    return "";
-  };
-
-  onRemoveMeal = (ev, sender) => {
-    const { selectedMeal, mealEntries, dayEntry } = this.state;
-
-    dayEntry.meals = dayEntry.meals.filter((m) => !((m.mealid && m.mealid === sender.state.mealEntry.mealid)
-      || (m.key !== undefined && m.key.toString() === sender._reactInternalFiber.key)));
-
-    this.setState({
-      mealEntries: mealEntries.filter((meal) => meal.key !== sender._reactInternalFiber.key),
-      dayEntry,
-    });
-    this.updateDayMacros(-sender.state.fat, -sender.state.carbs, -sender.state.protein);
-
-    if (selectedMeal !== null && selectedMeal === sender) {
-      this.setState({ selectedMeal: null });
-    }
-    ev.stopPropagation();
-  };
-
-  onMealSelect = (ev, sender) => {
-    const { selectedMeal } = this.state;
-
-    if (sender === null && selectedMeal !== null) {
-      selectedMeal.toggleHighlight();
-      this.setState({ selectedMeal: null });
-    } else if (sender !== selectedMeal) {
-      if (selectedMeal) {
-        selectedMeal.toggleHighlight();
-      }
-      sender.toggleHighlight();
-      this.setState({ selectedMeal: sender });
-      ev.stopPropagation();
-      this.props.updateDishSelect(false);
-    }
   };
 
   onDayOffset = (ev) => {
@@ -248,15 +163,56 @@ class DayArea extends React.Component {
       });
   };
 
-  removeNote = () => {
+  onAddNewMeal = (mealName = "", portion = 1) => {
+    const { currentUser } = this.context;
     const { dayEntry } = this.state;
 
-    dayEntry.note = null;
+    if (currentUser.access === "Guest" && dayEntry.meals.length === 5) {
+      return "As Guest user you cannot enter more than 5 Meals per day!";
+    }
+    if (isNaN(portion)) {
+      return "Must Enter Valid Number for Portion!";
+    }
+
+    const newMealEntry = {
+      mealname: mealName === "" ? `Meal${dayEntry.meals.length + 1}` : mealName,
+      portion: portion === "" ? 1 : portion,
+      noteid: null,
+      foodentries: [],
+    };
+
+    dayEntry.meals.push(newMealEntry);
+    this.setState({ dayEntry });
+
+    return "";
+  };
+
+  updateRemoveMeal = (sender) => {
+    const { dayEntry } = this.state;
+
+    dayEntry.meals.splice(sender._reactInternalFiber.key, 1);
     this.setState({ dayEntry });
   };
 
+  updateSelectedMeal = (sender) => {
+    const { selectedMeal } = this.state;
+
+    if (sender === null && selectedMeal !== null) {
+      selectedMeal.toggleHighlight();
+      this.setState({ selectedMeal: null });
+    } else if (sender !== selectedMeal) {
+      if (selectedMeal) {
+        selectedMeal.toggleHighlight();
+      }
+      sender.toggleHighlight();
+      this.setState({ selectedMeal: sender });
+      // ev.stopPropagation();
+      this.props.updateDishSelect(false);
+    }
+  };
+
   updateNewFoodEntry = (newFoodEntry) => {
-    const { dayEntry, selectedMeal } = this.state;
+    const { selectedMeal } = this.state;
     const { currentUser } = this.context;
 
     if (selectedMeal === null) {
@@ -267,51 +223,8 @@ class DayArea extends React.Component {
     }
 
     selectedMeal.updateNewFoodEntry(newFoodEntry);
-    // for (const m of dayEntry.meals) {
-    //   if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-    //       || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
-    //     m.foodentries.push(newFoodEntry);
-    //     break;
-    //   }
-    // }
-    // this.setState({ dayEntry });
 
     return "";
-  };
-
-  updateDayNote = (newNote) => {
-    const { dayEntry } = this.state;
-
-    dayEntry.note = newNote;
-    this.setState({ dayEntry });
-  };
-
-  updateMealNote = () => {
-    const { dayEntry, selectedMeal } = this.state;
-
-    for (const m of dayEntry.meals) {
-      if ((m.mealid && selectedMeal.state.mealEntry.mealid === m.mealid)
-    || (m.key !== undefined && selectedMeal._reactInternalFiber.key === m.key.toString())) {
-        m.note = selectedMeal.state.mealEntry.note;
-        break;
-      }
-    }
-
-    this.setState({ dayEntry });
-  };
-
-  updateMealFoodEntries = (sender) => {
-    const { dayEntry } = this.state;
-
-    for (const m of dayEntry.meals) {
-      if ((m.mealid && sender.state.mealEntry.mealid === m.mealid)
-    || (m.key !== undefined && sender._reactInternalFiber.key === m.key.toString())) {
-        m.foodentries = sender.state.mealEntry.foodentries;
-        break;
-      }
-    }
-
-    this.setState({ dayEntry });
   };
 
   updateDayMacros = (newfat, newcarbs, newprotein) => {
@@ -324,6 +237,41 @@ class DayArea extends React.Component {
       dayCarbs: this.carbs,
       dayProtein: this.protein,
     });
+  };
+
+  updateDayNote = (newNote) => {
+    const { dayEntry } = this.state;
+
+    dayEntry.note = newNote;
+    this.setState({ dayEntry });
+  };
+
+  removeNote = () => {
+    const { dayEntry } = this.state;
+
+    dayEntry.note = null;
+    this.setState({ dayEntry });
+  };
+
+  _getMealEntries = () => {
+    const { dayEntry } = this.state;
+
+    this.mealsEntriesCounter = 0;
+
+    return dayEntry.meals.map(this._getMealEntry);
+
+  };
+
+  _getMealEntry = (entry) => {
+    const me = (
+      <MealEntry
+        key={this.mealsEntriesCounter} mealEntry={entry} updateDayMacros={this.updateDayMacros}
+        updateMealFoodEntries={this.updateMealFoodEntries} updateMealNote={this.updateMealNote}
+        updateRemoveMeal={this.updateRemoveMeal} updateSelectedMeal={this.updateSelectedMeal}
+      />);
+    this.mealsEntriesCounter += 1;
+
+    return me;
   };
 
   setInitialState = () => {
