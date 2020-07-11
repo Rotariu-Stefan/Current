@@ -29,12 +29,12 @@ class Note extends React.Component {
       newText: "",
     };
     this.options = [];
-    for (let i = -5; i <= 5; i++) {
+    for (let i = -5; i <= 5; i += 1) {
       this.options.push(<option key={i}>{i}</option>);
     }
   }
 
-  render = () => {
+  render() {
     const { isEdit, isEditValues, note, noteViews, noteViewsIsLoading, newScore } = this.state;
     if (this.props.isMin) {
       return <hr />;
@@ -85,7 +85,7 @@ class Note extends React.Component {
       return (
         <div className="note boxShow">
           <img alt={`S=${score}`} className="scoreImg" src={`SitePics/star${score}.png`} />
-          <img alt="X" className="managerImg" src="SitePics/icons8-close-window-16.png" onClick={this.props.removeNote} />
+          <img alt="X" className="managerImg" src="SitePics/icons8-close-window-16.png" onClick={this.onRemoveNote} />
           <img alt="New" className="managerImg" src="SitePics/icons8-edit-16.png" onClick={() => this.onEditAddNote(true)} />
           <span className="title">{title}</span>
           <span className="notetext">{notetext ? `--${notetext}` : ""}</span>
@@ -98,112 +98,114 @@ class Note extends React.Component {
         No Note<img alt="N" className="managerImg" src="SitePics/icons8-plus-16.png" onClick={this.onEditAddNote} />
       </div >
     );
+  }
+
+  onRemoveNote = () => this.props.removeNote;
+
+  onEditAddNote = (isValues) => {
+    if (isValues) {
+      this.setState({
+        isEdit: true,
+        isEditValues: true,
+      });
+    } else {
+      this.setState({
+        isEdit: true,
+        isEditValues: false,
+      });
+      this.loadNoteViews("");
+    }
   };
 
-    onEditAddNote = (isValues) => {
-      if (isValues) {
-        this.setState({
-          isEdit: true,
-          isEditValues: true,
-        });
-      } else {
-        this.setState({
-          isEdit: true,
-          isEditValues: false,
-        });
-        this.loadNoteViews("");
+  onSelectedNoteViewChanged = (ev, sender) => {
+    const { selectedNoteView } = this.state;
+
+    if (sender !== selectedNoteView) {
+      if (selectedNoteView) {
+        selectedNoteView.toggleSelected();
       }
-    };
+      sender.toggleSelected();
 
-    onSelectedNoteViewChanged = (ev, sender) => {
-      const { selectedNoteView } = this.state;
+      this.setState({ selectedNoteView: sender });
+    }
+  }
 
-      if (sender !== selectedNoteView) {
-        if (selectedNoteView) {
-          selectedNoteView.toggleSelected();
-        }
-        sender.toggleSelected();
+  searchNoteViews = async(searchTerms, searchCounter) => {
+    if (searchCounter < this.state.searchCounter) {
+      return;
+    }
 
-        this.setState({ selectedNoteView: sender });
+    let { noteViewCounter } = this.state;
+    // If app.currentUser is Guest pretend it's SV
+    const userId = this.context.currentUser.userid === 0 ? 1 : this.context.currentUser.userid;
+
+    let res = await fetch(`${getServerURL()}/dailymeals/notesearch`, {
+      method: "get",
+      headers: {
+        "content-type": "application/json",
+        "userid": userId,
+        "search": searchTerms,
+      },
+    });
+    res = await res.json();
+    if (searchCounter < this.state.searchCounter) {
+      return;
+    }
+
+    const noteViews = [];
+    let first = true;
+    for (const n of res) {
+      if (!first) {
+        noteViews.push(<NoteView key={noteViewCounter++} note={n} selectedChanged={this.onSelectedNoteViewChanged} />);
+      } else {
+        noteViews.push(<NoteView key={noteViewCounter++} note={n} selectedChanged={this.onSelectedNoteViewChanged} signalSelect={true} />);
+        first = false;
       }
     }
 
-    searchNoteViews = async(searchTerms, searchCounter) => {
-      if (searchCounter < this.state.searchCounter) {
-        return;
-      }
+    this.setState({
+      noteViews,
+      noteViewCounter,
+      noteViewsIsLoading: false,
+    });
+  };
 
-      let { noteViewCounter } = this.state;
-      // If app.currentUser is Guest pretend it's SV
-      const userId = this.context.currentUser.userid === 0 ? 1 : this.context.currentUser.userid;
+  loadNoteViews = (searchTerms) => {
+    this.setState({
+      noteViews: [],
+      noteViewsIsLoading: true,
+      searchCounter: this.state.searchCounter + 1,
+    });
+    const sc = this.state.searchCounter + 1;
 
-      let res = await fetch(`${getServerURL()}/dailymeals/notesearch`, {
-        method: "get",
-        headers: {
-          "content-type": "application/json",
-          "userid": userId,
-          "search": searchTerms,
-        },
+    setTimeout(() => this.searchNoteViews(searchTerms, sc), 150);
+  };
+
+  setNote = () => {
+    const { isEditValues, newScore, newTitle, newText } = this.state;
+
+    if (isEditValues) {
+      this.props.updateAttach({
+        score: newScore,
+        title: newTitle === "" ? "Untitled" : newTitle,
+        notetext: newText,
       });
-      res = await res.json();
-      if (searchCounter < this.state.searchCounter) {
-        return;
-      }
-
-      const noteViews = [];
-      let first = true;
-      for (const n of res) {
-        if (!first) {
-          noteViews.push(<NoteView key={noteViewCounter++} note={n} selectedChanged={this.onSelectedNoteViewChanged} />);
-        } else {
-          noteViews.push(<NoteView key={noteViewCounter++} note={n} selectedChanged={this.onSelectedNoteViewChanged} signalSelect={true} />);
-          first = false;
-        }
-      }
-
       this.setState({
-        noteViews,
-        noteViewCounter,
-        noteViewsIsLoading: false,
-      });
-    };
-
-    loadNoteViews = (searchTerms) => {
-      this.setState({
-        noteViews: [],
-        noteViewsIsLoading: true,
-        searchCounter: this.state.searchCounter + 1,
-      });
-      const sc = this.state.searchCounter + 1;
-
-      setTimeout(() => this.searchNoteViews(searchTerms, sc), 150);
-    };
-
-    setNote = () => {
-      const { isEditValues, newScore, newTitle, newText } = this.state;
-
-      if (isEditValues) {
-        this.props.updateAttach({
+        note: {
           score: newScore,
           title: newTitle === "" ? "Untitled" : newTitle,
           notetext: newText,
-        });
-        this.setState({
-          note: {
-            score: newScore,
-            title: newTitle === "" ? "Untitled" : newTitle,
-            notetext: newText,
-          },
-          isEdit: false,
-        });
-      } else {
-        this.props.updateAttach(this.state.selectedNoteView.state.note);
-        this.setState({
-          note: this.state.selectedNoteView.state.note,
-          isEdit: false,
-        });
-      }
+        },
+        isEdit: false,
+      });
+    } else {
+      this.props.updateAttach(this.state.selectedNoteView.state.note);
+      this.setState({
+        note: this.state.selectedNoteView.state.note,
+        isEdit: false,
+      });
     }
+  }
 }
 
 export default Note;

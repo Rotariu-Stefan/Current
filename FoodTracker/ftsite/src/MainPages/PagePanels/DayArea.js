@@ -151,7 +151,7 @@ class DayArea extends React.Component {
 
     const newMeal = {
       mealname: mealName === "" ? `Meal${mealEntries.length + 1}` : mealName,
-      portion: portion === "" ? portion : 1,
+      portion: portion === "" ? 1 : portion,
       noteid: null,
       foodentries: [],
     };
@@ -185,7 +185,7 @@ class DayArea extends React.Component {
       mealEntries: mealEntries.filter((meal) => meal.key !== sender._reactInternalFiber.key),
       dayEntry,
     });
-    this.addNewFoodEntryMacros(-sender.state.fat, -sender.state.carbs, -sender.state.protein);
+    this.updateDayMacros(-sender.state.fat, -sender.state.carbs, -sender.state.protein);
 
     if (selectedMeal !== null && selectedMeal === sender) {
       this.setState({ selectedMeal: null });
@@ -219,32 +219,33 @@ class DayArea extends React.Component {
   };
 
   onCommit = () => {
-    this.setState({ searchareaIsLoading: true });
-    (async() => {
-      const { dayEntry, selectedDay } = this.state;
-      const { currentUser } = this.context;
+    this.setState({ searchareaIsLoading: true },
+      async() => {
+        const { dayEntry, selectedDay } = this.state;
+        const { currentUser } = this.context;
 
-      const dayPutReq = dayEntry;
-      dayPutReq.userid = currentUser.userid;
-      dayPutReq.date = selectedDay;
+        const dayPutReq = dayEntry;
+        dayPutReq.userid = currentUser.userid;
+        dayPutReq.date = selectedDay;
 
-      let res = await fetch(`${getServerURL()}/dailymeals`, {
-        method: "put",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(dayPutReq),
+        let res = await fetch(`${getServerURL()}/dailymeals`, {
+          method: "put",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(dayPutReq),
+        });
+        res = await res.json();
+
+        this.onLoadDailyMeals(this.state.selectedDay);
+
+        console.log(res);
+        if (typeof res !== "string") {
+          alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
+        } else {
+          alert("There was an Error!");
+        }
+
+        this.setState({ searchareaIsLoading: false });
       });
-      res = await res.json();
-
-      this.loadDailyMeals(this.state.selectedDay);
-
-      if (typeof res !== "string") {
-        alert(`Successfully entered date for day ${selectedDay}!\n --You can view resulting entry in the console`);
-      } else {
-        alert("There was an Error!");
-      }
-      console.log(res);
-    })();
-    this.setState({ searchareaIsLoading: false });
   };
 
   removeNote = () => {
