@@ -80,16 +80,37 @@
   font-weight: bold;
 }
 
-.managerImg {
+.managerImg16 {
+  all: unset;
+
   float: right;
+
+  width: 16px;
+  height: 16px;
 
   padding: 0 0.3rem;
 }
 
-.managerImg:hover,
-.managerImg:focus {
+.managerImg20 {
+  all: unset;
+
+  float: right;
+
+  width: 20px;
+  height: 20px;
+
+  padding: 0 0.3rem;
+}
+
+.managerImg16:hover,
+.managerImg20:hover {
   color: coral;
   background-color: saddlebrown;
+}
+
+.managerImg16:focus,
+.managerImg20:focus {
+  color: coral;
 }
 
 .foodEntry {
@@ -359,9 +380,9 @@
   background-color: rgba(143, 136, 80, 0.25);
 }
 
-.note .managerImg:hover,
+.note .managerImg16:hover,
 .noteView:hover,
-.note .managerImg:focus,
+.note .managerImg16:focus,
 .noteView:focus {
   background-color: slategrey;
 }
@@ -396,7 +417,6 @@
   margin: 0 0.3rem;
 }
 
-.note button,
 .noteEdit button {
   font-size: 0.8rem;
 

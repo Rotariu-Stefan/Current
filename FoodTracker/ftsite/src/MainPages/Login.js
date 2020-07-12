@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 
 import "../Css/UserForms.css";

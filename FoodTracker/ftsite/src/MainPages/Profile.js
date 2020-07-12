@@ -1,3 +1,7 @@
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 
 import "../Css/UserForms.css";
@@ -10,19 +14,8 @@ class Profile extends React.Component {
 
   constructor(props) {
     super(props);
-    // const { username, email, firstname, lastname, dob, sex, describe, pic, diet } = this.context.currentUser;
 
     this.state = {
-      // username,
-      // email,
-      // firstname,
-      // lastname,
-      // dob,
-      // sex,
-      // describe,
-      // pic,
-      // diet,
-
       passNow: "",
       passNew: "",
       passConfirm: "",

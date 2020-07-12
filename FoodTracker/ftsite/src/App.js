@@ -22,7 +22,13 @@ class App extends React.Component {
   }
 
 render = () => (
-  <AppContext.Provider value={ { currentUser: this.state.currentUser, changeMainPage: this.changeMainPage, updateUser: this.updateUser } } >
+  <AppContext.Provider
+    value={ {
+      currentUser: this.state.currentUser,
+      changeMainPage: this.changeMainPage,
+      updateUser: this.updateUser,
+    } }
+  >
     <div className="layout">
       <Header key="H" ref={refs.header} />
       <Nav key="N" ref={refs.nav} />

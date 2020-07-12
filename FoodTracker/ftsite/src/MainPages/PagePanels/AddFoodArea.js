@@ -1,6 +1,7 @@
-// SEND ANDU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! JOS !!
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 /* eslint-disable max-lines */
 import React from "react";
 import PropTypes from "prop-types";
@@ -15,8 +16,8 @@ class AddFoodArea extends React.Component {
   static contextType = AppContext;
   static propTypes = {
     updateAddNewFoodEntry: PropTypes.func.isRequired,
+    updateAddNewMeal: PropTypes.func.isRequired,
     updateSelectedFood: PropTypes.func.isRequired,
-    onAddNewMeal: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -29,12 +30,14 @@ class AddFoodArea extends React.Component {
       measure: "---",
 
       searchareaIsLoading: true,
-      searchCounter: 0,
+      searchTerms: "",
+      isAll: false,
 
       newFoodForm: false,
       newFoodItem: null,
     };
     this.foodItemsCounter = 0;
+    this.searchCounter = 0;
   }
 
   componentDidMount() {
@@ -42,11 +45,7 @@ class AddFoodArea extends React.Component {
   }
 
   render() {
-    const { amount, measure, mealareaIsLoading, searchareaIsLoading, newFoodForm }
-      = this.state;
-
-    const searchAreaOrLoading = searchareaIsLoading ? "LOADING..." : this._getFoodItems();
-
+    const { amount, measure, mealareaIsLoading, searchareaIsLoading, newFoodForm } = this.state;
 
     return (
       <div className="addFoodArea subblock boxShow">
@@ -118,7 +117,7 @@ class AddFoodArea extends React.Component {
             <span className="textHigh">Search Food: </span>
             <input
               className="isAll" maxLength="100" type="checkbox"
-              onChange={(ev) => this.onLoadSearchFoodItems(document.querySelector(".search").value, ev.currentTarget.checked)}
+              onChange={this.onIsAllChange}
             />
             ALL
             <button className="ftButton" onClick={this.onToggleFoodForm} >
@@ -126,12 +125,11 @@ class AddFoodArea extends React.Component {
             </button>
             <input
               className="search" placeholder="search text" type="text"
-              onChange={(ev) => this.onLoadSearchFoodItems(ev.currentTarget.value, document.querySelector(".isAll").checked)}
-              onKeyDown={this.onSearchKey}
+              onChange={this.onSearchTermsChange} onKeyDown={this.onSearchKey}
             />
           </div>,
           <div key="searchResults" className="searchResults boxShow">
-            {searchAreaOrLoading}
+            {searchareaIsLoading ? "LOADING..." : this._getFoodItems()}
           </div>,
         ]}
         <div className="amountForm boxShow">
@@ -139,11 +137,11 @@ class AddFoodArea extends React.Component {
           <input
             className="amountSize" disabled={searchareaIsLoading} maxLength="10"
             placeholder={this._getAmountDefault()} type="text" value={amount}
-            onChange={(ev) => this.setState({ amount: ev.currentTarget.value })} onKeyDown={this.onAmountKey}
+            onChange={this.onAmountChange} onKeyDown={this.onAmountKey}
           />
           <select
             disabled={searchareaIsLoading} id="measureSelect" value={measure}
-            onChange={(ev) => this.setState({ measure: ev.currentTarget.value })}
+            onChange={this.onMeasureChange}
           >
             <option className={this._getMeasureVisible("Grams")}>
               Grams</option>
@@ -175,69 +173,17 @@ class AddFoodArea extends React.Component {
     );
   }
 
-  onLoadSearchFoodItems = (searchTerms, isAll) => {
-    this.setState({
-      sFoodItems: [],
-      searchareaIsLoading: true,
-      searchCounter: this.state.searchCounter + 1,
-    });
-    const typeDelay = 150;
-    const sc = this.state.searchCounter + 1;
+  onSearchTermsChange = (ev) => this.setState({ searchTerms: ev.currentTarget.value },
+    this.loadFoodItems);
 
-    setTimeout(async(searchCounter = sc) => {
-      if (searchCounter < this.state.searchCounter) {
-        return;
-      }
+  onIsAllChange = (ev) => this.setState({ isAll: ev.currentTarget.checked },
+    this.loadFoodItems);
 
-      const { currentUser } = this.context;
-
-      let res = await fetch(`${getServerURL()}/dailymeals/foodsearch`, {
-        method: "get",
-        headers: {
-          "content-type": "application/json",
-          "userid": currentUser.userid,
-          "search": searchTerms,
-          "isall": isAll,
-        },
-      });
-      res = await res.json();
-      if (searchCounter < this.state.searchCounter) {
-        return;
-      }
-
-      if (res.length === 0) {
-        this.setState({
-          selectedFood: null,
-          measure: "---",
-          amount: "",
-        });
-      }
-      this.setState({
-        sFoodItems: res,
-        searchareaIsLoading: false,
-      });
-    }, typeDelay);
-
-    // SEND ANDU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // if (first) {
-    //   this.setState({
-    //     selectedFood: null,
-    //     measure: "---",
-    //     sFoodItems,
-    //     sFoodCounter,
-    //     searchareaIsLoading: false,
-    //   })
-    // } else {
-    //   this.setState({
-    //     sFoodItems,
-    //     sFoodCounter,
-    //     searchareaIsLoading: false,
-    //   })
-    // }
-  };
+  onMeasureChange = (ev) => this.setState({ measure: ev.currentTarget.value });
+  onAmountChange = (ev) => this.setState({ amount: ev.currentTarget.value });
 
   onSearchKey = (ev) => {
-    const { selectedFood, sFoodItems } = this.state;
+    const { selectedFood } = this.state;
 
     switch (ev.key) {
       case "Enter":
@@ -254,28 +200,22 @@ class AddFoodArea extends React.Component {
         break;
       case "ArrowUp":
         if (selectedFood) {
-          for (let i = 0; i < sFoodItems.length; i += 1) {
-            if (sFoodItems[i].key === selectedFood._reactInternalFiber.key) {
-              if (i === 0) {
-                break;
-              } else {
-                document.querySelectorAll(".foodItem")[i - 1].click();
-              }
-            }
+          const selectedIndex = Number(selectedFood._reactInternalFiber.key);
+          const foodList = document.querySelectorAll(".foodItem");
+
+          if (selectedIndex > 0) {
+            foodList[selectedIndex - 1].click();
           }
         }
         ev.preventDefault();
         break;
       case "ArrowDown":
         if (selectedFood) {
-          for (let i = 0; i < sFoodItems.length; i += 1) {
-            if (sFoodItems[i].key === selectedFood._reactInternalFiber.key) {
-              if (i === sFoodItems.length - 1) {
-                break;
-              } else {
-                document.querySelectorAll(".foodItem")[i + 1].click();
-              }
-            }
+          const selectedIndex = Number(selectedFood._reactInternalFiber.key);
+          const foodList = document.querySelectorAll(".foodItem");
+
+          if (selectedIndex < foodList.length - 1) {
+            foodList[selectedIndex + 1].click();
           }
         }
         ev.preventDefault();
@@ -286,7 +226,6 @@ class AddFoodArea extends React.Component {
   };
 
   onAmountKey = (ev) => {
-    // TODO:Up/Down keys map?
     switch (ev.key) {
       case "Enter":
         this.onAddNewFoodEntry();
@@ -301,13 +240,11 @@ class AddFoodArea extends React.Component {
         ev.preventDefault();
         break;
       case "ArrowUp":
-      // TODO:Change Measure maybe??
-        console.log(ev.key);
+        this.setState({ amount: this.state.amount + 1 });
         ev.preventDefault();
         break;
       case "ArrowDown":
-      // TODO:Change Measure??
-        console.log(ev.key);
+        this.setState({ amount: this.state.amount - 1 });
         ev.preventDefault();
         break;
       default:
@@ -333,7 +270,7 @@ class AddFoodArea extends React.Component {
   onAddNewMeal = () => {
     const newMName = document.querySelector(".newMName").value;
     const newMPortion = document.querySelector(".newMPortion").value;
-    this.props.onAddNewMeal(newMName, newMPortion);
+    this.props.updateAddNewMeal(newMName, newMPortion);
   };
 
   onToggleFoodForm = () => {
@@ -373,7 +310,9 @@ class AddFoodArea extends React.Component {
       case "sizeinfo":
         newFoodItem[field] = value === "" ? null : value;
         break;
-      case "fat" || "carbs" || "protein":
+      case "fat":
+      case "carbs":
+      case "protein":
         newFoodItem[field] = value === "" ? 0 : value;
         break;
       default:
@@ -383,6 +322,51 @@ class AddFoodArea extends React.Component {
     this.setState({
       newFoodItem,
       measure: newFoodItem.sizeinfo === null ? "Pieces" : "Grams",
+    });
+  };
+
+  loadFoodItems = (searchTerms = this.state.searchTerms, isAll = this.state.isAll) => {
+    this.setState({
+      sFoodItems: [],
+      searchareaIsLoading: true,
+    });
+
+    this.searchCounter += 1;
+    const sc = this.searchCounter;
+    const typeDelay = 200;
+    setTimeout(() => this.searchFoodItems(searchTerms, isAll, sc), typeDelay);
+  };
+
+  searchFoodItems = async(searchTerms, isAll, searchCounter) => {
+    if (searchCounter < this.searchCounter) {
+      return;
+    }
+
+    const { currentUser } = this.context;
+    let res = await fetch(`${getServerURL()}/dailymeals/foodsearch`, {
+      method: "get",
+      headers: {
+        "content-type": "application/json",
+        "userid": currentUser.userid,
+        "search": searchTerms,
+        "isall": isAll,
+      },
+    });
+    res = await res.json();
+    if (searchCounter < this.state.searchCounter) {
+      return;
+    }
+
+    if (res.length === 0) {
+      this.setState({
+        selectedFood: null,
+        measure: "---",
+        amount: "",
+      });
+    }
+    this.setState({
+      sFoodItems: res,
+      searchareaIsLoading: false,
     });
   };
 
@@ -473,17 +457,13 @@ class AddFoodArea extends React.Component {
         noteid: null,
         foodentries: null,
       },
-    });
-
-    setTimeout(() => {
-      this.onLoadSearchFoodItems("", false);
-    }, 0);
+    }, this.loadFoodItems);
   };
 
   _currentEntry = () => {
     const { selectedFood, measure, newFoodForm, newFoodItem } = this.state;
 
-    const selectedOrNull = selectedFood ? selectedFood.state.foodItem : FoodItem.defaultFoodItem;
+    const selectedOrNull = selectedFood ? { ...selectedFood.state.foodItem } : { ...FoodItem.defaultFoodItem };
     const newEntry = newFoodForm ? newFoodItem : selectedOrNull;
     newEntry.measure = measure;
     newEntry.amount = this._getAmountCurrent();

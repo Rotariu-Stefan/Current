@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -20,11 +21,11 @@ class FoodDetailsArea extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { selectedFoodDetails: FoodItem.defaultFoodItem };
+    this.state = { selectedFoodDetails: { ...FoodItem.defaultFoodItem } };
     this.foodEntriesCounter = 0;
   }
 
-  render = () => {
+  render() {
     const { selectedFoodDetails } = this.state;
 
     if (!selectedFoodDetails) {
@@ -87,7 +88,7 @@ class FoodDetailsArea extends React.Component {
         </div>
       </div>
     );
-  };
+  }
 
   onDishSelect = () => {
     const { isdish } = this.state.selectedFoodDetails;

@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -12,10 +13,12 @@ class MealEntry extends React.Component {
   static propTypes = {
     mealEntry: PropTypes.object.isRequired,
     updateDayMacros: PropTypes.func.isRequired,
-    updateSelectedMeal: PropTypes.func.isRequired,
     updateRemoveMeal: PropTypes.func.isRequired,
+    updateSelectedMeal: PropTypes.func.isRequired,
+    signalSelect: PropTypes.bool,
   };
 
+  static defaultProps = { signalSelect: false };
   static defaultMealEntry = {
     mealname: "New Meal",
     portion: 1,
@@ -25,12 +28,13 @@ class MealEntry extends React.Component {
 
   constructor(props) {
     super(props);
+    const { mealEntry } = props;
 
     this.fat = 0;
     this.carbs = 0;
     this.protein = 0;
     this.state = {
-      mealEntry: props.mealEntry ? props.mealEntry : { ...MealEntry.defaultMealEntry },
+      mealEntry: mealEntry ? mealEntry : { ...MealEntry.defaultMealEntry },
 
       fat: 0,
       carbs: 0,
@@ -42,10 +46,14 @@ class MealEntry extends React.Component {
     this.foodEntriesCounter = 0;
   }
 
-  componentDidUpdate() {
-    if (this.props.mealEntry !== this.state.mealEntry) {
-      this.setState({ mealEntry: this.props.mealEntry });
+  componentDidMount() {
+    if (this.props.signalSelect) {
+      this.onMealSelect();
     }
+  }
+
+  componentDidUpdate() {
+    this.kEYUPDATE();
   }
 
   render() {
@@ -59,18 +67,16 @@ class MealEntry extends React.Component {
       >
         <div className="mealTitle">
           {`${mealname} (x${portion})`}
-          <img
-            alt="X" className="managerImg" src="SitePics/icons8-cancel-20.png"
-            onClick={this.onRemoveMeal}
-          />
-          <img
-            alt={isMin ? "+" : "-"} className="managerImg" src={isMin ? "SitePics/icons8-plus-20.png" : "SitePics/icons8-minus-20.png"}
-            onClick={this.toggleMinMax}
-          />
+          <button className="managerImg20" onClick={this.onRemoveMeal}>
+            <img alt="X" src="SitePics/icons8-cancel-20.png" />
+          </button>
+          <button className="managerImg20" onClick={this.onMinMaxToggle}>
+            <img alt={isMin ? "+" : "-"} src={isMin ? "SitePics/icons8-plus-20.png" : "SitePics/icons8-minus-20.png"} />
+          </button>
         </div>
         <Note
           key={this._reactInternalFiber.key + (note ? "_note" : "0")} isMin={isMin} note={note}
-          removeNote={this.removeNote} updateAttach={this.updateAttach}
+          removeNote={this.removeNote} updateNote={this.updateNote}
         />
         <div className={`foodEntries lineDown${isMin ? " hidden" : ""}`}>
           {this._getFoodEntries()}
@@ -92,15 +98,12 @@ class MealEntry extends React.Component {
     this.props.updateDayMacros(-fat, -carbs, -protein);
   }
 
-  removeNote = () => {
-    const { mealEntry } = this.state;
-
-    mealEntry.note = null;
-    this.setState({ mealEntry });
-    this.props.updateMealNote();
+  onMinMaxToggle = (ev) => {
+    this.setState({ isMin: !this.state.isMin });
+    ev.stopPropagation();
   };
 
-  updateAttach = (newNote) => {
+  updateNote = (newNote) => {
     const { mealEntry } = this.state;
 
     mealEntry.note = newNote;
@@ -140,11 +143,6 @@ class MealEntry extends React.Component {
 
   toggleHighlight = () => this.setState({ isHighlighted: !this.state.isHighlighted });
 
-  toggleMinMax = (ev) => {
-    this.setState({ isMin: !this.state.isMin });
-    ev.stopPropagation();
-  };
-
   _getFoodEntries = () => {
     const { mealEntry } = this.state;
 
@@ -163,6 +161,12 @@ class MealEntry extends React.Component {
 
     return fe;
   };
+
+  kEYUPDATE() {
+    if (this.props.mealEntry !== this.state.mealEntry) {
+      this.setState({ mealEntry: this.props.mealEntry });
+    }
+  }
 }
 
 export default MealEntry;

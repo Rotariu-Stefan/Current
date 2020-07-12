@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 import "../Css/DailyMeals.css";
 
-// import FoodEntry from "../Components/FoodEntry";
-// import FoodItem from "../Components/FoodItem";
-// import MealEntry from "../Components/MealEntry";
 import { AppContext } from "../AppContext";
 
 import DayArea from "./PagePanels/DayArea";
@@ -27,7 +26,7 @@ class DailyMeals extends React.Component {
     };
   }
 
-  render = () => {
+  render() {
     const { isDishSelected } = this.state;
 
     return (
@@ -35,7 +34,7 @@ class DailyMeals extends React.Component {
         <DayArea ref={this.dayAreaRef} updateDishSelect={this.updateDishSelect} />
         <AddFoodArea
           ref={this.addFoodAreaRef} updateAddNewFoodEntry={this.updateAddNewFoodEntry}
-          updateSelectedFood={this.updateSelectedFood} onAddNewMeal={this.onAddNewMeal}
+          updateAddNewMeal={this.updateAddNewMeal} updateSelectedFood={this.updateSelectedFood}
         />
         <FoodDetailsArea
           ref={this.foodDetailsAreaRef} isDishSelected={isDishSelected}
@@ -43,10 +42,14 @@ class DailyMeals extends React.Component {
         />
       </main>
     );
-  };
+  }
 
-  onAddNewMeal = (mealName, portion) => {
-    const errorMessage = this.state.dayArea.onAddNewMeal(mealName, portion);
+  dayAreaRef = (node) => this.setState({ dayArea: node });
+  addFoodAreaRef = (node) => this.setState({ addFoodArea: node });
+  foodDetailsAreaRef = (node) => this.setState({ foodDetailsArea: node });
+
+  updateAddNewMeal = (mealName, portion) => {
+    const errorMessage = this.state.dayArea.updateAddNewMeal(mealName, portion);
     if (errorMessage) {
       alert(errorMessage);
     } else {
@@ -78,10 +81,6 @@ class DailyMeals extends React.Component {
       this.state.addFoodArea.resetAfterAdd();
     }
   };
-
-  dayAreaRef = (node) => this.setState({ dayArea: node });
-  addFoodAreaRef = (node) => this.setState({ addFoodArea: node });
-  foodDetailsAreaRef = (node) => this.setState({ foodDetailsArea: node });
 
   updateDishSelect = (status) => {
     if (status) {

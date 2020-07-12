@@ -1,13 +1,19 @@
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 import PropTypes from "prop-types";
 
 
 class FoodEntry extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     foodEntry: PropTypes.object,
     readOnly: PropTypes.bool,
     updateMealMacros: PropTypes.func,
     updateRemoveFoodEntry: PropTypes.func,
+
   };
 
   static defaultProps ={
@@ -15,6 +21,7 @@ class FoodEntry extends React.Component {
     readOnly: false,
     updateMealMacros: null,
     updateRemoveFoodEntry: null,
+    className: "",
   };
 
   static defaultFoodEntry = {
@@ -32,23 +39,13 @@ class FoodEntry extends React.Component {
 
   constructor(props) {
     super(props);
-
-    let initFoodEntry = {};
-    if (props.foodEntry) {
-      initFoodEntry = props.foodEntry;
-    } else if (props.foodItem) {
-      initFoodEntry = props.foodItem;
-      initFoodEntry.amount = props.amount;
-      initFoodEntry.measure = props.measure;
-    } else {
-      initFoodEntry = { ...FoodEntry.defaultFoodEntry };
-    }
+    const { foodEntry } = props;
 
     this.state = {
-      foodEntry: initFoodEntry,
-      fatRes: this.getMacroRes("fat", initFoodEntry),
-      carbsRes: this.getMacroRes("carbs", initFoodEntry),
-      proteinRes: this.getMacroRes("protein", initFoodEntry),
+      foodEntry: foodEntry ? foodEntry : { ...FoodEntry.defaultFoodEntry },
+      fatRes: this.getMacroRes("fat", foodEntry),
+      carbsRes: this.getMacroRes("carbs", foodEntry),
+      proteinRes: this.getMacroRes("protein", foodEntry),
     };
   }
 
@@ -61,9 +58,7 @@ class FoodEntry extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.props.foodEntry !== this.state.foodEntry) {
-      this.setState({ foodEntry: this.props.foodEntry });
-    }
+    this.kEYUPDATE();
   }
 
   render() {
@@ -72,10 +67,9 @@ class FoodEntry extends React.Component {
 
     const brandOrNot = brand ? `@${brand}` : "";
     const removeImgOrNot = this.props.readOnly ? "" : (
-      <img
-        alt="X" className="managerImg" src="SitePics/icons8-closeM-window-16.png"
-        onClick={this.onRemoveFoodEntry}
-      />);
+      <button className="managerImg16" onClick={this.onRemoveFoodEntry}>
+        <img alt="X" src="SitePics/icons8-closeM-window-16.png" />
+      </button>);
 
     return (
       <div className={`foodEntry ${this.props.className}`}>
@@ -87,25 +81,39 @@ class FoodEntry extends React.Component {
     );
   }
 
-    onRemoveFoodEntry = () => {
-      const { fatRes, carbsRes, proteinRes } = this.state;
+  onRemoveFoodEntry = () => {
+    const { fatRes, carbsRes, proteinRes } = this.state;
 
-      this.props.updateRemoveFoodEntry(this);
+    this.props.updateRemoveFoodEntry(this);
+    if (this.props.updateMealMacros) {
       this.props.updateMealMacros(-fatRes, -carbsRes, -proteinRes);
     }
+  }
 
-    getMacroRes = (mstr, foodEntry) => {
-      const { amount, measure, sizeinfo } = foodEntry;
-      if (measure === "Pieces") {
-        if (sizeinfo === null) {
-          return Number((foodEntry[mstr] * amount).toFixed(1));
-        }
-
-        return Number((foodEntry[mstr] * amount * sizeinfo / 100).toFixed(1));
+  getMacroRes = (mstr, foodEntry) => {
+    const { amount, measure, sizeinfo } = foodEntry;
+    if (measure === "Pieces") {
+      if (sizeinfo === null) {
+        return Number((foodEntry[mstr] * amount).toFixed(1));
       }
 
-      return Number((foodEntry[mstr] * amount / 100).toFixed(1));
-    };
+      return Number((foodEntry[mstr] * amount * sizeinfo / 100).toFixed(1));
+    }
+
+    return Number((foodEntry[mstr] * amount / 100).toFixed(1));
+  };
+
+  kEYUPDATE() {
+    if (this.props.foodEntry !== this.state.foodEntry) {
+      const { foodEntry } = this.props;
+      this.setState({
+        foodEntry,
+        fatRes: this.getMacroRes("fat", foodEntry),
+        carbsRes: this.getMacroRes("carbs", foodEntry),
+        proteinRes: this.getMacroRes("protein", foodEntry),
+      });
+    }
+  }
 }
 
 export default FoodEntry;

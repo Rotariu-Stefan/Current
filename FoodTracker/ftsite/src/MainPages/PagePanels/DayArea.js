@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-onchange */
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -43,7 +45,7 @@ class DayArea extends React.Component {
     const noteOrLoading = mealareaIsLoading ? "LOADING..." : (
       <Note
         key={`D${dayEntry.note ? dayEntry.note.noteid : "D0"}`} note={dayEntry.note}
-        removeNote={this.removeNote} updateDayNote={this.updateDayNote}
+        removeNote={this.removeNote} updateNote={this.updateNote}
       />
     );
 
@@ -106,7 +108,6 @@ class DayArea extends React.Component {
       dayProtein: 0,
     },
     async() => {
-
       let res = await fetch(`${getServerURL()}/dailymeals`, {
         method: "get",
         headers: {
@@ -163,7 +164,7 @@ class DayArea extends React.Component {
       });
   };
 
-  onAddNewMeal = (mealName = "", portion = 1) => {
+  updateAddNewMeal = (mealName = "", portion = 1) => {
     const { currentUser } = this.context;
     const { dayEntry } = this.state;
 
@@ -239,17 +240,10 @@ class DayArea extends React.Component {
     });
   };
 
-  updateDayNote = (newNote) => {
+  updateNote = (newNote) => {
     const { dayEntry } = this.state;
 
     dayEntry.note = newNote;
-    this.setState({ dayEntry });
-  };
-
-  removeNote = () => {
-    const { dayEntry } = this.state;
-
-    dayEntry.note = null;
     this.setState({ dayEntry });
   };
 
@@ -265,16 +259,17 @@ class DayArea extends React.Component {
   _getMealEntry = (entry) => {
     const me = (
       <MealEntry
-        key={this.mealsEntriesCounter} mealEntry={entry} updateDayMacros={this.updateDayMacros}
-        updateMealFoodEntries={this.updateMealFoodEntries} updateMealNote={this.updateMealNote}
-        updateRemoveMeal={this.updateRemoveMeal} updateSelectedMeal={this.updateSelectedMeal}
+        key={this.mealsEntriesCounter} mealEntry={entry} signalSelect={this.mealsEntriesCounter === 0}
+        updateDayMacros={this.updateDayMacros} updateMealFoodEntries={this.updateMealFoodEntries}
+        updateMealNote={this.updateMealNote} updateRemoveMeal={this.updateRemoveMeal}
+        updateSelectedMeal={this.updateSelectedMeal}
       />);
     this.mealsEntriesCounter += 1;
 
     return me;
   };
 
-  setInitialState = () => {
+  setInitialState() {
     const { currentUser } = this.context;
 
     const initialDate = currentUser.access === "Guest" ? new Date("2020-06-07") : new Date();
