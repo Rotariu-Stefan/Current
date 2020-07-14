@@ -21,8 +21,9 @@ const defaultUser = {
 
 const AppContext = React.createContext({
   currentUser: defaultUser,
-  changeMainPage: null,
   updateUser: null,
+  updateUserProfile: null,
+  changeMainPage: null,
 });
 
 export { AppContext, defaultUser };

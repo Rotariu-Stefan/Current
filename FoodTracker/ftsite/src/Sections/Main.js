@@ -18,6 +18,7 @@
 // }
 
 import React from "react";
+import PropTypes from "prop-types";
 
 import Home from "../MainPages/Home";
 import DailyMeals from "../MainPages/DailyMeals";
@@ -33,13 +34,15 @@ import Error from "../MainPages/Error";
 
 
 class Main extends React.Component {
+  static propTypes = { page: PropTypes.string.isRequired };
+
   constructor(props) {
     super(props);
 
     this.state = { page: props.page ? props.page : "Home" };
   }
 
-  render = () => {
+  render() {
     switch (this.state.page) {
       case "Home":
         return <Home />;
@@ -64,15 +67,15 @@ class Main extends React.Component {
       default:
         return <Error />;
     }
+  }
+
+  changePage = (newPage) => {
+    const { page } = this.state;
+
+    if (page !== newPage) {
+      this.setState({ page: newPage });
+    }
   };
-
-    changePage = (newPage) => {
-      const { page } = this.state;
-
-      if (page !== newPage) {
-        this.setState({ page: newPage });
-      }
-    };
 }
 
 export default Main;

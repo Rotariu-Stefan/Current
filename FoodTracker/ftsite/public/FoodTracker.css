@@ -107,38 +107,38 @@ footer {
   padding: 2px;
 }
 
-#titleArea {
+.titleArea {
   flex: auto;
 
   cursor: pointer;
 }
 
-#profileArea {
+.profileArea {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
 
-#profileArea * {
+.profileArea * {
   cursor: pointer;
 }
 
-#profileArea > :first-child {
+.profileArea > :first-child {
   grid-column: span 2;
 
   text-align: center;
 }
 
-#profileArea img {
+.profileArea img {
   height: 2rem;
 }
 
-#title {
+.pagetitle {
   font-size: 3rem;
 
   text-decoration: underline;
 }
 
-#subtitle {
+.subtitle {
   font-size: 1rem;
   font-style: italic;
 }
@@ -167,7 +167,7 @@ footer {
 /* #endregion Top Section */
 
 /* #region Bottom Section */
-#author {
+.author {
   font-size: 1rem;
 
   margin: 1px;

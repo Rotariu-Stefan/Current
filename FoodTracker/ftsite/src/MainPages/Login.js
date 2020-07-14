@@ -17,14 +17,16 @@ class Login extends React.Component {
     super(props);
 
     this.state = {
+      user: "",
+      pass: "",
+
       warningMsg: null,
       isLoading: false,
     };
   }
 
-  render = () => {
+  render() {
     const { warningMsg, isLoading } = this.state;
-    const { changeMainPage } = this.context;
 
     return (
       <main className="mainUserForm boxShow">
@@ -32,9 +34,9 @@ class Login extends React.Component {
           <h1 className="lineDown">Enter Username/Email and Password to Login!</h1>
           <div className="fields">
             <span>Username/Email:</span>
-            <input name="username" type="text" />
+            <input name="username" type="text" onChange={this.onUserChange} />
             <span>Password:</span>
-            <input name="password" type="password" />
+            <input name="password" type="password" onChange={this.onPassChange} />
             <span disabled={isLoading}>
               Remember Me?
               <input name="member" type="checkbox" />
@@ -49,9 +51,9 @@ class Login extends React.Component {
         </div>
         */}
           <div className="loglinks">
-            <span disabled={isLoading} role="link" onClick={() => changeMainPage("Home")}>
+            <span data-page="Home" disabled={isLoading} role="link" onClick={this.onLinkPress}>
               Forgot Password?</span>
-            <span disabled={isLoading} role="link" onClick={() => changeMainPage("Register")}>
+            <span data-page="Register" disabled={isLoading} role="link" onClick={this.onLinkPress}>
               New here? Go Register!</span>
           </div>
         </form>
@@ -59,14 +61,18 @@ class Login extends React.Component {
     );
   }
 
+  onUserChange = (ev) => this.setState({ username: ev.currentTarget.value });
+  onPassChange = (ev) => this.setState({ pass: ev.currentTarget.value });
+  onLinkPress = (ev) => this.context.changeMainPage(ev.currentTarget.getAttribute("data-page"));
+
   onLogin = (ev) => {
     ev.preventDefault();
+    this.setState({ isLoading: true }, this.loginUser);
+  };
 
-    this.setState({ isLoading: true });
-    (async() => {
-      const inputs = document.querySelectorAll(".userform input");
-      const usernameText = inputs[0].value;
-      const passText = inputs[1].value;
+  loginUser = async() => {
+    try {
+      const { username, pass } = this.state;
       const { updateUser, changeMainPage } = this.context;
       const successStatus = 200;
 
@@ -74,8 +80,8 @@ class Login extends React.Component {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: usernameText,
-          pass: passText,
+          username,
+          pass,
         }),
       });
       if (res.status === successStatus) {
@@ -87,10 +93,13 @@ class Login extends React.Component {
           changeMainPage("Profile");
         }
       } else {
-        console.log(await res.json());
+        console.log(res);
       }
+    } catch (err) {
+      console.log("___________ERROR___________\n", err.message);
+    } finally {
       this.setState({ isLoading: false });
-    })();
+    }
   };
 }
 

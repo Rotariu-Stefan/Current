@@ -8,46 +8,52 @@ import { AppContext, defaultUser } from "./AppContext";
 import { dateToStr } from "./methods";
 
 
-const refs = {
-  main: React.createRef(),
-  footer: React.createRef(),
-  header: React.createRef(),
-  nav: React.createRef(),
-};
-
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { currentUser: defaultUser };
+    this.state = {
+      currentUser: defaultUser,
+      main: null,
+      footer: null,
+      header: null,
+      nav: null,
+    };
   }
 
-render = () => (
-  <AppContext.Provider
-    value={ {
-      currentUser: this.state.currentUser,
-      changeMainPage: this.changeMainPage,
-      updateUser: this.updateUser,
-    } }
-  >
-    <div className="layout">
-      <Header key="H" ref={refs.header} />
-      <Nav key="N" ref={refs.nav} />
-      <Main key="M" ref={refs.main} page="Home" />
-      <Footer key="F" ref={refs.footer} />
-    </div>
-  </AppContext.Provider>
-);
+  render() {
+    return (
+      <AppContext.Provider
+        value={ {
+          currentUser: this.state.currentUser,
+          updateUser: this.updateUser,
+          updateUserProfile: this.updateUserProfile,
+          changeMainPage: this.changeMainPage,
+        } }
+      >
+        <div className="layout">
+          <Header key="H" ref={this.headerRef} />
+          <Nav key="N" ref={this.navRef} />
+          <Main key="M" ref={this.mainRef} page="Home" />
+          <Footer key="F" ref={this.footerRef} />
+        </div>
+      </AppContext.Provider>
+    );
+  }
 
-  changeMainPage = (newPage) => refs.main.current.changePage(newPage);
+  headerRef = (node) => this.setState({ header: node });
+  navRef = (node) => this.setState({ nav: node });
+  mainRef = (node) => this.setState({ main: node });
+  footerRef = (node) => this.setState({ footer: node });
+  changeMainPage = (newPage) => this.state.main.changePage(newPage);
 
   updateUser = (data) => {
     if (data === null) {
       this.setState({ currentUser: defaultUser });
-      refs.header.current.updateUser(false);
+      this.state.header.updateUser(false);
     } else {
       data.dob = dateToStr(new Date(data.dob));
       this.setState({ currentUser: data });
-      refs.header.current.updateUser(true);
+      this.state.header.updateUser(true);
     }
   };
 
