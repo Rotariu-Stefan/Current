@@ -23,17 +23,21 @@ class DailyMeals extends React.Component {
       addFoodArea: null,
       foodDetailsArea: null,
       isDishSelected: false,
+      isDayLoading: true,
     };
   }
 
   render() {
-    const { isDishSelected } = this.state;
+    const { isDishSelected, isDayLoading } = this.state;
 
     return (
       <main className="mainDailyMeals boxShow" >
-        <DayArea ref={this.dayAreaRef} updateDishSelect={this.updateDishSelect} />
+        <DayArea
+          ref={this.dayAreaRef} updateDayLoading={this.updateDayLoading}
+          updateDishSelect={this.updateDishSelect}
+        />
         <AddFoodArea
-          ref={this.addFoodAreaRef} updateAddNewFoodEntry={this.updateAddNewFoodEntry}
+          ref={this.addFoodAreaRef} isDayLoading={isDayLoading} updateAddNewFoodEntry={this.updateAddNewFoodEntry}
           updateAddNewMeal={this.updateAddNewMeal} updateSelectedFood={this.updateSelectedFood}
         />
         <FoodDetailsArea
@@ -56,6 +60,8 @@ class DailyMeals extends React.Component {
       this.state.addFoodArea.resetAfterAdd();
     }
   };
+
+  updateDayLoading = (loading) => this.setState({ isDayLoading: loading });
 
   updateSelectedFood = (selectedFood) => {
     const { isDishSelected } = this.state;

@@ -174,14 +174,6 @@ const quickPartition = (nums, start, end) => {
 
 
 
-
-
-
-
-
-
-
-
 const nums = [5,3,8,7,1,10,4,2,9,6,11];
 const nums2 = [3,4,5,2,7];
 //bubbleSort(nums);

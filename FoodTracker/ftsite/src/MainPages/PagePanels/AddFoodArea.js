@@ -15,6 +15,7 @@ import { AppContext } from "../../AppContext";
 class AddFoodArea extends React.Component {
   static contextType = AppContext;
   static propTypes = {
+    isDayLoading: PropTypes.bool.isRequired,
     updateAddNewFoodEntry: PropTypes.func.isRequired,
     updateAddNewMeal: PropTypes.func.isRequired,
     updateSelectedFood: PropTypes.func.isRequired,
@@ -23,7 +24,6 @@ class AddFoodArea extends React.Component {
   constructor(props) {
     super(props);
 
-    this.newFoodKey = "mustchange";
     this.state = {
       selectedFood: null,
       amount: "",
@@ -45,7 +45,8 @@ class AddFoodArea extends React.Component {
   }
 
   render() {
-    const { amount, measure, mealareaIsLoading, searchareaIsLoading, newFoodForm } = this.state;
+    const { amount, measure, searchareaIsLoading, newFoodForm } = this.state;
+    const { isDayLoading } = this.props;
 
     return (
       <div className="addFoodArea subblock boxShow">
@@ -165,7 +166,7 @@ class AddFoodArea extends React.Component {
             <span className="textHigh">Portion:</span>
             <input className="newMPortion" maxLength="5" placeholder="1" type="text" />
           </div>
-          <button className="newMeal ftButton" disabled={mealareaIsLoading} onClick={this.onAddNewMeal}>
+          <button className="newMeal ftButton" disabled={isDayLoading} onClick={this.onAddNewMeal}>
             ADD NEW MEAL
           </button>
         </div>

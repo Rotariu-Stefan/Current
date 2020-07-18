@@ -6,44 +6,50 @@ var orangesRotting = function(grid) {
   let minutes=0;
   let change=true;
   const tempgrid=[];
-  for(let row of grid)
-  tempgrid.push([...row]);
+  for(let row of grid){
+    tempgrid.push([...row]);
+  }
 
   while(change){
     change=false;
 
-    for(let i=0;i<grid.length;i++)
-    for(let j=0;j<grid.length;j++){
-      if(grid[i][j]===2){
-        if(j!==0 && grid[i][j-1]===1){
-          tempgrid[i][j-1]=2;
-          change=true;
-        }
-        if(i!==0 && grid[i-1][j]===1){
-          tempgrid[i-1][j]=2;
-          change=true;
-        }
-        if(j!==grid.length-1 && grid[i][j+1]===1){
-          tempgrid[i][j+1]=2;
-          change=true;
-        }
-        if(i!==grid.length-1 && grid[i+1][j]===1){
-          tempgrid[i+1][j]=2;
-          change=true;
+    for(let i=0;i<grid.length;i++){
+      for(let j=0;j<grid.length;j++){
+        if(grid[i][j]===2){
+          if(j!==0 && grid[i][j-1]===1){
+            tempgrid[i][j-1]=2;
+            change=true;
+          }
+          if(i!==0 && grid[i-1][j]===1){
+            tempgrid[i-1][j]=2;
+            change=true;
+          }
+          if(j!==grid.length-1 && grid[i][j+1]===1){
+            tempgrid[i][j+1]=2;
+            change=true;
+          }
+          if(i!==grid.length-1 && grid[i+1][j]===1){
+            tempgrid[i+1][j]=2;
+            change=true;
+          }
         }
       }
     }
     if(change){
       minutes++;
       grid=[];
-      for(let row of tempgrid)
-      grid.push([...row]);
+      for(let row of tempgrid){
+        grid.push([...row]);
+      }
     }
   }
-  for(let i=0;i<grid.length;i++)
-  for(let j=0;j<grid.length;j++)
-  if(grid[i][j]===1)
-  return -1;
+  for(let i=0;i<grid.length;i++){
+    for(let j=0;j<grid.length;j++){
+      if(grid[i][j]===1){
+        return -1;
+      }
+    }
+  }
   return minutes;
 };
 

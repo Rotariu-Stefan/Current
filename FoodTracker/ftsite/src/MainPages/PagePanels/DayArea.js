@@ -13,7 +13,10 @@ import { AppContext } from "../../AppContext";
 
 class DayArea extends React.Component {
   static contextType = AppContext;
-  static propTypes = { updateDishSelect: PropTypes.func.isRequired }
+  static propTypes = {
+    updateDayLoading: PropTypes.func.isRequired,
+    updateDishSelect: PropTypes.func.isRequired,
+  }
 
   constructor(props) {
     super(props);
@@ -96,6 +99,7 @@ class DayArea extends React.Component {
       return;
     }
 
+    this.props.updateDayLoading(true);
     this.fat = 0;
     this.carbs = 0;
     this.protein = 0;
@@ -123,6 +127,7 @@ class DayArea extends React.Component {
         selectedDay: day,
         dayEntry: res,
       });
+      this.props.updateDayLoading(false);
     });
   };
 
@@ -257,9 +262,11 @@ class DayArea extends React.Component {
   };
 
   _getMealEntry = (entry) => {
+    const { dayEntry } = this.state;
     const me = (
       <MealEntry
-        key={this.mealsEntriesCounter} mealEntry={entry} signalSelect={this.mealsEntriesCounter === 0}
+        key={this.mealsEntriesCounter} mealEntry={entry}
+        signalSelect={this.mealsEntriesCounter === dayEntry.meals.length - 1}
         updateDayMacros={this.updateDayMacros} updateMealFoodEntries={this.updateMealFoodEntries}
         updateMealNote={this.updateMealNote} updateRemoveMeal={this.updateRemoveMeal}
         updateSelectedMeal={this.updateSelectedMeal}
