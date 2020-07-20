@@ -7,7 +7,6 @@ const toNr = (x16) => {
     //console.log("TONR(", x16, ")=>", xnr);
     return xnr;
 };
-
 const to16 = (x, val) => {
     let str = x.toString(2);
     for (i = str.length; i < 16; i++)
@@ -16,7 +15,6 @@ const to16 = (x, val) => {
     Instr[val] = () => str;
     return str;
 };
-
 const or16 = (x16, y16, val) => {
     let r16 = "";
     for (i = 0; i < 16; i++)
@@ -28,7 +26,6 @@ const or16 = (x16, y16, val) => {
     Instr[val] = () => r16;
     return r16;
 };
-
 const and16 = (x16, y16, val) => {
     let r16 = "";
     for (i = 0; i < 16; i++)
@@ -40,7 +37,6 @@ const and16 = (x16, y16, val) => {
     Instr[val] = () => r16;
     return r16;
 };
-
 const not16 = (x16, val) => {
     let r16 = "";
     for (i = 0; i < 16; i++)
@@ -52,7 +48,6 @@ const not16 = (x16, val) => {
     Instr[val] = () => r16;
     return r16;
 };
-
 const right16 = (x16, sh, val) => {
     let r16 = x16;
     for (i = 0; i < sh; i++)
@@ -61,7 +56,6 @@ const right16 = (x16, sh, val) => {
     Instr[val] = () => r16;
     return r16;
 };
-
 const left16 = (x16, sh, val) => {
     let r16 = x16;
     for (i = 0; i < sh; i++)
@@ -70,7 +64,6 @@ const left16 = (x16, sh, val) => {
     Instr[val] = () => r16;
     return r16;
 };
-
 const nr_or_var = (value) => {
     if (isNaN(value))
         return Instr[value]();

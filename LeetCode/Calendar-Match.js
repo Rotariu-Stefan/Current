@@ -3,7 +3,7 @@ const calendarMatch = (calendar1, bound1, calendar2, bound2, minTime) => {
 
   let i1=-2, i2=-2;
   let freeTime1={start:0, end:0}, freeTime2={start:0, end:0};
-  let nextCal=1;
+  let nextCal=1;        //NOT NEEDED !!!
 
   while(freeTime1 && freeTime2){
     console.log("C1",freeTime1, i1);
