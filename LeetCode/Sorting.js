@@ -60,7 +60,7 @@ const mergeSort = sorting((nums) => mergeSplit(nums));
 const mergeSplit = (nums) => {
   const n=nums.length;
 
-  if(n===1){
+  if(n<=1){
     return nums;
   }
   else{
@@ -177,8 +177,8 @@ const quickPartition = (nums, start, end) => {
 const nums = [5,3,8,7,1,10,4,2,9,6,11];
 const nums2 = [3,4,5,2,7];
 //bubbleSort(nums);
-//insertionSort(nums);
+insertionSort(nums2);
 //selectionSort(nums);
 //mergeSort(nums);
 //heapSort(nums);
-quickSort(nums);
+//quickSort(nums);
