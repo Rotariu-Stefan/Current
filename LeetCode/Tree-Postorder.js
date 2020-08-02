@@ -27,3 +27,45 @@ const traverse = (node) =>{
     }
     result.push(node.val);
 };
+
+var postorderITR = function(root) {
+    if(!root){
+        return [];
+    }
+
+    const visited=[];
+    const stack=[root];
+
+    while(stack.length){
+        const current=stack.pop();
+        visited.unshift(current.val);
+        for(ch of current.children){
+            stack.push(ch);
+        }
+    }
+
+    return visited;
+};
+
+var postorderITR2 = function(root) {    
+    if(!root){
+        return [];
+    }
+
+    const stack=[root];
+
+    let cIndex=1;
+    while(stack.length-cIndex>=0){
+        const current=stack[stack.length-cIndex];
+        for(ch of current.children){
+            stack.splice(stack.length-cIndex,0,ch);
+        }
+        cIndex++;
+    }
+
+    const visited=[];
+    for(node of stack){
+        visited.push(node.val);
+    }
+    return visited;
+};
