@@ -1,5 +1,5 @@
 //https://leetcode.com/explore/challenge/card/august-leetcoding-challenge/549/week-1-august-1st-august-7th/3413/
-/** O(m) sO(m) <=m is lenth of string
+/** O(m) sO(26^m?) <=m is lenth of string
  * Initialize your data structure here.
  */
  var WordDictionary = function() {
