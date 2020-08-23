@@ -168,7 +168,7 @@ class Note extends React.Component {
   }
 
   loadNoteViews = (searchParam) => {
-    const searchTerms = typeof searchParam === "string" ? searchParam : searchParam.currentTarget.value;
+    const searchTerms = (typeof searchParam === "string") ? searchParam : this.state.searchTerms;
 
     this.setState({
       noteViews: [],
